@@ -9,7 +9,8 @@ Based on the official Paralympic Committee India brand identity, this design sys
 | Color Name          | Hex Code  | Usage                                          | WCAG Contrast (on White) |
 | ------------------- | --------- | ---------------------------------------------- | ------------------------ |
 | **Paralympic Blue** | `#003DA5` | Primary brand color, headers, CTAs, navigation | 10.73:1 (AAA)            |
-| **Saffron Orange**  | `#FF671F` | Accent, highlights, active states              | 3.26:1 (AA Large Text)   |
+| **Saffron Orange**  | `#FF671F` | Accent, icons, focus rings (NO TEXT)           | 3.26:1 (Avoid text)      |
+| **Saffron Dark**    | `#D35400` | **Small text, labels, secondary buttons**      | 4.8:1 (AA)               |
 | **India Green**     | `#046A38` | Success states, achievements, badges           | 7.89:1 (AAA)             |
 
 ### Secondary Colors
@@ -19,6 +20,15 @@ Based on the official Paralympic Committee India brand identity, this design sys
 | **Navy Dark**  | `#001F5C` | Dark backgrounds, footer, admin panel | 15.5:1        |
 | **Azure Blue** | `#0066CC` | Links, interactive elements           | 8.59:1        |
 | **Coral Red**  | `#E53935` | Alerts, errors, critical actions      | 4.76:1        |
+
+### Blue Usage Hierarchy (Do/Don't)
+
+To reduce cognitive load, strictly adhere to these roles:
+
+- **Paralympic Blue (`#003DA5`):** **Primary Only.** Use for Main Headers, Primary Call-to-Actions, and Navigation. **Don't** use for generic body links.
+- **Navy Dark (`#001F5C`):** **Structural.** Use for footers, admin sidebars, and dark backgrounds. **Don't** use for interactive buttons.
+- **Azure Blue (`#0066CC`):** **Interactive.** Use strictly for inline text links and simple UI triggers.
+- **Data Blue (`#3498DB`):** **Visualization.** Use strictly for charts and graphs. **Never** use for UI buttons.
 
 ### Neutral Colors
 
@@ -76,6 +86,10 @@ Based on the official Paralympic Committee India brand identity, this design sys
   - Clean white backgrounds with Paralympic Blue navigation.
   - High-contrast cards for news and events.
   - Saffron accents for primary "Donate" or "Register" buttons.
+- **Emotional Engagement (Addressing Neutrality):**
+  - Avoid a purely "institutional" look by using **10-15% opacity gradients** (Blue to Green) on banners.
+  - Use full-width photography to tell human stories.
+  - **Success Banners:** Use India Green generously for achievement celebrations to boost morale.
 
 ### B. Shooter Dashboard
 
@@ -243,3 +257,20 @@ Given the para-sports context, the platform should feature a dedicated **Accessi
 2.  **Standard:** Explicit mention of **WCAG 2.1 Level AA** as the target standard.
 3.  **Feedback Mechanism:** A clear way to report issues (e.g., "If you encounter accessibility barriers, please contact us at [email]").
 4.  **Compatibility:** Mention support for common assistive technologies (NVDA, JAWS, VoiceOver, Magnifiers).
+
+---
+
+## 9. Future Dark Mode Strategy
+
+To support admins and shooters in low-light environments (e.g., indoor ranges), we will implement a dedicated dark mode.
+
+### Mapping Strategy
+
+- **Background:** `#FFFFFF` → `#0D1117` (Dark Navy - reduces eye strain better than pure black)
+- **Surface/Cards:** `#F5F7FA` → `#161B22` (Lighter Navy)
+- **Text Primary:** `#2C3E50` → `#E6EDF3` (Off-white)
+- **Text Secondary:** `#8B95A5` → `#8B949E`
+- **Primary Brand:** `#003DA5` → `#1F6FEB` (Brightened for dark background visibility)
+- **Borders:** Change from solid lines to subtle background color differences.
+
+**Note:** Ensure all dark mode colors maintain the 4.5:1 contrast ratio against the new dark background.
