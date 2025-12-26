@@ -1,0 +1,45 @@
+:root {
+  /* Brand Colors */
+  --color-primary: #003da5; /* Paralympic Blue */
+  --color-accent: #ff671f; /* Saffron Orange */
+  --color-success: #046a38; /* India Green */
+
+  /* Secondary Colors */
+  --color-secondary: #001f5c; /* Navy Dark */
+  --color-interactive: #0066cc; /* Azure Blue */
+  --color-error: #e53935; /* Coral Red */
+
+  /* Neutral Colors */
+  --color-bg-base: #ffffff; /* White */
+  --color-bg-alt: #f5f7fa; /* Light Gray */
+  --color-text-primary: #2c3e50; /* Dark Gray */
+  --color-text-secondary: #8b95a5; /* Medium Gray */
+  --color-border: #e2e8f0;
+
+  /* Typography */
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-heading: "Outfit", "Inter", sans-serif;
+  --font-data: "Roboto Mono", monospace;
+
+  /* Font Sizes */
+  --text-sm: 0.875rem; /* 14px */
+  --text-base: 1rem; /* 16px */
+  --text-lg: 1.125rem; /* 18px */
+  --text-xl: 1.5rem; /* 24px */
+  --text-2xl: 1.875rem; /* 30px */
+  --text-3xl: 2.25rem; /* 36px */
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  /* Layout */
+  --radius-sm: 4px;
+  --radius-card: 8px;
+  --radius-pill: 9999px;
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
