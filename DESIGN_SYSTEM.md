@@ -159,6 +159,7 @@ To reduce cognitive load, strictly adhere to these roles:
 ## 6. Design Tokens (Developer Reference)
 
 Use these CSS variables to ensure consistency across the application.
+**Rule:** Developers must use variables (e.g., `var(--color-primary)`) and **never** use raw hex codes (e.g., `#003DA5`) in the codebase. This allows for global theme updates (like Dark Mode) without refactoring.
 
 ### Colors
 
@@ -245,6 +246,16 @@ Use these CSS variables to ensure consistency across the application.
 - **Empty States:**
   - When no data is available (e.g., "No upcoming events"), use a neutral gray icon and clear, friendly text. Avoid blank empty spaces.
 
+### News Cards (Warmth Strategy)
+
+- **Text-First Fallback:** Since high-quality photos may be scarce, design cards to look beautiful with _just_ typography and a colored border/accent. Don't rely on placeholder images which look generic.
+- **Visuals:** When images exist, use them full-width. When missing, use a subtle pattern or gradient background based on the category (e.g., Green for Achievements).
+
+### Event Listings
+
+- **Hybrid Layout:** Combine a "List View" (efficient for scanning dates) with a "Calendar Block" (visual date reference).
+- **Status Indicators:** clearly mark "Upcoming", "Live Now" (pulsing red dot), and "Completed".
+
 ---
 
 ## 8. Accessibility Statement Recommendations
@@ -274,3 +285,13 @@ To support admins and shooters in low-light environments (e.g., indoor ranges), 
 - **Borders:** Change from solid lines to subtle background color differences.
 
 **Note:** Ensure all dark mode colors maintain the 4.5:1 contrast ratio against the new dark background.
+
+---
+
+## 10. Design Governance
+
+To prevent visual drift and maintain the platform's authority over time, the following rules are immutable:
+
+1.  **Locked Palette:** No new colors may be introduced to the codebase without a formal accessibility and governance review.
+2.  **Token Enforcement:** All new UI development must use the defined design tokens.
+3.  **Authority Check:** Before deploying new distinct UI components, ask: _"Does this look like it belongs on a National Federation website?"_
