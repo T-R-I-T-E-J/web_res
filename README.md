@@ -1,0 +1,82 @@
+# Para Shooting Committee of India - Digital Platform
+
+Welcome to the official source code repository for the Para Shooting Committee of India's digital platform. This project is a comprehensive full-stack web application designed to manage the committee's public presence, shooter operations, competitions, and administrative functions.
+
+## 🏗️ Project Architecture
+
+This project follows a **Monorepo Architecture** to ensure detailed separation of concerns while maximizing code reuse and scalability.
+
+### Directory Structure
+
+```plaintext
+/
+├── apps/                    # Deployable Applications
+│   ├── web/                 # Next.js Frontend (Public Site + Dashboard)
+│   │   └── public/          # Current static prototype & assets
+│   └── api/                 # Node.js/TypeScript Backend API
+│
+├── packages/                # Shared Libraries
+│   ├── database/            # Database Schema (Prisma) & Migrations
+│   ├── ui/                  # Design System Components
+│   └── shared-types/        # Shared TypeScript Interfaces & DTOs
+│
+├── docs/                    # Architectural Documentation
+│   ├── DESIGN_SYSTEM.md     # Brand Identity, Tokens, & UI Guidelines
+│   └── PROJECT_ARCHITECTURE.md # Detailed Architectural Blueprint
+│
+├── rules/                   # Coding Standards & Best Practices
+│   ├── postgresql.mdc       # SQL Naming & Design Rules
+│   ├── cti-schema-design.md # DB Primary Keys & Column Patterns
+│   └── ui-ux-best-practices.mdc # UX & Accessibility Guidelines
+│
+└── README.md                # Project Entry Point
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js (LTS recommended)
+- Git
+
+### Current Status
+
+The project is currently in the **Migration Phase**.
+
+- **Legacy/Static Code**: Located in `apps/web/public`. This contains the initial HTML/CSS implementation of the new Design System.
+- **Governance**: Strict rules for database and UI implementation are defined in the `rules/` directory.
+
+## 📚 Documentation
+
+Detailed guides to understand the system's design and architecture.
+
+- **[Design System](./docs/DESIGN_SYSTEM.md)**<br>
+  The single source of truth for Color Palette, Typography, Accessibility (WCAG 2.1), and token usage.
+
+- **[Project Architecture](./docs/PROJECT_ARCHITECTURE.md)**<br>
+  Deep dive into the Monorepo structure, Vertical Slice architecture for the backend, and tech stack decisions.
+
+## 📏 Rules & Standards
+
+Mandatory guidelines for all contributors.
+
+- **[PostgreSQL Rules](./rules/postgresql.mdc)**<br>
+  Naming conventions, SQL formatting, and best practices for the database layer.
+
+- **[Database Schema Patterns](./rules/cti-schema-design.md)**<br>
+  Reference implementation for Primary Keys (`BIGSERIAL` + `UUID`), Column Types, and constraints.
+
+- **[UI/UX Best Practices](./rules/ui-ux-design-best-practices.mdc)**<br>
+  Checklist for ensuring a consistent, accessible, and professional user experience.
+
+## 🛠️ Tech Stack (Planned)
+
+- **Frontend**: Next.js 14+ (App Router), React, Tailwind CSS
+- **Backend**: Node.js, Express/Fastify (Modular Monolith)
+- **Database**: PostgreSQL
+- **Authentication**: JWT / OAuth 2.0
+- **DevOps**: Docker, CI/CD Pipelines
+
+---
+
+_Para Shooting Committee of India &copy; 2025_
