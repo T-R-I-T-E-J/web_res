@@ -1,3 +1,5 @@
+'use client'
+
 import { Home, Users, Calendar, Trophy, FileText, CreditCard, Settings, BarChart3, Shield } from 'lucide-react'
 import { Sidebar } from '@/components/dashboard'
 
