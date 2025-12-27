@@ -71,10 +71,11 @@ Mandatory guidelines for all contributors.
 
 ## 🛠️ Tech Stack (Planned)
 
-- **Frontend**: Next.js 14+ (App Router), React, Tailwind CSS
-- **Backend**: Node.js, Express/Fastify (Modular Monolith)
+- **Frontend**: Next.js 14+ (App Router), React, TypeScript, Tailwind CSS
+- **Backend**: Node.js + TypeScript (NestJS or Express)
 - **Database**: PostgreSQL
-- **Authentication**: JWT / OAuth 2.0
+- **Authentication**: JWT + RBAC
+- **Payments**: Razorpay
 - **DevOps**: Docker, CI/CD Pipelines
 
 ---

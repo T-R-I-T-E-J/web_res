@@ -98,7 +98,7 @@ apps/web/
 
 ## 4. Backend Structure (`apps/api`)
 
-**Tech:** Node.js (Express/Fastify), TypeScript.
+**Tech:** Node.js (Express/Fastify), TypeScript; **Database:** PostgreSQL.
 **Architecture:** Modular Monolith (Vertical Slices).
 
 ```plaintext
