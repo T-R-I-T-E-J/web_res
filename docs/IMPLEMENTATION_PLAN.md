@@ -5,16 +5,21 @@ This document outlines the step-by-step plan to bring the _Para Shooting Committ
 
 ---
 
-## Phase 1: Foundation & Scaffold (✅ Structure Complete)
+## Phase 1: Foundation & Scaffold (✅ COMPLETE)
 
 - [x] Define Monorepo Structure (`apps/`, `packages/`).
 - [x] Establish Governance Rules (`rules/`).
-- [x] setup Git & `.gitignore`.
-- [ ] **Action Item:** Initialize Package Manager (pnpm/npm workspaces).
+- [x] Setup Git & `.gitignore`.
+- [x] **Database Environment**: PostgreSQL 16 running in Docker with complete schema (29 tables).
+- [ ] **Action Item**: Initialize Package Manager (pnpm/npm workspaces).
 
-## Phase 2: Frontend Core (Next.js 14+)
+---
+
+## Phase 2: Frontend Core (Next.js 14+) - **🚀 CURRENT PHASE**
 
 **Goal:** A running Next.js app consuming the Design System.
+
+**Status:** Ready to begin
 
 1.  **Initialize `apps/web`**:
     - `npx create-next-app@latest` with TypeScript, Tailwind, ESLint.
@@ -25,54 +30,26 @@ This document outlines the step-by-step plan to bring the _Para Shooting Committ
 3.  **Migrate Public Pages**:
     - Convert static HTML (`public/index.html`) to React Components (`page.tsx`).
 
-## Phase 3: Shared Libraries (`packages/`)
-
-**Goal:** Type safety and consistency.
-
-1.  **`packages/shared-types`**:
-    - Initialize TS project.
-    - Define Zod schemas for `Shooter`, `Score`, `User`.
-2.  **`packages/ui`**:
-    - Setup shared Tailwind configuration presests.
-
-## Phase 4: Database & Backend (`apps/api`)
-
-**Goal:** Robust API with PostgreSQL.
-
-1.  **Database Setup**:
-    - Initialize `packages/database` with Prisma ORM.
-    - Model the schema (Users, Shooters, Scores) in `schema.prisma`.
-    - Run migrations against local PostgreSQL.
-2.  **Backend API Initialization**:
-    - Setup `apps/api` with Express/Fastify.
-    - Connect to Prisma.
-    - Implement "Vertical Slice" folder structure.
-
-## Phase 5: Authentication & Security
-
-**Goal:** Secure RBAC (Role-Based Access Control).
-
-1.  **Auth Strategy**:
-    - Implement JWT generation/verification in `apps/api`.
-    - Create "Auth Guard" Middleware.
-2.  **Frontend Auth**:
-    - Build Login/Register forms.
-    - Create `AuthProvider` context in Next.js.
-    - Protect `/dashboard` routes.
-
-## Phase 6: DevOps & Deployment
-
-**Goal:** Production readiness.
-
-1.  **Dockerization**:
-    - Create `Dockerfile` for `apps/web` and `apps/api`.
-    - Create `docker-compose.yml` for full stack orchestration.
-2.  **CI/CD**:
-    - Github Action for Linting & Type Checking.
-
 ---
 
 ## 🚦 Immediate Next Action
 
 **Initialize Phase 2 (Frontend Core)**:
-Run `npx create-next-app` inside `apps/web` to replace the placeholder folder.
+
+The database foundation is solid and running. Next step is to initialize the Next.js frontend application in `apps/web`.
+
+**Command to run:**
+
+```bash
+cd apps
+npx create-next-app@latest web --typescript --tailwind --eslint --app --src-dir --import-alias "@/*"
+```
+
+This will create a production-ready Next.js 14+ application with:
+
+- ✅ TypeScript
+- ✅ Tailwind CSS
+- ✅ ESLint
+- ✅ App Router
+- ✅ `src/` directory structure
+- ✅ Path aliases configured

@@ -2,6 +2,26 @@
 
 Welcome to the official source code repository for the Para Shooting Committee of India's digital platform. This project is a comprehensive full-stack web application designed to manage the committee's public presence, shooter operations, competitions, and administrative functions.
 
+## 🚀 Quick Start
+
+### Current Running Services
+
+- **Frontend:** http://localhost:3000 (Next.js 16 + React 19)
+- **Backend API:** http://localhost:8080/api/v1 (NestJS 11 + TypeScript)
+- **Database:** localhost:5432 (PostgreSQL 16)
+- **pgAdmin:** http://localhost:8081 (admin@psci.in / admin123)
+
+### Start Development
+
+```bash
+# Start database
+docker-compose up -d
+
+# Start frontend (in another terminal)
+cd apps/web
+npm run dev
+```
+
 ## 🏗️ Project Architecture
 
 This project follows a **Monorepo Architecture** to ensure detailed separation of concerns while maximizing code reuse and scalability.

@@ -14,6 +14,7 @@
 5. [Indexes](#indexes)
 6. [Triggers & Functions](#triggers--functions)
 7. [Views](#views)
+8. [Validation & Review](#validation--review)
 
 ---
 
@@ -23,27 +24,27 @@ This document provides the complete Data Definition Language (DDL) specification
 
 ### Database Configuration
 
-| Setting | Value |
-|---------|-------|
+| Setting         | Value          |
+| --------------- | -------------- |
 | Database Engine | PostgreSQL 15+ |
-| Schema | `public` |
-| Character Set | UTF-8 |
-| Collation | en_US.UTF-8 |
-| Timezone | UTC |
+| Schema          | `public`       |
+| Character Set   | UTF-8          |
+| Collation       | en_US.UTF-8    |
+| Timezone        | UTC            |
 
 ---
 
 ## Naming Conventions
 
-| Element | Convention | Example |
-|---------|------------|---------|
-| Tables | snake_case, plural | `users`, `shooting_events` |
-| Columns | snake_case, singular | `first_name`, `created_at` |
-| Primary Keys | `id` (bigint identity) | `id bigint generated always as identity` |
-| Foreign Keys | `{table_singular}_id` | `user_id`, `competition_id` |
-| Indexes | `idx_{table}_{column(s)}` | `idx_users_email` |
-| Unique Constraints | `uq_{table}_{column(s)}` | `uq_users_email` |
-| Check Constraints | `chk_{table}_{condition}` | `chk_scores_value_positive` |
+| Element            | Convention                | Example                                  |
+| ------------------ | ------------------------- | ---------------------------------------- |
+| Tables             | snake_case, plural        | `users`, `shooting_events`               |
+| Columns            | snake_case, singular      | `first_name`, `created_at`               |
+| Primary Keys       | `id` (bigint identity)    | `id bigint generated always as identity` |
+| Foreign Keys       | `{table_singular}_id`     | `user_id`, `competition_id`              |
+| Indexes            | `idx_{table}_{column(s)}` | `idx_users_email`                        |
+| Unique Constraints | `uq_{table}_{column(s)}`  | `uq_users_email`                         |
+| Check Constraints  | `chk_{table}_{condition}` | `chk_scores_value_positive`              |
 
 ---
 
@@ -104,22 +105,22 @@ This document provides the complete Data Definition Language (DDL) specification
 
 Base user accounts for all platform users.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `public_id` | `uuid` | `not null default gen_random_uuid() unique` | External API identifier |
-| `email` | `varchar(255)` | `not null unique` | Login email address |
-| `password_hash` | `varchar(255)` | `not null` | Bcrypt hashed password |
-| `first_name` | `varchar(100)` | `not null` | User's first name |
-| `last_name` | `varchar(100)` | `not null` | User's last name |
-| `phone` | `varchar(20)` | | Contact phone number |
-| `avatar_url` | `text` | | Profile picture URL |
-| `email_verified_at` | `timestamptz` | | Email verification timestamp |
-| `is_active` | `boolean` | `not null default true` | Account active status |
-| `last_login_at` | `timestamptz` | | Last successful login |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
-| `updated_at` | `timestamptz` | `not null default now()` | Last modification time |
-| `deleted_at` | `timestamptz` | | Soft delete timestamp |
+| Column              | Type           | Constraints                                 | Description                  |
+| ------------------- | -------------- | ------------------------------------------- | ---------------------------- |
+| `id`                | `bigint`       | `generated always as identity primary key`  | Internal primary key         |
+| `public_id`         | `uuid`         | `not null default gen_random_uuid() unique` | External API identifier      |
+| `email`             | `varchar(255)` | `not null unique`                           | Login email address          |
+| `password_hash`     | `varchar(255)` | `not null`                                  | Bcrypt hashed password       |
+| `first_name`        | `varchar(100)` | `not null`                                  | User's first name            |
+| `last_name`         | `varchar(100)` | `not null`                                  | User's last name             |
+| `phone`             | `varchar(20)`  |                                             | Contact phone number         |
+| `avatar_url`        | `text`         |                                             | Profile picture URL          |
+| `email_verified_at` | `timestamptz`  |                                             | Email verification timestamp |
+| `is_active`         | `boolean`      | `not null default true`                     | Account active status        |
+| `last_login_at`     | `timestamptz`  |                                             | Last successful login        |
+| `created_at`        | `timestamptz`  | `not null default now()`                    | Record creation time         |
+| `updated_at`        | `timestamptz`  | `not null default now()`                    | Last modification time       |
+| `deleted_at`        | `timestamptz`  |                                             | Soft delete timestamp        |
 
 ```sql
 create table public.users (
@@ -148,15 +149,15 @@ comment on table public.users is 'Base user accounts for authentication and prof
 
 Role definitions for RBAC (Role-Based Access Control).
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `name` | `varchar(50)` | `not null unique` | Role identifier |
-| `display_name` | `varchar(100)` | `not null` | Human-readable name |
-| `description` | `text` | | Role description |
-| `permissions` | `jsonb` | `not null default '{}'` | Permission flags |
-| `is_system` | `boolean` | `not null default false` | System role (non-deletable) |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
+| Column         | Type           | Constraints                                | Description                 |
+| -------------- | -------------- | ------------------------------------------ | --------------------------- |
+| `id`           | `bigint`       | `generated always as identity primary key` | Internal primary key        |
+| `name`         | `varchar(50)`  | `not null unique`                          | Role identifier             |
+| `display_name` | `varchar(100)` | `not null`                                 | Human-readable name         |
+| `description`  | `text`         |                                            | Role description            |
+| `permissions`  | `jsonb`        | `not null default '{}'`                    | Permission flags            |
+| `is_system`    | `boolean`      | `not null default false`                   | System role (non-deletable) |
+| `created_at`   | `timestamptz`  | `not null default now()`                   | Record creation time        |
 
 ```sql
 create table public.roles (
@@ -174,13 +175,13 @@ comment on table public.roles is 'Role definitions for RBAC. System roles includ
 
 **Default Roles:**
 
-| Name | Display Name | Description |
-|------|--------------|-------------|
-| `admin` | Administrator | Full system access |
-| `shooter` | Shooter | Registered para-shooter |
-| `coach` | Coach | Team coach with limited access |
-| `official` | Official | Competition official |
-| `viewer` | Viewer | Read-only public access |
+| Name       | Display Name  | Description                    |
+| ---------- | ------------- | ------------------------------ |
+| `admin`    | Administrator | Full system access             |
+| `shooter`  | Shooter       | Registered para-shooter        |
+| `coach`    | Coach         | Team coach with limited access |
+| `official` | Official      | Competition official           |
+| `viewer`   | Viewer        | Read-only public access        |
 
 ---
 
@@ -188,14 +189,14 @@ comment on table public.roles is 'Role definitions for RBAC. System roles includ
 
 Many-to-many relationship between users and roles.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `user_id` | `bigint` | `not null references users(id) on delete cascade` | User reference |
-| `role_id` | `bigint` | `not null references roles(id) on delete cascade` | Role reference |
-| `assigned_by` | `bigint` | `references users(id)` | Admin who assigned role |
-| `assigned_at` | `timestamptz` | `not null default now()` | Assignment timestamp |
-| `expires_at` | `timestamptz` | | Optional expiration |
+| Column        | Type          | Constraints                                       | Description             |
+| ------------- | ------------- | ------------------------------------------------- | ----------------------- |
+| `id`          | `bigint`      | `generated always as identity primary key`        | Internal primary key    |
+| `user_id`     | `bigint`      | `not null references users(id) on delete cascade` | User reference          |
+| `role_id`     | `bigint`      | `not null references roles(id) on delete cascade` | Role reference          |
+| `assigned_by` | `bigint`      | `references users(id)`                            | Admin who assigned role |
+| `assigned_at` | `timestamptz` | `not null default now()`                          | Assignment timestamp    |
+| `expires_at`  | `timestamptz` |                                                   | Optional expiration     |
 
 ```sql
 create table public.user_roles (
@@ -217,17 +218,17 @@ comment on table public.user_roles is 'Junction table for user-role assignments.
 
 Active user sessions for JWT management.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `user_id` | `bigint` | `not null references users(id) on delete cascade` | User reference |
-| `token_hash` | `varchar(255)` | `not null unique` | Hashed refresh token |
-| `device_info` | `jsonb` | | Device/browser information |
-| `ip_address` | `inet` | | Client IP address |
-| `user_agent` | `text` | | Browser user agent |
-| `last_active_at` | `timestamptz` | `not null default now()` | Last activity timestamp |
-| `expires_at` | `timestamptz` | `not null` | Session expiration |
-| `created_at` | `timestamptz` | `not null default now()` | Session creation time |
+| Column           | Type           | Constraints                                       | Description                |
+| ---------------- | -------------- | ------------------------------------------------- | -------------------------- |
+| `id`             | `bigint`       | `generated always as identity primary key`        | Internal primary key       |
+| `user_id`        | `bigint`       | `not null references users(id) on delete cascade` | User reference             |
+| `token_hash`     | `varchar(255)` | `not null unique`                                 | Hashed refresh token       |
+| `device_info`    | `jsonb`        |                                                   | Device/browser information |
+| `ip_address`     | `inet`         |                                                   | Client IP address          |
+| `user_agent`     | `text`         |                                                   | Browser user agent         |
+| `last_active_at` | `timestamptz`  | `not null default now()`                          | Last activity timestamp    |
+| `expires_at`     | `timestamptz`  | `not null`                                        | Session expiration         |
+| `created_at`     | `timestamptz`  | `not null default now()`                          | Session creation time      |
 
 ```sql
 create table public.user_sessions (
@@ -253,20 +254,20 @@ comment on table public.user_sessions is 'Active user sessions for JWT refresh t
 
 Member state/unit associations affiliated with Para Shooting.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `code` | `varchar(10)` | `not null unique` | State code (e.g., MH, DL) |
-| `name` | `varchar(200)` | `not null` | Full association name |
-| `state` | `varchar(100)` | `not null` | State/territory name |
-| `secretary_name` | `varchar(200)` | | Current secretary |
-| `secretary_email` | `varchar(255)` | | Secretary email |
-| `secretary_phone` | `varchar(20)` | | Secretary phone |
-| `address` | `text` | | Registered address |
-| `is_active` | `boolean` | `not null default true` | Active membership |
-| `affiliated_since` | `date` | | Affiliation date |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
-| `updated_at` | `timestamptz` | `not null default now()` | Last modification time |
+| Column             | Type           | Constraints                                | Description               |
+| ------------------ | -------------- | ------------------------------------------ | ------------------------- |
+| `id`               | `bigint`       | `generated always as identity primary key` | Internal primary key      |
+| `code`             | `varchar(10)`  | `not null unique`                          | State code (e.g., MH, DL) |
+| `name`             | `varchar(200)` | `not null`                                 | Full association name     |
+| `state`            | `varchar(100)` | `not null`                                 | State/territory name      |
+| `secretary_name`   | `varchar(200)` |                                            | Current secretary         |
+| `secretary_email`  | `varchar(255)` |                                            | Secretary email           |
+| `secretary_phone`  | `varchar(20)`  |                                            | Secretary phone           |
+| `address`          | `text`         |                                            | Registered address        |
+| `is_active`        | `boolean`      | `not null default true`                    | Active membership         |
+| `affiliated_since` | `date`         |                                            | Affiliation date          |
+| `created_at`       | `timestamptz`  | `not null default now()`                   | Record creation time      |
+| `updated_at`       | `timestamptz`  | `not null default now()`                   | Last modification time    |
 
 ```sql
 create table public.state_associations (
@@ -293,17 +294,17 @@ comment on table public.state_associations is 'State/unit rifle associations aff
 
 WSPS (World Para Shooting) sport classification categories.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `code` | `varchar(10)` | `not null unique` | Classification code |
-| `name` | `varchar(100)` | `not null` | Full classification name |
-| `description` | `text` | `not null` | Detailed description |
-| `event_type` | `varchar(20)` | `not null` | RIFLE, PISTOL, or BOTH |
-| `min_impairment` | `text` | | Minimum eligible impairment |
-| `equipment_allowed` | `jsonb` | | Allowed adaptive equipment |
-| `is_active` | `boolean` | `not null default true` | Currently in use |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
+| Column              | Type           | Constraints                                | Description                 |
+| ------------------- | -------------- | ------------------------------------------ | --------------------------- |
+| `id`                | `bigint`       | `generated always as identity primary key` | Internal primary key        |
+| `code`              | `varchar(10)`  | `not null unique`                          | Classification code         |
+| `name`              | `varchar(100)` | `not null`                                 | Full classification name    |
+| `description`       | `text`         | `not null`                                 | Detailed description        |
+| `event_type`        | `varchar(20)`  | `not null`                                 | RIFLE, PISTOL, or BOTH      |
+| `min_impairment`    | `text`         |                                            | Minimum eligible impairment |
+| `equipment_allowed` | `jsonb`        |                                            | Allowed adaptive equipment  |
+| `is_active`         | `boolean`      | `not null default true`                    | Currently in use            |
+| `created_at`        | `timestamptz`  | `not null default now()`                   | Record creation time        |
 
 ```sql
 create table public.disability_categories (
@@ -323,13 +324,13 @@ comment on table public.disability_categories is 'World Para Shooting (WSPS) spo
 
 **WSPS Sport Classes:**
 
-| Code | Name | Event Type | Description |
-|------|------|------------|-------------|
-| `SH1` | SH1 - Pistol/Rifle | BOTH | Athletes who do not require a shooting stand |
-| `SH2` | SH2 - Rifle | RIFLE | Athletes who require a shooting stand |
-| `VI1` | VI1 - Visually Impaired | RIFLE | B1 - Totally blind |
-| `VI2` | VI2 - Visually Impaired | RIFLE | B2 - Partially sighted (severe) |
-| `VI3` | VI3 - Visually Impaired | RIFLE | B3 - Partially sighted (moderate) |
+| Code  | Name                    | Event Type | Description                                  |
+| ----- | ----------------------- | ---------- | -------------------------------------------- |
+| `SH1` | SH1 - Pistol/Rifle      | BOTH       | Athletes who do not require a shooting stand |
+| `SH2` | SH2 - Rifle             | RIFLE      | Athletes who require a shooting stand        |
+| `VI1` | VI1 - Visually Impaired | RIFLE      | B1 - Totally blind                           |
+| `VI2` | VI2 - Visually Impaired | RIFLE      | B2 - Partially sighted (severe)              |
+| `VI3` | VI3 - Visually Impaired | RIFLE      | B3 - Partially sighted (moderate)            |
 
 ---
 
@@ -337,28 +338,28 @@ comment on table public.disability_categories is 'World Para Shooting (WSPS) spo
 
 Para-shooter profiles with detailed information.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `user_id` | `bigint` | `not null unique references users(id)` | Linked user account |
-| `shooter_id` | `varchar(20)` | `not null unique` | Official shooter ID (PSCI-XXXX) |
-| `issf_id` | `varchar(20)` | `unique` | ISSF license number |
-| `date_of_birth` | `date` | `not null` | Date of birth |
-| `gender` | `varchar(10)` | `not null check (gender in ('male', 'female', 'other'))` | Gender |
-| `nationality` | `varchar(100)` | `not null default 'Indian'` | Nationality |
-| `state_association_id` | `bigint` | `references state_associations(id)` | Affiliated state unit |
-| `blood_group` | `varchar(5)` | | Blood group |
-| `emergency_contact_name` | `varchar(200)` | | Emergency contact |
-| `emergency_contact_phone` | `varchar(20)` | | Emergency phone |
-| `coach_name` | `varchar(200)` | | Current coach |
-| `club_name` | `varchar(200)` | | Club affiliation |
-| `bio` | `text` | | Shooter biography |
-| `achievements` | `jsonb` | `default '[]'` | List of achievements |
-| `profile_complete` | `boolean` | `not null default false` | Profile completion status |
-| `verified_at` | `timestamptz` | | Verification timestamp |
-| `verified_by` | `bigint` | `references users(id)` | Verifying admin |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
-| `updated_at` | `timestamptz` | `not null default now()` | Last modification time |
+| Column                    | Type           | Constraints                                              | Description                     |
+| ------------------------- | -------------- | -------------------------------------------------------- | ------------------------------- |
+| `id`                      | `bigint`       | `generated always as identity primary key`               | Internal primary key            |
+| `user_id`                 | `bigint`       | `not null unique references users(id)`                   | Linked user account             |
+| `shooter_id`              | `varchar(20)`  | `not null unique`                                        | Official shooter ID (PSCI-XXXX) |
+| `issf_id`                 | `varchar(20)`  | `unique`                                                 | ISSF license number             |
+| `date_of_birth`           | `date`         | `not null`                                               | Date of birth                   |
+| `gender`                  | `varchar(10)`  | `not null check (gender in ('male', 'female', 'other'))` | Gender                          |
+| `nationality`             | `varchar(100)` | `not null default 'Indian'`                              | Nationality                     |
+| `state_association_id`    | `bigint`       | `references state_associations(id)`                      | Affiliated state unit           |
+| `blood_group`             | `varchar(5)`   |                                                          | Blood group                     |
+| `emergency_contact_name`  | `varchar(200)` |                                                          | Emergency contact               |
+| `emergency_contact_phone` | `varchar(20)`  |                                                          | Emergency phone                 |
+| `coach_name`              | `varchar(200)` |                                                          | Current coach                   |
+| `club_name`               | `varchar(200)` |                                                          | Club affiliation                |
+| `bio`                     | `text`         |                                                          | Shooter biography               |
+| `achievements`            | `jsonb`        | `default '[]'`                                           | List of achievements            |
+| `profile_complete`        | `boolean`      | `not null default false`                                 | Profile completion status       |
+| `verified_at`             | `timestamptz`  |                                                          | Verification timestamp          |
+| `verified_by`             | `bigint`       | `references users(id)`                                   | Verifying admin                 |
+| `created_at`              | `timestamptz`  | `not null default now()`                                 | Record creation time            |
+| `updated_at`              | `timestamptz`  | `not null default now()`                                 | Last modification time          |
 
 ```sql
 create table public.shooters (
@@ -385,6 +386,22 @@ create table public.shooters (
 );
 
 comment on table public.shooters is 'Para-shooter profiles with personal information, affiliations, and achievements.';
+
+-- Auto-generate Shooter ID (PSCI-XXXX)
+create sequence public.shooter_id_seq start 1001;
+
+create or replace function public.generate_shooter_id() returns trigger as $$
+begin
+    new.shooter_id := 'PSCI-' || nextval('public.shooter_id_seq');
+    return new;
+end;
+$$ language plpgsql;
+
+create trigger set_shooter_id
+before insert on public.shooters
+for each row
+when (new.shooter_id is null)
+execute function public.generate_shooter_id();
 ```
 
 ---
@@ -393,21 +410,21 @@ comment on table public.shooters is 'Para-shooter profiles with personal informa
 
 Shooter's WSPS classification records with history.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `shooter_id` | `bigint` | `not null references shooters(id)` | Shooter reference |
-| `disability_category_id` | `bigint` | `not null references disability_categories(id)` | Classification category |
-| `classification_status` | `varchar(20)` | `not null` | NEW, REVIEW, CONFIRMED, FIXED |
-| `classification_date` | `date` | `not null` | Date of classification |
-| `valid_until` | `date` | | Validity expiration |
-| `classifier_name` | `varchar(200)` | | Classifying official |
-| `classification_venue` | `varchar(200)` | | Where classified |
-| `medical_documents_url` | `text` | | Supporting documents |
-| `notes` | `text` | | Additional notes |
-| `is_current` | `boolean` | `not null default true` | Current active classification |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
-| `updated_at` | `timestamptz` | `not null default now()` | Last modification time |
+| Column                   | Type           | Constraints                                     | Description                   |
+| ------------------------ | -------------- | ----------------------------------------------- | ----------------------------- |
+| `id`                     | `bigint`       | `generated always as identity primary key`      | Internal primary key          |
+| `shooter_id`             | `bigint`       | `not null references shooters(id)`              | Shooter reference             |
+| `disability_category_id` | `bigint`       | `not null references disability_categories(id)` | Classification category       |
+| `classification_status`  | `varchar(20)`  | `not null`                                      | NEW, REVIEW, CONFIRMED, FIXED |
+| `classification_date`    | `date`         | `not null`                                      | Date of classification        |
+| `valid_until`            | `date`         |                                                 | Validity expiration           |
+| `classifier_name`        | `varchar(200)` |                                                 | Classifying official          |
+| `classification_venue`   | `varchar(200)` |                                                 | Where classified              |
+| `medical_documents_url`  | `text`         |                                                 | Supporting documents          |
+| `notes`                  | `text`         |                                                 | Additional notes              |
+| `is_current`             | `boolean`      | `not null default true`                         | Current active classification |
+| `created_at`             | `timestamptz`  | `not null default now()`                        | Record creation time          |
+| `updated_at`             | `timestamptz`  | `not null default now()`                        | Last modification time        |
 
 ```sql
 create table public.shooter_classifications (
@@ -439,26 +456,26 @@ comment on table public.shooter_classifications is 'WSPS classification records 
 
 Shooting ranges and competition venues.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `name` | `varchar(200)` | `not null` | Venue name |
-| `code` | `varchar(20)` | `unique` | Venue code |
-| `address` | `text` | `not null` | Full address |
-| `city` | `varchar(100)` | `not null` | City |
-| `state` | `varchar(100)` | `not null` | State |
-| `country` | `varchar(100)` | `not null default 'India'` | Country |
-| `pin_code` | `varchar(10)` | | Postal code |
-| `latitude` | `decimal(10,8)` | | GPS latitude |
-| `longitude` | `decimal(11,8)` | | GPS longitude |
-| `facilities` | `jsonb` | `default '{}'` | Available facilities |
-| `capacity` | `integer` | | Maximum capacity |
-| `contact_name` | `varchar(200)` | | Contact person |
-| `contact_phone` | `varchar(20)` | | Contact phone |
-| `contact_email` | `varchar(255)` | | Contact email |
-| `is_active` | `boolean` | `not null default true` | Venue active status |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
-| `updated_at` | `timestamptz` | `not null default now()` | Last modification time |
+| Column          | Type            | Constraints                                | Description            |
+| --------------- | --------------- | ------------------------------------------ | ---------------------- |
+| `id`            | `bigint`        | `generated always as identity primary key` | Internal primary key   |
+| `name`          | `varchar(200)`  | `not null`                                 | Venue name             |
+| `code`          | `varchar(20)`   | `unique`                                   | Venue code             |
+| `address`       | `text`          | `not null`                                 | Full address           |
+| `city`          | `varchar(100)`  | `not null`                                 | City                   |
+| `state`         | `varchar(100)`  | `not null`                                 | State                  |
+| `country`       | `varchar(100)`  | `not null default 'India'`                 | Country                |
+| `pin_code`      | `varchar(10)`   |                                            | Postal code            |
+| `latitude`      | `decimal(10,8)` |                                            | GPS latitude           |
+| `longitude`     | `decimal(11,8)` |                                            | GPS longitude          |
+| `facilities`    | `jsonb`         | `default '{}'`                             | Available facilities   |
+| `capacity`      | `integer`       |                                            | Maximum capacity       |
+| `contact_name`  | `varchar(200)`  |                                            | Contact person         |
+| `contact_phone` | `varchar(20)`   |                                            | Contact phone          |
+| `contact_email` | `varchar(255)`  |                                            | Contact email          |
+| `is_active`     | `boolean`       | `not null default true`                    | Venue active status    |
+| `created_at`    | `timestamptz`   | `not null default now()`                   | Record creation time   |
+| `updated_at`    | `timestamptz`   | `not null default now()`                   | Last modification time |
 
 ```sql
 create table public.venues (
@@ -491,16 +508,16 @@ comment on table public.venues is 'Shooting ranges and competition venues with l
 
 High-level event categories (Rifle, Pistol, Shotgun).
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `name` | `varchar(50)` | `not null unique` | Category name |
-| `code` | `varchar(10)` | `not null unique` | Short code (R, P, S) |
-| `description` | `text` | | Category description |
-| `icon_url` | `text` | | Category icon |
-| `sort_order` | `integer` | `not null default 0` | Display order |
-| `is_active` | `boolean` | `not null default true` | Active status |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
+| Column        | Type          | Constraints                                | Description          |
+| ------------- | ------------- | ------------------------------------------ | -------------------- |
+| `id`          | `bigint`      | `generated always as identity primary key` | Internal primary key |
+| `name`        | `varchar(50)` | `not null unique`                          | Category name        |
+| `code`        | `varchar(10)` | `not null unique`                          | Short code (R, P, S) |
+| `description` | `text`        |                                            | Category description |
+| `icon_url`    | `text`        |                                            | Category icon        |
+| `sort_order`  | `integer`     | `not null default 0`                       | Display order        |
+| `is_active`   | `boolean`     | `not null default true`                    | Active status        |
+| `created_at`  | `timestamptz` | `not null default now()`                   | Record creation time |
 
 ```sql
 create table public.event_categories (
@@ -523,26 +540,26 @@ comment on table public.event_categories is 'High-level shooting event categorie
 
 Specific shooting event definitions.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `event_category_id` | `bigint` | `not null references event_categories(id)` | Category reference |
-| `name` | `varchar(100)` | `not null` | Event name |
-| `code` | `varchar(20)` | `not null unique` | Event code (R1, P1, etc.) |
-| `distance` | `varchar(20)` | `not null` | Distance (10m, 25m, 50m) |
-| `shots_qualification` | `integer` | `not null` | Shots in qualification |
-| `shots_final` | `integer` | | Shots in final |
-| `max_score_qualification` | `decimal(7,1)` | `not null` | Max qualification score |
-| `max_score_final` | `decimal(7,1)` | | Max final score |
-| `time_limit_minutes` | `integer` | | Time limit in minutes |
-| `gender` | `varchar(10)` | `check (gender in ('men', 'women', 'mixed'))` | Gender category |
-| `disability_categories` | `jsonb` | `default '[]'` | Eligible WSPS classes |
-| `is_paralympic` | `boolean` | `not null default false` | Paralympic event |
-| `is_wsps` | `boolean` | `not null default false` | WSPS recognized |
-| `rules_url` | `text` | | Link to event rules |
-| `is_active` | `boolean` | `not null default true` | Active status |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
-| `updated_at` | `timestamptz` | `not null default now()` | Last modification time |
+| Column                    | Type           | Constraints                                   | Description               |
+| ------------------------- | -------------- | --------------------------------------------- | ------------------------- |
+| `id`                      | `bigint`       | `generated always as identity primary key`    | Internal primary key      |
+| `event_category_id`       | `bigint`       | `not null references event_categories(id)`    | Category reference        |
+| `name`                    | `varchar(100)` | `not null`                                    | Event name                |
+| `code`                    | `varchar(20)`  | `not null unique`                             | Event code (R1, P1, etc.) |
+| `distance`                | `varchar(20)`  | `not null`                                    | Distance (10m, 25m, 50m)  |
+| `shots_qualification`     | `integer`      | `not null`                                    | Shots in qualification    |
+| `shots_final`             | `integer`      |                                               | Shots in final            |
+| `max_score_qualification` | `decimal(7,1)` | `not null`                                    | Max qualification score   |
+| `max_score_final`         | `decimal(7,1)` |                                               | Max final score           |
+| `time_limit_minutes`      | `integer`      |                                               | Time limit in minutes     |
+| `gender`                  | `varchar(10)`  | `check (gender in ('men', 'women', 'mixed'))` | Gender category           |
+| `disability_categories`   | `jsonb`        | `default '[]'`                                | Eligible WSPS classes     |
+| `is_paralympic`           | `boolean`      | `not null default false`                      | Paralympic event          |
+| `is_wsps`                 | `boolean`      | `not null default false`                      | WSPS recognized           |
+| `rules_url`               | `text`         |                                               | Link to event rules       |
+| `is_active`               | `boolean`      | `not null default true`                       | Active status             |
+| `created_at`              | `timestamptz`  | `not null default now()`                      | Record creation time      |
+| `updated_at`              | `timestamptz`  | `not null default now()`                      | Last modification time    |
 
 ```sql
 create table public.shooting_events (
@@ -571,20 +588,20 @@ comment on table public.shooting_events is 'Specific shooting event definitions 
 
 **Standard Para-Shooting Events:**
 
-| Code | Name | Distance | Shots (Q/F) | Max Score |
-|------|------|----------|-------------|-----------|
-| `R1` | 10m Air Rifle Standing SH1 | 10m | 60/24 | 654.5 |
-| `R2` | 10m Air Rifle Prone SH1 | 10m | 60/24 | 654.5 |
-| `R3` | 10m Air Rifle Prone SH2 | 10m | 60/24 | 654.5 |
-| `R4` | 10m Air Rifle Standing SH2 | 10m | 60/24 | 654.5 |
-| `R5` | 10m Air Rifle Prone Mixed SH2 | 10m | 60/24 | 654.5 |
-| `R6` | 50m Rifle Prone SH1 | 50m | 60/- | 654.5 |
-| `R7` | 50m Rifle 3 Position SH1 | 50m | 120/- | 1185.5 |
-| `P1` | 10m Air Pistol SH1 | 10m | 60/24 | 246.1 |
-| `P2` | 25m Pistol SH1 | 25m | 30/30 | 594.0 |
-| `P3` | 25m Pistol Mixed SH1 | 25m | 30/30 | 594.0 |
-| `P4` | 50m Pistol SH1 | 50m | 60/- | 580.0 |
-| `V1` | 10m Air Rifle Standing VI | 10m | 60/24 | 654.5 |
+| Code | Name                          | Distance | Shots (Q/F) | Max Score |
+| ---- | ----------------------------- | -------- | ----------- | --------- |
+| `R1` | 10m Air Rifle Standing SH1    | 10m      | 60/24       | 654.5     |
+| `R2` | 10m Air Rifle Prone SH1       | 10m      | 60/24       | 654.5     |
+| `R3` | 10m Air Rifle Prone SH2       | 10m      | 60/24       | 654.5     |
+| `R4` | 10m Air Rifle Standing SH2    | 10m      | 60/24       | 654.5     |
+| `R5` | 10m Air Rifle Prone Mixed SH2 | 10m      | 60/24       | 654.5     |
+| `R6` | 50m Rifle Prone SH1           | 50m      | 60/-        | 654.5     |
+| `R7` | 50m Rifle 3 Position SH1      | 50m      | 120/-       | 1185.5    |
+| `P1` | 10m Air Pistol SH1            | 10m      | 60/24       | 246.1     |
+| `P2` | 25m Pistol SH1                | 25m      | 30/30       | 594.0     |
+| `P3` | 25m Pistol Mixed SH1          | 25m      | 30/30       | 594.0     |
+| `P4` | 50m Pistol SH1                | 50m      | 60/-        | 580.0     |
+| `V1` | 10m Air Rifle Standing VI     | 10m      | 60/24       | 654.5     |
 
 ---
 
@@ -592,33 +609,33 @@ comment on table public.shooting_events is 'Specific shooting event definitions 
 
 Championships and tournament events.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `public_id` | `uuid` | `not null default gen_random_uuid() unique` | External identifier |
-| `name` | `varchar(200)` | `not null` | Competition name |
-| `code` | `varchar(30)` | `unique` | Competition code |
-| `competition_type` | `varchar(30)` | `not null` | Type of competition |
-| `level` | `varchar(20)` | `not null` | INTERNATIONAL, NATIONAL, STATE, CLUB |
-| `venue_id` | `bigint` | `references venues(id)` | Venue reference |
-| `start_date` | `date` | `not null` | Start date |
-| `end_date` | `date` | `not null` | End date |
-| `registration_opens` | `timestamptz` | | Registration open date |
-| `registration_closes` | `timestamptz` | | Registration deadline |
-| `entry_fee` | `decimal(10,2)` | `default 0` | Entry fee in INR |
-| `max_participants` | `integer` | | Participant limit |
-| `description` | `text` | | Competition description |
-| `rules_document_url` | `text` | | Rules document link |
-| `schedule_document_url` | `text` | | Schedule document link |
-| `status` | `varchar(20)` | `not null default 'draft'` | Competition status |
-| `is_wsps_ranked` | `boolean` | `not null default false` | WSPS ranking event |
-| `is_record_eligible` | `boolean` | `not null default true` | Records can be set |
-| `organizer_name` | `varchar(200)` | | Organizing body |
-| `organizer_contact` | `jsonb` | | Organizer contact info |
-| `results_published_at` | `timestamptz` | | Results publication time |
-| `created_by` | `bigint` | `references users(id)` | Creator user |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
-| `updated_at` | `timestamptz` | `not null default now()` | Last modification time |
+| Column                  | Type            | Constraints                                 | Description                          |
+| ----------------------- | --------------- | ------------------------------------------- | ------------------------------------ |
+| `id`                    | `bigint`        | `generated always as identity primary key`  | Internal primary key                 |
+| `public_id`             | `uuid`          | `not null default gen_random_uuid() unique` | External identifier                  |
+| `name`                  | `varchar(200)`  | `not null`                                  | Competition name                     |
+| `code`                  | `varchar(30)`   | `unique`                                    | Competition code                     |
+| `competition_type`      | `varchar(30)`   | `not null`                                  | Type of competition                  |
+| `level`                 | `varchar(20)`   | `not null`                                  | INTERNATIONAL, NATIONAL, STATE, CLUB |
+| `venue_id`              | `bigint`        | `references venues(id)`                     | Venue reference                      |
+| `start_date`            | `date`          | `not null`                                  | Start date                           |
+| `end_date`              | `date`          | `not null`                                  | End date                             |
+| `registration_opens`    | `timestamptz`   |                                             | Registration open date               |
+| `registration_closes`   | `timestamptz`   |                                             | Registration deadline                |
+| `entry_fee`             | `decimal(10,2)` | `default 0`                                 | Entry fee in INR                     |
+| `max_participants`      | `integer`       |                                             | Participant limit                    |
+| `description`           | `text`          |                                             | Competition description              |
+| `rules_document_url`    | `text`          |                                             | Rules document link                  |
+| `schedule_document_url` | `text`          |                                             | Schedule document link               |
+| `status`                | `varchar(20)`   | `not null default 'draft'`                  | Competition status                   |
+| `is_wsps_ranked`        | `boolean`       | `not null default false`                    | WSPS ranking event                   |
+| `is_record_eligible`    | `boolean`       | `not null default true`                     | Records can be set                   |
+| `organizer_name`        | `varchar(200)`  |                                             | Organizing body                      |
+| `organizer_contact`     | `jsonb`         |                                             | Organizer contact info               |
+| `results_published_at`  | `timestamptz`   |                                             | Results publication time             |
+| `created_by`            | `bigint`        | `references users(id)`                      | Creator user                         |
+| `created_at`            | `timestamptz`   | `not null default now()`                    | Record creation time                 |
+| `updated_at`            | `timestamptz`   | `not null default now()`                    | Last modification time               |
 
 ```sql
 create table public.competitions (
@@ -665,23 +682,23 @@ comment on table public.competitions is 'Championships, tournaments, and competi
 
 Events scheduled within a competition.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `competition_id` | `bigint` | `not null references competitions(id)` | Competition reference |
-| `shooting_event_id` | `bigint` | `not null references shooting_events(id)` | Event type reference |
-| `scheduled_date` | `date` | `not null` | Event date |
-| `scheduled_time` | `time` | | Start time |
-| `qualification_end_time` | `time` | | Qualification end |
-| `final_time` | `time` | | Final start time |
-| `max_entries` | `integer` | | Entry limit |
-| `entry_fee_override` | `decimal(10,2)` | | Override competition fee |
-| `status` | `varchar(20)` | `not null default 'scheduled'` | Event status |
-| `results_finalized_at` | `timestamptz` | | Results finalization |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
-| `updated_at` | `timestamptz` | `not null default now()` | Last modification time |
+| Column                   | Type            | Constraints                                | Description              |
+| ------------------------ | --------------- | ------------------------------------------ | ------------------------ |
+| `id`                     | `bigint`        | `generated always as identity primary key` | Internal primary key     |
+| `competition_id`         | `bigint`        | `not null references competitions(id)`     | Competition reference    |
+| `shooting_event_id`      | `bigint`        | `not null references shooting_events(id)`  | Event type reference     |
+| `scheduled_date`         | `date`          | `not null`                                 | Event date               |
+| `scheduled_time`         | `time`          |                                            | Start time               |
+| `qualification_end_time` | `time`          |                                            | Qualification end        |
+| `final_time`             | `time`          |                                            | Final start time         |
+| `max_entries`            | `integer`       |                                            | Entry limit              |
+| `entry_fee_override`     | `decimal(10,2)` |                                            | Override competition fee |
+| `status`                 | `varchar(20)`   | `not null default 'scheduled'`             | Event status             |
+| `results_finalized_at`   | `timestamptz`   |                                            | Results finalization     |
+| `created_at`             | `timestamptz`   | `not null default now()`                   | Record creation time     |
+| `updated_at`             | `timestamptz`   | `not null default now()`                   | Last modification time   |
 
-```sql
+````sql
 create table public.competition_events (
     id bigint generated always as identity primary key,
     competition_id bigint not null references public.competitions(id) on delete cascade,
@@ -702,7 +719,39 @@ create table public.competition_events (
 );
 
 comment on table public.competition_events is 'Individual shooting events within a competition with scheduling details.';
-```
+
+---
+
+#### Table: `event_relays`
+
+Specific relays/details for an event (handles multi-day schedules).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
+| `competition_event_id` | `bigint` | `not null references competition_events(id)` | Event reference |
+| `relay_number` | `integer` | `not null` | Relay sequence number |
+| `scheduled_date` | `date` | `not null` | Specific date for this relay |
+| `start_time` | `time` | `not null` | Start time |
+| `end_time` | `time` | `not null` | End time |
+| `reporting_time` | `time` | | Reporting time for shooters |
+| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
+
+```sql
+create table public.event_relays (
+    id bigint generated always as identity primary key,
+    competition_event_id bigint not null references public.competition_events(id) on delete cascade,
+    relay_number integer not null check (relay_number > 0),
+    scheduled_date date not null,
+    start_time time not null,
+    end_time time not null,
+    reporting_time time,
+    created_at timestamptz not null default now(),
+    unique(competition_event_id, relay_number)
+);
+
+comment on table public.event_relays is 'Specific relays and time slots for competition events.';
+
 
 ---
 
@@ -710,35 +759,35 @@ comment on table public.competition_events is 'Individual shooting events within
 
 Shooter registrations for competition events.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
+| Column                 | Type            | Constraints                                  | Description             |
+| ---------------------- | --------------- | -------------------------------------------- | ----------------------- |
 | `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
 | `public_id` | `uuid` | `not null default gen_random_uuid() unique` | External identifier |
 | `competition_event_id` | `bigint` | `not null references competition_events(id)` | Event reference |
+| `event_relay_id` | `bigint` | `references event_relays(id)` | Relay reference |
 | `shooter_id` | `bigint` | `not null references shooters(id)` | Shooter reference |
 | `bib_number` | `varchar(10)` | | Assigned bib number |
-| `relay_number` | `integer` | | Relay assignment |
 | `firing_point` | `varchar(10)` | | Firing point assignment |
-| `entry_status` | `varchar(20)` | `not null default 'pending'` | Entry status |
-| `payment_status` | `varchar(20)` | `not null default 'pending'` | Payment status |
-| `payment_id` | `bigint` | `references payments(id)` | Payment reference |
-| `entry_fee_paid` | `decimal(10,2)` | | Fee amount paid |
-| `registered_at` | `timestamptz` | `not null default now()` | Registration time |
-| `confirmed_at` | `timestamptz` | | Confirmation time |
-| `withdrawn_at` | `timestamptz` | | Withdrawal time |
-| `withdrawal_reason` | `text` | | Reason for withdrawal |
-| `notes` | `text` | | Admin notes |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
-| `updated_at` | `timestamptz` | `not null default now()` | Last modification time |
+| `entry_status`         | `varchar(20)`   | `not null default 'pending'`                 | Entry status            |
+| `payment_status`       | `varchar(20)`   | `not null default 'pending'`                 | Payment status          |
+| `payment_id`           | `bigint`        | `references payments(id)`                    | Payment reference       |
+| `entry_fee_paid`       | `decimal(10,2)` |                                              | Fee amount paid         |
+| `registered_at`        | `timestamptz`   | `not null default now()`                     | Registration time       |
+| `confirmed_at`         | `timestamptz`   |                                              | Confirmation time       |
+| `withdrawn_at`         | `timestamptz`   |                                              | Withdrawal time         |
+| `withdrawal_reason`    | `text`          |                                              | Reason for withdrawal   |
+| `notes`                | `text`          |                                              | Admin notes             |
+| `created_at`           | `timestamptz`   | `not null default now()`                     | Record creation time    |
+| `updated_at`           | `timestamptz`   | `not null default now()`                     | Last modification time  |
 
 ```sql
 create table public.competition_entries (
     id bigint generated always as identity primary key,
     public_id uuid not null default gen_random_uuid() unique,
     competition_event_id bigint not null references public.competition_events(id),
+    event_relay_id bigint references public.event_relays(id),
     shooter_id bigint not null references public.shooters(id),
     bib_number varchar(10),
-    relay_number integer,
     firing_point varchar(10),
     entry_status varchar(20) not null default 'pending' check (
         entry_status in ('pending', 'confirmed', 'waitlisted', 'withdrawn', 'disqualified', 'dns', 'dnf')
@@ -755,11 +804,12 @@ create table public.competition_entries (
     notes text,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now(),
-    unique(competition_event_id, shooter_id)
+    unique(competition_event_id, shooter_id),
+    unique(event_relay_id, firing_point)
 );
 
 comment on table public.competition_entries is 'Shooter registrations for competition events with payment and status tracking.';
-```
+````
 
 ---
 
@@ -769,25 +819,25 @@ comment on table public.competition_entries is 'Shooter registrations for compet
 
 Individual shooter scores in competition events.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `competition_entry_id` | `bigint` | `not null references competition_entries(id)` | Entry reference |
-| `stage` | `varchar(20)` | `not null` | QUALIFICATION, FINAL, SHOOTOFF |
-| `series_scores` | `jsonb` | `not null default '[]'` | Individual series scores |
-| `inner_tens` | `integer` | `default 0` | Inner 10s count |
-| `total_score` | `decimal(7,1)` | `not null` | Total score |
-| `rank_in_stage` | `integer` | | Rank in this stage |
-| `qualified_for_final` | `boolean` | `default false` | Qualified for final |
-| `is_record` | `boolean` | `default false` | Record-breaking score |
-| `record_type` | `varchar(30)` | | WR, AR, NR, CR type |
-| `equipment_check_passed` | `boolean` | `default true` | Equipment check status |
-| `protest_filed` | `boolean` | `default false` | Protest status |
-| `protest_resolved_at` | `timestamptz` | | Protest resolution time |
-| `verified_by` | `bigint` | `references users(id)` | Verifying official |
-| `verified_at` | `timestamptz` | | Verification time |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
-| `updated_at` | `timestamptz` | `not null default now()` | Last modification time |
+| Column                   | Type           | Constraints                                   | Description                    |
+| ------------------------ | -------------- | --------------------------------------------- | ------------------------------ |
+| `id`                     | `bigint`       | `generated always as identity primary key`    | Internal primary key           |
+| `competition_entry_id`   | `bigint`       | `not null references competition_entries(id)` | Entry reference                |
+| `stage`                  | `varchar(20)`  | `not null`                                    | QUALIFICATION, FINAL, SHOOTOFF |
+| `series_scores`          | `jsonb`        | `not null default '[]'`                       | Individual series scores       |
+| `inner_tens`             | `integer`      | `default 0`                                   | Inner 10s count                |
+| `total_score`            | `decimal(7,1)` | `not null`                                    | Total score                    |
+| `rank_in_stage`          | `integer`      |                                               | Rank in this stage             |
+| `qualified_for_final`    | `boolean`      | `default false`                               | Qualified for final            |
+| `is_record`              | `boolean`      | `default false`                               | Record-breaking score          |
+| `record_type`            | `varchar(30)`  |                                               | WR, AR, NR, CR type            |
+| `equipment_check_passed` | `boolean`      | `default true`                                | Equipment check status         |
+| `protest_filed`          | `boolean`      | `default false`                               | Protest status                 |
+| `protest_resolved_at`    | `timestamptz`  |                                               | Protest resolution time        |
+| `verified_by`            | `bigint`       | `references users(id)`                        | Verifying official             |
+| `verified_at`            | `timestamptz`  |                                               | Verification time              |
+| `created_at`             | `timestamptz`  | `not null default now()`                      | Record creation time           |
+| `updated_at`             | `timestamptz`  | `not null default now()`                      | Last modification time         |
 
 ```sql
 create table public.scores (
@@ -817,11 +867,20 @@ comment on table public.scores is 'Individual shooter scores with detailed serie
 ```
 
 **Series Scores JSON Structure:**
+
 ```json
 {
   "series": [
-    { "number": 1, "shots": [10.5, 10.3, 10.1, 10.4, 10.2, 10.6, 10.0, 10.3, 10.4, 10.2], "total": 103.0 },
-    { "number": 2, "shots": [10.1, 10.4, 10.3, 10.5, 10.2, 10.4, 10.1, 10.3, 10.2, 10.5], "total": 103.0 }
+    {
+      "number": 1,
+      "shots": [10.5, 10.3, 10.1, 10.4, 10.2, 10.6, 10.0, 10.3, 10.4, 10.2],
+      "total": 103.0
+    },
+    {
+      "number": 2,
+      "shots": [10.1, 10.4, 10.3, 10.5, 10.2, 10.4, 10.1, 10.3, 10.2, 10.5],
+      "total": 103.0
+    }
   ],
   "sighters": [9.8, 10.2, 10.0]
 }
@@ -833,23 +892,23 @@ comment on table public.scores is 'Individual shooter scores with detailed serie
 
 National and international rankings by event.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `shooter_id` | `bigint` | `not null references shooters(id)` | Shooter reference |
-| `shooting_event_id` | `bigint` | `not null references shooting_events(id)` | Event reference |
-| `ranking_type` | `varchar(20)` | `not null` | NATIONAL, WORLD, ASIAN |
-| `rank` | `integer` | `not null` | Current rank |
-| `previous_rank` | `integer` | | Previous rank |
-| `ranking_points` | `decimal(10,2)` | `not null default 0` | Ranking points |
-| `best_score` | `decimal(7,1)` | | Personal best score |
-| `competitions_counted` | `integer` | `default 0` | Competitions in ranking |
-| `last_competition_date` | `date` | | Last competition date |
-| `valid_from` | `date` | `not null` | Ranking validity start |
-| `valid_until` | `date` | | Ranking validity end |
-| `is_current` | `boolean` | `not null default true` | Current ranking |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
-| `updated_at` | `timestamptz` | `not null default now()` | Last modification time |
+| Column                  | Type            | Constraints                                | Description             |
+| ----------------------- | --------------- | ------------------------------------------ | ----------------------- |
+| `id`                    | `bigint`        | `generated always as identity primary key` | Internal primary key    |
+| `shooter_id`            | `bigint`        | `not null references shooters(id)`         | Shooter reference       |
+| `shooting_event_id`     | `bigint`        | `not null references shooting_events(id)`  | Event reference         |
+| `ranking_type`          | `varchar(20)`   | `not null`                                 | NATIONAL, WORLD, ASIAN  |
+| `rank`                  | `integer`       | `not null`                                 | Current rank            |
+| `previous_rank`         | `integer`       |                                            | Previous rank           |
+| `ranking_points`        | `decimal(10,2)` | `not null default 0`                       | Ranking points          |
+| `best_score`            | `decimal(7,1)`  |                                            | Personal best score     |
+| `competitions_counted`  | `integer`       | `default 0`                                | Competitions in ranking |
+| `last_competition_date` | `date`          |                                            | Last competition date   |
+| `valid_from`            | `date`          | `not null`                                 | Ranking validity start  |
+| `valid_until`           | `date`          |                                            | Ranking validity end    |
+| `is_current`            | `boolean`       | `not null default true`                    | Current ranking         |
+| `created_at`            | `timestamptz`   | `not null default now()`                   | Record creation time    |
+| `updated_at`            | `timestamptz`   | `not null default now()`                   | Last modification time  |
 
 ```sql
 create table public.rankings (
@@ -882,17 +941,17 @@ comment on table public.rankings is 'National and international rankings by even
 
 Types of memberships offered.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `name` | `varchar(50)` | `not null unique` | Membership type name |
-| `code` | `varchar(20)` | `not null unique` | Type code |
-| `description` | `text` | | Type description |
-| `duration_months` | `integer` | | Duration (null = lifetime) |
-| `price` | `decimal(10,2)` | `not null` | Price in INR |
-| `benefits` | `jsonb` | `default '[]'` | List of benefits |
-| `is_active` | `boolean` | `not null default true` | Active status |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
+| Column            | Type            | Constraints                                | Description                |
+| ----------------- | --------------- | ------------------------------------------ | -------------------------- |
+| `id`              | `bigint`        | `generated always as identity primary key` | Internal primary key       |
+| `name`            | `varchar(50)`   | `not null unique`                          | Membership type name       |
+| `code`            | `varchar(20)`   | `not null unique`                          | Type code                  |
+| `description`     | `text`          |                                            | Type description           |
+| `duration_months` | `integer`       |                                            | Duration (null = lifetime) |
+| `price`           | `decimal(10,2)` | `not null`                                 | Price in INR               |
+| `benefits`        | `jsonb`         | `default '[]'`                             | List of benefits           |
+| `is_active`       | `boolean`       | `not null default true`                    | Active status              |
+| `created_at`      | `timestamptz`   | `not null default now()`                   | Record creation time       |
 
 ```sql
 create table public.membership_types (
@@ -912,12 +971,12 @@ comment on table public.membership_types is 'Membership type definitions with pr
 
 **Membership Types:**
 
-| Code | Name | Duration | Price (INR) |
-|------|------|----------|-------------|
-| `LIFE` | Life Membership | Lifetime | 25,000 |
-| `ANNUAL` | Annual Membership | 12 months | 2,500 |
-| `INSTITUTIONAL` | Institutional | 12 months | 10,000 |
-| `HONORARY` | Honorary | Lifetime | 0 |
+| Code            | Name              | Duration  | Price (INR) |
+| --------------- | ----------------- | --------- | ----------- |
+| `LIFE`          | Life Membership   | Lifetime  | 25,000      |
+| `ANNUAL`        | Annual Membership | 12 months | 2,500       |
+| `INSTITUTIONAL` | Institutional     | 12 months | 10,000      |
+| `HONORARY`      | Honorary          | Lifetime  | 0           |
 
 ---
 
@@ -925,23 +984,23 @@ comment on table public.membership_types is 'Membership type definitions with pr
 
 User membership records.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `public_id` | `uuid` | `not null default gen_random_uuid() unique` | External identifier |
-| `user_id` | `bigint` | `not null references users(id)` | User reference |
-| `membership_type_id` | `bigint` | `not null references membership_types(id)` | Type reference |
-| `membership_number` | `varchar(30)` | `unique` | Membership number |
-| `start_date` | `date` | `not null` | Start date |
-| `end_date` | `date` | | End date (null = lifetime) |
-| `status` | `varchar(20)` | `not null default 'pending'` | Membership status |
-| `amount_paid` | `decimal(10,2)` | `not null` | Amount paid |
-| `payment_id` | `bigint` | | Payment reference |
-| `approved_by` | `bigint` | `references users(id)` | Approving admin |
-| `approved_at` | `timestamptz` | | Approval timestamp |
-| `notes` | `text` | | Admin notes |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
-| `updated_at` | `timestamptz` | `not null default now()` | Last modification time |
+| Column               | Type            | Constraints                                 | Description                |
+| -------------------- | --------------- | ------------------------------------------- | -------------------------- |
+| `id`                 | `bigint`        | `generated always as identity primary key`  | Internal primary key       |
+| `public_id`          | `uuid`          | `not null default gen_random_uuid() unique` | External identifier        |
+| `user_id`            | `bigint`        | `not null references users(id)`             | User reference             |
+| `membership_type_id` | `bigint`        | `not null references membership_types(id)`  | Type reference             |
+| `membership_number`  | `varchar(30)`   | `unique`                                    | Membership number          |
+| `start_date`         | `date`          | `not null`                                  | Start date                 |
+| `end_date`           | `date`          |                                             | End date (null = lifetime) |
+| `status`             | `varchar(20)`   | `not null default 'pending'`                | Membership status          |
+| `amount_paid`        | `decimal(10,2)` | `not null`                                  | Amount paid                |
+| `payment_id`         | `bigint`        |                                             | Payment reference          |
+| `approved_by`        | `bigint`        | `references users(id)`                      | Approving admin            |
+| `approved_at`        | `timestamptz`   |                                             | Approval timestamp         |
+| `notes`              | `text`          |                                             | Admin notes                |
+| `created_at`         | `timestamptz`   | `not null default now()`                    | Record creation time       |
+| `updated_at`         | `timestamptz`   | `not null default now()`                    | Last modification time     |
 
 ```sql
 create table public.memberships (
@@ -973,34 +1032,34 @@ comment on table public.memberships is 'User membership records with status and 
 
 Payment transactions (Razorpay integration).
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `public_id` | `uuid` | `not null default gen_random_uuid() unique` | External identifier |
-| `user_id` | `bigint` | `not null references users(id)` | Payer reference |
-| `payment_type` | `varchar(30)` | `not null` | MEMBERSHIP, ENTRY_FEE, etc. |
-| `amount` | `decimal(10,2)` | `not null` | Amount in INR |
-| `currency` | `varchar(3)` | `not null default 'INR'` | Currency code |
-| `status` | `varchar(20)` | `not null default 'pending'` | Payment status |
-| `razorpay_order_id` | `varchar(50)` | `unique` | Razorpay order ID |
-| `razorpay_payment_id` | `varchar(50)` | `unique` | Razorpay payment ID |
-| `razorpay_signature` | `text` | | Payment signature |
-| `payment_method` | `varchar(30)` | | UPI, CARD, NETBANKING, etc. |
-| `description` | `text` | | Payment description |
-| `metadata` | `jsonb` | `default '{}'` | Additional metadata |
-| `paid_at` | `timestamptz` | | Payment completion time |
-| `failed_at` | `timestamptz` | | Failure timestamp |
-| `failure_reason` | `text` | | Failure reason |
-| `receipt_url` | `text` | | Receipt download URL |
-| `invoice_number` | `varchar(30)` | `unique` | Invoice number |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
-| `updated_at` | `timestamptz` | `not null default now()` | Last modification time |
+| Column                | Type            | Constraints                                 | Description                 |
+| --------------------- | --------------- | ------------------------------------------- | --------------------------- |
+| `id`                  | `bigint`        | `generated always as identity primary key`  | Internal primary key        |
+| `public_id`           | `uuid`          | `not null default gen_random_uuid() unique` | External identifier         |
+| `user_id`             | `bigint`        | `not null references users(id)`             | Payer reference             |
+| `payment_type`        | `varchar(30)`   | `not null`                                  | MEMBERSHIP, ENTRY_FEE, etc. |
+| `amount`              | `decimal(10,2)` | `not null`                                  | Amount in INR               |
+| `currency`            | `varchar(3)`    | `not null default 'INR'`                    | Currency code               |
+| `status`              | `varchar(20)`   | `not null default 'pending'`                | Payment status              |
+| `razorpay_order_id`   | `varchar(50)`   | `unique`                                    | Razorpay order ID           |
+| `razorpay_payment_id` | `varchar(50)`   | `unique`                                    | Razorpay payment ID         |
+| `razorpay_signature`  | `text`          |                                             | Payment signature           |
+| `payment_method`      | `varchar(30)`   |                                             | UPI, CARD, NETBANKING, etc. |
+| `description`         | `text`          |                                             | Payment description         |
+| `metadata`            | `jsonb`         | `default '{}'`                              | Additional metadata         |
+| `paid_at`             | `timestamptz`   |                                             | Payment completion time     |
+| `failed_at`           | `timestamptz`   |                                             | Failure timestamp           |
+| `failure_reason`      | `text`          |                                             | Failure reason              |
+| `receipt_url`         | `text`          |                                             | Receipt download URL        |
+| `invoice_number`      | `varchar(30)`   | `unique`                                    | Invoice number              |
+| `created_at`          | `timestamptz`   | `not null default now()`                    | Record creation time        |
+| `updated_at`          | `timestamptz`   | `not null default now()`                    | Last modification time      |
 
 ```sql
 create table public.payments (
     id bigint generated always as identity primary key,
     public_id uuid not null default gen_random_uuid() unique,
-    user_id bigint not null references public.users(id),
+    user_id bigint not null references public.users(id) on delete restrict,
     payment_type varchar(30) not null check (
         payment_type in ('MEMBERSHIP', 'ENTRY_FEE', 'FINE', 'DONATION', 'OTHER')
     ),
@@ -1033,19 +1092,19 @@ comment on table public.payments is 'Payment transactions with Razorpay integrat
 
 Refund records for payments.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `payment_id` | `bigint` | `not null references payments(id)` | Original payment |
-| `amount` | `decimal(10,2)` | `not null` | Refund amount |
-| `status` | `varchar(20)` | `not null default 'pending'` | Refund status |
-| `razorpay_refund_id` | `varchar(50)` | `unique` | Razorpay refund ID |
-| `reason` | `text` | `not null` | Refund reason |
-| `initiated_by` | `bigint` | `not null references users(id)` | Admin who initiated |
-| `processed_at` | `timestamptz` | | Processing timestamp |
-| `notes` | `text` | | Admin notes |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
-| `updated_at` | `timestamptz` | `not null default now()` | Last modification time |
+| Column               | Type            | Constraints                                | Description            |
+| -------------------- | --------------- | ------------------------------------------ | ---------------------- |
+| `id`                 | `bigint`        | `generated always as identity primary key` | Internal primary key   |
+| `payment_id`         | `bigint`        | `not null references payments(id)`         | Original payment       |
+| `amount`             | `decimal(10,2)` | `not null`                                 | Refund amount          |
+| `status`             | `varchar(20)`   | `not null default 'pending'`               | Refund status          |
+| `razorpay_refund_id` | `varchar(50)`   | `unique`                                   | Razorpay refund ID     |
+| `reason`             | `text`          | `not null`                                 | Refund reason          |
+| `initiated_by`       | `bigint`        | `not null references users(id)`            | Admin who initiated    |
+| `processed_at`       | `timestamptz`   |                                            | Processing timestamp   |
+| `notes`              | `text`          |                                            | Admin notes            |
+| `created_at`         | `timestamptz`   | `not null default now()`                   | Record creation time   |
+| `updated_at`         | `timestamptz`   | `not null default now()`                   | Last modification time |
 
 ```sql
 create table public.refunds (
@@ -1075,26 +1134,26 @@ comment on table public.refunds is 'Refund records for payment reversals with Ra
 
 News and announcements.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `public_id` | `uuid` | `not null default gen_random_uuid() unique` | External identifier |
-| `title` | `varchar(255)` | `not null` | Article title |
-| `slug` | `varchar(255)` | `not null unique` | URL slug |
-| `excerpt` | `text` | | Short excerpt |
-| `content` | `text` | `not null` | Full content (HTML/Markdown) |
-| `featured_image_url` | `text` | | Featured image |
-| `category` | `varchar(50)` | `not null` | Article category |
-| `tags` | `jsonb` | `default '[]'` | Article tags |
-| `author_id` | `bigint` | `not null references users(id)` | Author user |
-| `status` | `varchar(20)` | `not null default 'draft'` | Article status |
-| `is_featured` | `boolean` | `default false` | Featured article |
-| `is_pinned` | `boolean` | `default false` | Pinned to top |
-| `view_count` | `integer` | `default 0` | View counter |
-| `published_at` | `timestamptz` | | Publication time |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
-| `updated_at` | `timestamptz` | `not null default now()` | Last modification time |
-| `deleted_at` | `timestamptz` | | Soft delete timestamp |
+| Column               | Type           | Constraints                                 | Description                  |
+| -------------------- | -------------- | ------------------------------------------- | ---------------------------- |
+| `id`                 | `bigint`       | `generated always as identity primary key`  | Internal primary key         |
+| `public_id`          | `uuid`         | `not null default gen_random_uuid() unique` | External identifier          |
+| `title`              | `varchar(255)` | `not null`                                  | Article title                |
+| `slug`               | `varchar(255)` | `not null unique`                           | URL slug                     |
+| `excerpt`            | `text`         |                                             | Short excerpt                |
+| `content`            | `text`         | `not null`                                  | Full content (HTML/Markdown) |
+| `featured_image_url` | `text`         |                                             | Featured image               |
+| `category`           | `varchar(50)`  | `not null`                                  | Article category             |
+| `tags`               | `jsonb`        | `default '[]'`                              | Article tags                 |
+| `author_id`          | `bigint`       | `not null references users(id)`             | Author user                  |
+| `status`             | `varchar(20)`  | `not null default 'draft'`                  | Article status               |
+| `is_featured`        | `boolean`      | `default false`                             | Featured article             |
+| `is_pinned`          | `boolean`      | `default false`                             | Pinned to top                |
+| `view_count`         | `integer`      | `default 0`                                 | View counter                 |
+| `published_at`       | `timestamptz`  |                                             | Publication time             |
+| `created_at`         | `timestamptz`  | `not null default now()`                    | Record creation time         |
+| `updated_at`         | `timestamptz`  | `not null default now()`                    | Last modification time       |
+| `deleted_at`         | `timestamptz`  |                                             | Soft delete timestamp        |
 
 ```sql
 create table public.news_articles (
@@ -1131,18 +1190,18 @@ comment on table public.news_articles is 'News articles, announcements, and pres
 
 System notifications for users.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `user_id` | `bigint` | `not null references users(id)` | Recipient user |
-| `type` | `varchar(50)` | `not null` | Notification type |
-| `title` | `varchar(255)` | `not null` | Notification title |
-| `message` | `text` | `not null` | Notification message |
-| `action_url` | `text` | | Action link |
-| `metadata` | `jsonb` | `default '{}'` | Additional data |
-| `is_read` | `boolean` | `default false` | Read status |
-| `read_at` | `timestamptz` | | Read timestamp |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
+| Column       | Type           | Constraints                                | Description          |
+| ------------ | -------------- | ------------------------------------------ | -------------------- |
+| `id`         | `bigint`       | `generated always as identity primary key` | Internal primary key |
+| `user_id`    | `bigint`       | `not null references users(id)`            | Recipient user       |
+| `type`       | `varchar(50)`  | `not null`                                 | Notification type    |
+| `title`      | `varchar(255)` | `not null`                                 | Notification title   |
+| `message`    | `text`         | `not null`                                 | Notification message |
+| `action_url` | `text`         |                                            | Action link          |
+| `metadata`   | `jsonb`        | `default '{}'`                             | Additional data      |
+| `is_read`    | `boolean`      | `default false`                            | Read status          |
+| `read_at`    | `timestamptz`  |                                            | Read timestamp       |
+| `created_at` | `timestamptz`  | `not null default now()`                   | Record creation time |
 
 ```sql
 create table public.notifications (
@@ -1169,16 +1228,16 @@ comment on table public.notifications is 'System notifications for users includi
 
 Categories for downloadable documents.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `name` | `varchar(100)` | `not null unique` | Category name |
-| `slug` | `varchar(100)` | `not null unique` | URL slug |
-| `description` | `text` | | Category description |
-| `icon` | `varchar(50)` | | Icon identifier |
-| `sort_order` | `integer` | `default 0` | Display order |
-| `is_active` | `boolean` | `default true` | Active status |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
+| Column        | Type           | Constraints                                | Description          |
+| ------------- | -------------- | ------------------------------------------ | -------------------- |
+| `id`          | `bigint`       | `generated always as identity primary key` | Internal primary key |
+| `name`        | `varchar(100)` | `not null unique`                          | Category name        |
+| `slug`        | `varchar(100)` | `not null unique`                          | URL slug             |
+| `description` | `text`         |                                            | Category description |
+| `icon`        | `varchar(50)`  |                                            | Icon identifier      |
+| `sort_order`  | `integer`      | `default 0`                                | Display order        |
+| `is_active`   | `boolean`      | `default true`                             | Active status        |
+| `created_at`  | `timestamptz`  | `not null default now()`                   | Record creation time |
 
 ```sql
 create table public.document_categories (
@@ -1201,25 +1260,25 @@ comment on table public.document_categories is 'Categories for organizing downlo
 
 Downloadable documents and files.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `category_id` | `bigint` | `not null references document_categories(id)` | Category reference |
-| `title` | `varchar(255)` | `not null` | Document title |
-| `description` | `text` | | Document description |
-| `file_url` | `text` | `not null` | Download URL |
-| `file_name` | `varchar(255)` | `not null` | Original filename |
-| `file_size` | `bigint` | | File size in bytes |
-| `file_type` | `varchar(50)` | | MIME type |
-| `version` | `varchar(20)` | | Document version |
-| `is_public` | `boolean` | `default true` | Public visibility |
-| `download_count` | `integer` | `default 0` | Download counter |
-| `uploaded_by` | `bigint` | `references users(id)` | Uploader user |
-| `valid_from` | `date` | | Validity start |
-| `valid_until` | `date` | | Validity end |
-| `is_active` | `boolean` | `default true` | Active status |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
-| `updated_at` | `timestamptz` | `not null default now()` | Last modification time |
+| Column           | Type           | Constraints                                   | Description            |
+| ---------------- | -------------- | --------------------------------------------- | ---------------------- |
+| `id`             | `bigint`       | `generated always as identity primary key`    | Internal primary key   |
+| `category_id`    | `bigint`       | `not null references document_categories(id)` | Category reference     |
+| `title`          | `varchar(255)` | `not null`                                    | Document title         |
+| `description`    | `text`         |                                               | Document description   |
+| `file_url`       | `text`         | `not null`                                    | Download URL           |
+| `file_name`      | `varchar(255)` | `not null`                                    | Original filename      |
+| `file_size`      | `bigint`       |                                               | File size in bytes     |
+| `file_type`      | `varchar(50)`  |                                               | MIME type              |
+| `version`        | `varchar(20)`  |                                               | Document version       |
+| `is_public`      | `boolean`      | `default true`                                | Public visibility      |
+| `download_count` | `integer`      | `default 0`                                   | Download counter       |
+| `uploaded_by`    | `bigint`       | `references users(id)`                        | Uploader user          |
+| `valid_from`     | `date`         |                                               | Validity start         |
+| `valid_until`    | `date`         |                                               | Validity end           |
+| `is_active`      | `boolean`      | `default true`                                | Active status          |
+| `created_at`     | `timestamptz`  | `not null default now()`                      | Record creation time   |
+| `updated_at`     | `timestamptz`  | `not null default now()`                      | Last modification time |
 
 ```sql
 create table public.documents (
@@ -1251,23 +1310,23 @@ comment on table public.documents is 'Downloadable documents including forms, ru
 
 Contact form submissions.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `name` | `varchar(200)` | `not null` | Sender name |
-| `email` | `varchar(255)` | `not null` | Sender email |
-| `phone` | `varchar(20)` | | Sender phone |
-| `subject` | `varchar(255)` | `not null` | Message subject |
-| `message` | `text` | `not null` | Message content |
-| `category` | `varchar(50)` | | Message category |
-| `status` | `varchar(20)` | `default 'new'` | Processing status |
-| `assigned_to` | `bigint` | `references users(id)` | Assigned staff |
-| `response` | `text` | | Staff response |
-| `responded_at` | `timestamptz` | | Response timestamp |
-| `responded_by` | `bigint` | `references users(id)` | Responding staff |
-| `ip_address` | `inet` | | Sender IP |
-| `created_at` | `timestamptz` | `not null default now()` | Submission time |
-| `updated_at` | `timestamptz` | `not null default now()` | Last modification time |
+| Column         | Type           | Constraints                                | Description            |
+| -------------- | -------------- | ------------------------------------------ | ---------------------- |
+| `id`           | `bigint`       | `generated always as identity primary key` | Internal primary key   |
+| `name`         | `varchar(200)` | `not null`                                 | Sender name            |
+| `email`        | `varchar(255)` | `not null`                                 | Sender email           |
+| `phone`        | `varchar(20)`  |                                            | Sender phone           |
+| `subject`      | `varchar(255)` | `not null`                                 | Message subject        |
+| `message`      | `text`         | `not null`                                 | Message content        |
+| `category`     | `varchar(50)`  |                                            | Message category       |
+| `status`       | `varchar(20)`  | `default 'new'`                            | Processing status      |
+| `assigned_to`  | `bigint`       | `references users(id)`                     | Assigned staff         |
+| `response`     | `text`         |                                            | Staff response         |
+| `responded_at` | `timestamptz`  |                                            | Response timestamp     |
+| `responded_by` | `bigint`       | `references users(id)`                     | Responding staff       |
+| `ip_address`   | `inet`         |                                            | Sender IP              |
+| `created_at`   | `timestamptz`  | `not null default now()`                   | Submission time        |
+| `updated_at`   | `timestamptz`  | `not null default now()`                   | Last modification time |
 
 ```sql
 create table public.contact_messages (
@@ -1299,22 +1358,22 @@ comment on table public.contact_messages is 'Contact form submissions from the p
 
 Executive committee member profiles.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `name` | `varchar(200)` | `not null` | Full name |
-| `designation` | `varchar(100)` | `not null` | Position/Title |
-| `photo_url` | `text` | | Photo URL |
-| `bio` | `text` | | Biography |
-| `email` | `varchar(255)` | | Contact email |
-| `phone` | `varchar(20)` | | Contact phone |
-| `term_start` | `date` | | Term start date |
-| `term_end` | `date` | | Term end date |
-| `committee_type` | `varchar(50)` | `not null` | Committee type |
-| `sort_order` | `integer` | `default 0` | Display order |
-| `is_active` | `boolean` | `default true` | Active status |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
-| `updated_at` | `timestamptz` | `not null default now()` | Last modification time |
+| Column           | Type           | Constraints                                | Description            |
+| ---------------- | -------------- | ------------------------------------------ | ---------------------- |
+| `id`             | `bigint`       | `generated always as identity primary key` | Internal primary key   |
+| `name`           | `varchar(200)` | `not null`                                 | Full name              |
+| `designation`    | `varchar(100)` | `not null`                                 | Position/Title         |
+| `photo_url`      | `text`         |                                            | Photo URL              |
+| `bio`            | `text`         |                                            | Biography              |
+| `email`          | `varchar(255)` |                                            | Contact email          |
+| `phone`          | `varchar(20)`  |                                            | Contact phone          |
+| `term_start`     | `date`         |                                            | Term start date        |
+| `term_end`       | `date`         |                                            | Term end date          |
+| `committee_type` | `varchar(50)`  | `not null`                                 | Committee type         |
+| `sort_order`     | `integer`      | `default 0`                                | Display order          |
+| `is_active`      | `boolean`      | `default true`                             | Active status          |
+| `created_at`     | `timestamptz`  | `not null default now()`                   | Record creation time   |
+| `updated_at`     | `timestamptz`  | `not null default now()`                   | Last modification time |
 
 ```sql
 create table public.committee_members (
@@ -1347,19 +1406,19 @@ comment on table public.committee_members is 'Executive and technical committee 
 
 Audit trail for all data changes.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `user_id` | `bigint` | `references users(id)` | Acting user |
-| `action` | `varchar(50)` | `not null` | Action type |
-| `table_name` | `varchar(100)` | `not null` | Affected table |
-| `record_id` | `bigint` | | Affected record ID |
-| `old_values` | `jsonb` | | Previous values |
-| `new_values` | `jsonb` | | New values |
-| `ip_address` | `inet` | | Client IP |
-| `user_agent` | `text` | | Browser user agent |
-| `request_id` | `uuid` | | Request correlation ID |
-| `created_at` | `timestamptz` | `not null default now()` | Event timestamp |
+| Column       | Type           | Constraints                                | Description            |
+| ------------ | -------------- | ------------------------------------------ | ---------------------- |
+| `id`         | `bigint`       | `generated always as identity primary key` | Internal primary key   |
+| `user_id`    | `bigint`       | `references users(id)`                     | Acting user            |
+| `action`     | `varchar(50)`  | `not null`                                 | Action type            |
+| `table_name` | `varchar(100)` | `not null`                                 | Affected table         |
+| `record_id`  | `bigint`       |                                            | Affected record ID     |
+| `old_values` | `jsonb`        |                                            | Previous values        |
+| `new_values` | `jsonb`        |                                            | New values             |
+| `ip_address` | `inet`         |                                            | Client IP              |
+| `user_agent` | `text`         |                                            | Browser user agent     |
+| `request_id` | `uuid`         |                                            | Request correlation ID |
+| `created_at` | `timestamptz`  | `not null default now()`                   | Event timestamp        |
 
 ```sql
 create table public.audit_logs (
@@ -1387,21 +1446,21 @@ comment on table public.audit_logs is 'Comprehensive audit trail for compliance 
 
 Background job scheduling and tracking.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `bigint` | `generated always as identity primary key` | Internal primary key |
-| `job_name` | `varchar(100)` | `not null` | Job identifier |
-| `job_type` | `varchar(50)` | `not null` | Job type |
-| `schedule` | `varchar(50)` | | Cron expression |
-| `last_run_at` | `timestamptz` | | Last execution time |
-| `last_run_status` | `varchar(20)` | | Last run result |
-| `last_run_duration_ms` | `integer` | | Last run duration |
-| `last_error` | `text` | | Last error message |
-| `next_run_at` | `timestamptz` | | Next scheduled run |
-| `is_enabled` | `boolean` | `default true` | Job enabled |
-| `metadata` | `jsonb` | `default '{}'` | Job configuration |
-| `created_at` | `timestamptz` | `not null default now()` | Record creation time |
-| `updated_at` | `timestamptz` | `not null default now()` | Last modification time |
+| Column                 | Type           | Constraints                                | Description            |
+| ---------------------- | -------------- | ------------------------------------------ | ---------------------- |
+| `id`                   | `bigint`       | `generated always as identity primary key` | Internal primary key   |
+| `job_name`             | `varchar(100)` | `not null`                                 | Job identifier         |
+| `job_type`             | `varchar(50)`  | `not null`                                 | Job type               |
+| `schedule`             | `varchar(50)`  |                                            | Cron expression        |
+| `last_run_at`          | `timestamptz`  |                                            | Last execution time    |
+| `last_run_status`      | `varchar(20)`  |                                            | Last run result        |
+| `last_run_duration_ms` | `integer`      |                                            | Last run duration      |
+| `last_error`           | `text`         |                                            | Last error message     |
+| `next_run_at`          | `timestamptz`  |                                            | Next scheduled run     |
+| `is_enabled`           | `boolean`      | `default true`                             | Job enabled            |
+| `metadata`             | `jsonb`        | `default '{}'`                             | Job configuration      |
+| `created_at`           | `timestamptz`  | `not null default now()`                   | Record creation time   |
+| `updated_at`           | `timestamptz`  | `not null default now()`                   | Last modification time |
 
 ```sql
 create table public.scheduled_jobs (
@@ -1516,6 +1575,22 @@ create trigger update_competitions_updated_at before update on public.competitio
     for each row execute function public.update_updated_at_column();
 
 -- ... (apply to all tables with updated_at column)
+
+-- Apply Audit Log Triggers
+create trigger audit_users_changes after insert or update or delete on public.users
+    for each row execute function public.audit_log_changes();
+
+create trigger audit_shooters_changes after insert or update or delete on public.shooters
+    for each row execute function public.audit_log_changes();
+
+create trigger audit_competitions_changes after insert or update or delete on public.competitions
+    for each row execute function public.audit_log_changes();
+
+create trigger audit_payments_changes after insert or update or delete on public.payments
+    for each row execute function public.audit_log_changes();
+
+create trigger audit_scores_changes after insert or update or delete on public.scores
+    for each row execute function public.audit_log_changes();
 ```
 
 ### Audit Log Trigger
@@ -1551,7 +1626,7 @@ $$ language plpgsql;
 
 ```sql
 create or replace view public.v_active_shooters as
-select 
+select
     s.id,
     s.shooter_id,
     u.first_name,
@@ -1577,7 +1652,7 @@ comment on view public.v_active_shooters is 'Active shooters with their current 
 
 ```sql
 create or replace view public.v_upcoming_competitions as
-select 
+select
     c.id,
     c.public_id,
     c.name,
@@ -1607,7 +1682,7 @@ comment on view public.v_upcoming_competitions is 'Upcoming competitions with ve
 
 ```sql
 create or replace view public.v_current_rankings as
-select 
+select
     r.id,
     s.shooter_id,
     u.first_name || ' ' || u.last_name as shooter_name,
@@ -1619,7 +1694,7 @@ select
     r.ranking_points,
     r.best_score,
     r.valid_from,
-    case 
+    case
         when r.previous_rank is null then 'NEW'
         when r.rank < r.previous_rank then 'UP'
         when r.rank > r.previous_rank then 'DOWN'
@@ -1639,14 +1714,13 @@ comment on view public.v_current_rankings is 'Current rankings with rank change 
 
 ## Summary
 
-| Domain | Tables | Description |
-|--------|--------|-------------|
-| Authentication | 4 | Users, roles, sessions |
-| Shooters | 4 | Profiles, classifications, associations |
-| Competitions | 5 | Venues, events, entries |
-| Scores | 2 | Scores, rankings |
-| Payments | 4 | Memberships, payments, refunds |
-| Content | 6 | News, documents, contacts |
-| System | 2 | Audit logs, scheduled jobs |
-| **Total** | **27** | Complete platform schema |
-
+| Domain         | Tables | Description                             |
+| -------------- | ------ | --------------------------------------- |
+| Authentication | 4      | Users, roles, sessions                  |
+| Shooters       | 4      | Profiles, classifications, associations |
+| Competitions   | 5      | Venues, events, entries                 |
+| Scores         | 2      | Scores, rankings                        |
+| Payments       | 4      | Memberships, payments, refunds          |
+| Content        | 6      | News, documents, contacts               |
+| System         | 2      | Audit logs, scheduled jobs              |
+| **Total**      | **27** | Complete platform schema                |
