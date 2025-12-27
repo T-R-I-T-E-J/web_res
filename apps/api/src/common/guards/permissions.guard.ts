@@ -1,11 +1,16 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PERMISSIONS_KEY } from '../decorators/permissions.decorator.js';
-import { AuthService } from '../../auth/auth.service.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from '../../auth/entities/role.entity.js';
 import { UserRole } from '../../auth/entities/user-role.entity.js';
+import { User } from '../../users/entities/user.entity.js';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -27,7 +32,7 @@ export class PermissionsGuard implements CanActivate {
       return true; // No permissions required
     }
 
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<{ user: User }>();
     const user = request.user;
 
     if (!user || !user.id) {

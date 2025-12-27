@@ -11,7 +11,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly configService: ConfigService,
     private readonly usersService: UsersService,
   ) {
-    const secret = configService.get<string>('config.jwt.secret') || 'default-secret-change-in-production';
+    const secret =
+      configService.get<string>('config.jwt.secret') ||
+      'default-secret-change-in-production';
     
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

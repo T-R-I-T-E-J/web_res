@@ -9,7 +9,8 @@ import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { QueryUsersDto } from './dto/query-users.dto.js';
 import { User } from './entities/user.entity.js';
-import { hash, compare } from 'bcrypt';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import bcrypt = require('bcrypt');
 
 @Injectable()
 export class UsersService {
@@ -30,7 +31,10 @@ export class UsersService {
     }
 
     // Hash password
-    const passwordHash = await hash(createUserDto.password, this.SALT_ROUNDS);
+    const passwordHash = await bcrypt.hash(
+      createUserDto.password,
+      this.SALT_ROUNDS,
+    );
 
     // Create user
     return this.usersRepository.create(createUserDto, passwordHash);
@@ -158,14 +162,17 @@ export class UsersService {
     const user = await this.findById(id);
 
     // Verify current password
-    const isPasswordValid = await compare(currentPassword, user.password_hash);
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password_hash,
+    );
     if (!isPasswordValid) {
       throw new BadRequestException('Current password is incorrect');
     }
 
     // Hash new password
     // Hash new password
-    const newPasswordHash = await hash(newPassword, this.SALT_ROUNDS);
+    const newPasswordHash = await bcrypt.hash(newPassword, this.SALT_ROUNDS);
 
     // Update password
     await this.usersRepository.update(id, {
@@ -185,7 +192,7 @@ export class UsersService {
       return null;
     }
 
-    const isPasswordValid = await compare(password, user.password_hash);
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
     if (!isPasswordValid) {
       return null;
     }

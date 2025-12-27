@@ -10,7 +10,11 @@ import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service.js';
 import { LoginDto } from './dto/login.dto.js';
 import { RegisterDto } from './dto/register.dto.js';
-import { JwtPayload, AuthResponse } from './interfaces/jwt-payload.interface.js';
+import { User } from '../users/entities/user.entity.js';
+import {
+  JwtPayload,
+  AuthResponse,
+} from './interfaces/jwt-payload.interface.js';
 import { UserRole } from './entities/user-role.entity.js';
 import { Role } from './entities/role.entity.js';
 
@@ -145,7 +149,7 @@ export class AuthService {
   /**
    * Generate auth response with tokens
    */
-  private generateAuthResponse(user: any, roles: string[]): AuthResponse {
+  private generateAuthResponse(user: User, roles: string[]): AuthResponse {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
@@ -153,7 +157,9 @@ export class AuthService {
     };
 
     const accessToken = this.jwtService.sign(payload, {
-      expiresIn: this.configService.get<string>('config.jwt.expiresIn'),
+      expiresIn:
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+        (this.configService.get('config.jwt.expiresIn') as any) || '1h',
     });
 
     return {
@@ -175,7 +181,7 @@ export class AuthService {
   async validateToken(token: string): Promise<JwtPayload> {
     try {
       return this.jwtService.verify(token);
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Invalid token');
     }
   }

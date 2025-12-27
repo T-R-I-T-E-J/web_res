@@ -8,13 +8,20 @@ import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { AuditService } from '../services/audit.service.js';
 import { AuditAction } from '../entities/audit-log.entity.js';
+import { User } from '../../users/entities/user.entity.js';
 
 @Injectable()
 export class AuditInterceptor implements NestInterceptor {
   constructor(private readonly auditService: AuditService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<{
+      method: string;
+      url: string;
+      user: User;
+      ip: string;
+      headers: Record<string, any>;
+    }>();
     const { method, url, user, ip, headers } = request;
 
     // Map HTTP methods to audit actions
