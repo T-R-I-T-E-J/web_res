@@ -97,8 +97,8 @@ const Sidebar = ({ items, user }: SidebarProps) => {
               <Image
                 src="/logo.png"
                 alt="Paralympic Committee India"
-                width={collapsed ? 40 : 50}
-                height={collapsed ? 44 : 56}
+                width={collapsed ? 41 : 111}
+                height={collapsed ? 38 : 104}
                 className="object-contain flex-shrink-0"
               />
               {!collapsed && (

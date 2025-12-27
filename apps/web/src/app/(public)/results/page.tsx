@@ -7,51 +7,37 @@ export const metadata: Metadata = {
   description: 'View results from para shooting competitions - national and international events.',
 }
 
-const recentResults = [
+const resultFiles = [
   {
-    id: 1,
-    title: 'Paris 2024 Paralympics',
-    date: 'August-September 2024',
-    location: 'Paris, France',
-    type: 'Paralympic Games',
-    indianResults: [
-      { athlete: 'Avani Lekhara', event: 'R2 - 10m Air Rifle Standing SH1', position: '🥇 Gold', score: 249.7 },
-      { athlete: 'Avani Lekhara', event: 'R8 - 50m Rifle 3 Positions SH1', position: '🥈 Silver', score: 450.8 },
-      { athlete: 'Manish Narwal', event: 'P1 - 10m Air Pistol SH1', position: '🥇 Gold', score: 234.1 },
-      { athlete: 'Singhraj Adhana', event: 'P1 - 10m Air Pistol SH1', position: '🥉 Bronze', score: 216.7 },
-    ],
+    title: 'Complete Result of 6th NPSC 2025',
+    fileName: 'Complete Result of 6th NPSC 2025.pdf',
+    date: '2025',
   },
   {
-    id: 2,
-    title: 'WSPS World Cup - Changwon',
-    date: 'November 2025',
-    location: 'Changwon, South Korea',
-    type: 'World Cup',
-    indianResults: [
-      { athlete: 'Avani Lekhara', event: 'R2 - 10m Air Rifle Standing SH1', position: '🥇 Gold', score: 248.3 },
-      { athlete: 'Deepender Singh', event: 'R4 - 10m Air Rifle Standing SH2', position: '🥈 Silver', score: 247.1 },
-      { athlete: 'Rubina Francis', event: 'P2 - 10m Air Pistol SH1', position: '🥉 Bronze', score: 231.5 },
-    ],
+    title: 'Complete Results of 5th NPSC 2024 Revised',
+    fileName: 'Complete Results of 5th NPSC 2024 Revised.pdf',
+    date: '2024',
   },
   {
-    id: 3,
-    title: '67th National Shooting Championship',
-    date: 'December 2024',
-    location: 'New Delhi, India',
-    type: 'National',
-    indianResults: [
-      { athlete: 'Avani Lekhara', event: 'R2 - 10m Air Rifle Standing SH1', position: '🥇 Gold', score: 251.2 },
-      { athlete: 'Swaroop Unhalkar', event: 'R1 - 10m Air Rifle Standing SH1', position: '🥇 Gold', score: 246.8 },
-      { athlete: 'Manish Narwal', event: 'P1 - 10m Air Pistol SH1', position: '🥇 Gold', score: 239.4 },
-    ],
+    title: 'Complete Sign Scan Result of 4th NPSC (1st to 5th Nov 2023)',
+    fileName: 'Complete Sign Scan Result of 4th NPSC (1st to 5th Nov 2023).pdf',
+    date: '2023',
   },
-]
-
-const archives = [
-  { year: '2024', events: 12, medals: '15 Gold, 8 Silver, 11 Bronze' },
-  { year: '2023', events: 14, medals: '12 Gold, 10 Silver, 9 Bronze' },
-  { year: '2022', events: 11, medals: '18 Gold, 12 Silver, 14 Bronze' },
-  { year: '2021', events: 8, medals: '5 Gold, 3 Silver, 4 Bronze' },
+  {
+    title: 'Complete Final Results',
+    fileName: 'Complete-Final-Results.pdf',
+    date: 'Recent',
+  },
+  {
+    title: 'FINAL RESULT SCAN Results 3rd Zonal Para Shooting Championship',
+    fileName: 'FINAL RESULT SCAN Results-3rd-Zonal-Para-Shooting-Championship.pdf',
+    date: 'Archive',
+  },
+  {
+    title: 'Full Results 3rd National Para Shooting Championship at Mhow MP',
+    fileName: 'Full Results-3rd-National-Para-Shooting-Championship-at-Mhow-MP.pdf',
+    date: 'Archive',
+  },
 ]
 
 const ResultsPage = () => {
@@ -64,7 +50,7 @@ const ResultsPage = () => {
             Competition Results
           </h1>
           <p className="text-white/90 max-w-2xl mx-auto">
-            View detailed results from national and international para shooting competitions
+            Access official result sheets from national and zonal para shooting championships
           </p>
         </div>
       </section>
@@ -88,113 +74,43 @@ const ResultsPage = () => {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
               <input
                 type="search"
-                placeholder="Search by athlete, event, or competition..."
+                placeholder="Search by championship or year..."
                 className="input pl-12"
               />
             </div>
-            <select className="input w-full md:w-48">
-              <option value="">All Events</option>
-              <option value="R1">R1 - Air Rifle SH1</option>
-              <option value="R2">R2 - Air Rifle SH2</option>
-              <option value="P1">P1 - Air Pistol SH1</option>
-            </select>
-            <select className="input w-full md:w-48">
-              <option value="">All Years</option>
-              <option value="2025">2025</option>
-              <option value="2024">2024</option>
-              <option value="2023">2023</option>
-            </select>
           </div>
         </div>
       </section>
 
-      {/* Medal Summary */}
+      {/* Results List */}
       <section className="section bg-neutral-50">
         <div className="container-main">
-          <h2 className="section-title">2024-25 Medal Tally</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            {[
-              { label: 'Total Medals', value: 34, color: 'bg-primary' },
-              { label: 'Gold', value: 15, color: 'bg-accent' },
-              { label: 'Silver', value: 8, color: 'bg-neutral-400' },
-              { label: 'Bronze', value: 11, color: 'bg-amber-600' },
-            ].map((stat) => (
-              <div key={stat.label} className="card text-center">
-                <div className={`w-12 h-12 ${stat.color} rounded-full flex items-center justify-center mx-auto mb-3`}>
-                  <Medal className="w-6 h-6 text-white" />
-                </div>
-                <div className="font-heading text-3xl font-bold text-neutral-700">{stat.value}</div>
-                <div className="text-sm text-neutral-600">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Recent Results */}
-      <section className="section bg-white">
-        <div className="container-main">
-          <h2 className="section-title">Recent Competitions</h2>
-          <div className="space-y-8">
-            {recentResults.map((competition) => (
-              <div key={competition.id} className="card">
-                <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-6">
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="badge-info">{competition.type}</span>
-                    </div>
-                    <h3 className="font-heading text-xl font-semibold text-primary">
-                      {competition.title}
+          <h2 className="section-title">Official Result Sheets</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {resultFiles.map((file, i) => (
+              <div key={i} className="card-hover group">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-primary/10 rounded-card flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
+                    <Download className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-primary group-hover:text-interactive transition-colors truncate" title={file.title}>
+                      {file.title}
                     </h3>
-                    <div className="flex flex-wrap gap-4 mt-2 text-sm text-neutral-600">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        {competition.date}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        {competition.location}
-                      </span>
+                    <p className="text-sm text-neutral-500 mt-1 uppercase font-medium tracking-wider">
+                      {file.date} • PDF Document
+                    </p>
+                    <div className="mt-4">
+                      <a
+                        href={`/results/${file.fileName}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm font-bold text-accent hover:text-accent-dark transition-colors"
+                      >
+                        VIEW FULL RESULT <ChevronRight className="w-4 h-4" />
+                      </a>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Link
-                      href={`/results/${competition.id}`}
-                      className="btn-outline text-sm py-2"
-                    >
-                      Full Results
-                    </Link>
-                    <button className="btn-ghost text-sm py-2">
-                      <Download className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                <h4 className="font-semibold text-neutral-700 mb-3 flex items-center gap-2">
-                  <Trophy className="w-5 h-5 text-accent" />
-                  Indian Results
-                </h4>
-                <div className="overflow-x-auto">
-                  <table className="data-table">
-                    <thead>
-                      <tr>
-                        <th>Athlete</th>
-                        <th>Event</th>
-                        <th className="text-center">Position</th>
-                        <th className="text-right">Score</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {competition.indianResults.map((result, i) => (
-                        <tr key={i}>
-                          <td className="font-medium text-primary">{result.athlete}</td>
-                          <td className="text-neutral-600 text-sm">{result.event}</td>
-                          <td className="text-center font-semibold">{result.position}</td>
-                          <td className="text-right font-data">{result.score.toFixed(1)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
                 </div>
               </div>
             ))}
@@ -202,53 +118,15 @@ const ResultsPage = () => {
         </div>
       </section>
 
-      {/* Archives */}
-      <section className="section bg-neutral-50">
-        <div className="container-main">
-          <h2 className="section-title">Results Archive</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {archives.map((year) => (
-              <Link
-                key={year.year}
-                href={`/results/archive/${year.year}`}
-                className="card-hover group"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="font-heading text-2xl font-bold text-primary">{year.year}</span>
-                  <ChevronRight className="w-5 h-5 text-neutral-400 group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                </div>
-                <div className="text-sm text-neutral-600">
-                  <p>{year.events} Competitions</p>
-                  <p className="text-success font-medium mt-1">{year.medals}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Download Section */}
-      <section className="section bg-white">
-        <div className="container-main">
-          <div className="card bg-primary/5 border-primary/20">
-            <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                <Download className="w-8 h-8 text-primary" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-heading font-semibold text-lg text-primary mb-2">
-                  Download Complete Results
-                </h3>
-                <p className="text-neutral-600">
-                  Get comprehensive result sheets, score cards, and ranking reports in PDF or Excel format.
-                </p>
-              </div>
-              <div className="flex gap-3">
-                <button className="btn-primary">Download PDF</button>
-                <button className="btn-outline">Download Excel</button>
-              </div>
-            </div>
-          </div>
+      {/* Archive Info */}
+      <section className="section bg-white border-t border-neutral-200">
+        <div className="container-main text-center max-w-2xl mx-auto">
+          <h3 className="font-heading font-semibold text-xl text-primary mb-4">Looking for older results?</h3>
+          <p className="text-neutral-600 mb-8">
+            Our digital archive contains records from championships dating back to 2015. 
+            If you need a specific result sheet not listed here, please contact our technical department.
+          </p>
+          <a href="/contact" className="btn-primary">Contact Technical Team</a>
         </div>
       </section>
     </>

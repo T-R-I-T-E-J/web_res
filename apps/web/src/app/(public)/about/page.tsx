@@ -50,41 +50,25 @@ const AboutPage = () => {
       {/* Introduction Section */}
       <section id="intro" className="section bg-white">
         <div className="container-main">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="section-title">Introduction</h2>
-              <div className="prose prose-lg text-neutral-600 space-y-4">
-                <p>
-                  The Para Shooting Committee of India (PSCI) is the national governing body 
-                  for para shooting sports in India. Established in 1951, we have been at the 
-                  forefront of promoting, developing, and managing competitive shooting for 
-                  para-athletes across the nation.
-                </p>
-                <p>
-                  As a member of World Shooting Para Sport (WSPS) and the Paralympic Committee 
-                  of India, we organize national championships, selection trials, and training 
-                  programs to identify and nurture shooting talent among athletes with disabilities.
-                </p>
-                <p>
-                  Our mission is to provide equal opportunities for para-athletes to excel in 
-                  shooting sports, representing India at international competitions including 
-                  the Paralympic Games, World Championships, and Asian Para Games.
-                </p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { icon: Target, label: '500+', desc: 'Registered Shooters' },
-                { icon: Award, label: '100+', desc: 'International Medals' },
-                { icon: Users, label: '35', desc: 'State Associations' },
-                { icon: History, label: '70+', desc: 'Years of Excellence' },
-              ].map((stat) => (
-                <div key={stat.desc} className="card text-center">
-                  <stat.icon className="w-10 h-10 text-primary mx-auto mb-3" />
-                  <div className="font-heading text-2xl font-bold text-primary">{stat.label}</div>
-                  <div className="text-sm text-neutral-600">{stat.desc}</div>
-                </div>
-              ))}
+          <div className="max-w-4xl mx-auto">
+            <h2 className="section-title text-center">Introduction</h2>
+            <div className="prose prose-lg text-neutral-600 space-y-6 text-center">
+              <p>
+                The Para Shooting Committee of India (PSCI) is the national governing body 
+                for para shooting sports in India. Established in 1951, we have been at the 
+                forefront of promoting, developing, and managing competitive shooting for 
+                para-athletes across the nation.
+              </p>
+              <p>
+                As a member of World Shooting Para Sport (WSPS) and the Paralympic Committee 
+                of India, we organize national championships, selection trials, and training 
+                programs to identify and nurture shooting talent among athletes with disabilities.
+              </p>
+              <p>
+                Our mission is to provide equal opportunities for para-athletes to excel in 
+                shooting sports, representing India at international competitions including 
+                the Paralympic Games, World Championships, and Asian Para Games.
+              </p>
             </div>
           </div>
         </div>

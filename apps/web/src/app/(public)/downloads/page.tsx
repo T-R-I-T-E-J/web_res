@@ -3,120 +3,23 @@ import { FileText, Download, BookOpen, ClipboardList, Award, Shield } from 'luci
 
 export const metadata: Metadata = {
   title: 'Downloads',
-  description: 'Download forms, circulars, rules, and guidelines for para shooting in India.',
+  description: 'Download official rules and guidelines for para shooting in India.',
 }
-
-const forms = [
-  {
-    title: 'New Shooter Registration Form',
-    description: 'For athletes registering with PSCI for the first time',
-    fileType: 'PDF',
-    size: '245 KB',
-    href: '/downloads/forms/registration-form.pdf',
-  },
-  {
-    title: 'Event Entry Form',
-    description: 'Standard entry form for national championships',
-    fileType: 'PDF',
-    size: '180 KB',
-    href: '/downloads/forms/entry-form.pdf',
-  },
-  {
-    title: 'Classification Request Form',
-    description: 'Request for WSPS classification assessment',
-    fileType: 'PDF',
-    size: '156 KB',
-    href: '/downloads/forms/classification-form.pdf',
-  },
-  {
-    title: 'Equipment Declaration Form',
-    description: 'Mandatory equipment registration for competitions',
-    fileType: 'PDF',
-    size: '134 KB',
-    href: '/downloads/forms/equipment-form.pdf',
-  },
-  {
-    title: 'Coach Accreditation Form',
-    description: 'For coaches seeking official PSCI accreditation',
-    fileType: 'PDF',
-    size: '198 KB',
-    href: '/downloads/forms/coach-form.pdf',
-  },
-  {
-    title: 'State Association Affiliation Form',
-    description: 'For state unit registration and renewal',
-    fileType: 'PDF',
-    size: '212 KB',
-    href: '/downloads/forms/affiliation-form.pdf',
-  },
-]
 
 const rulesAndGuidelines = [
   {
-    title: 'ISSF/WSPS Rules 2024',
-    description: 'Official rules for Paralympic shooting events',
+    title: 'WSPS Rulebook 2026',
+    description: 'Official World Shooting Para Sport Rulebook - Final Version',
     fileType: 'PDF',
-    size: '2.4 MB',
-    href: '/downloads/rules/issf-wsps-rules-2024.pdf',
+    size: 'External',
+    href: 'https://www.paralympic.org/sites/default/files/2025-12/WSPS%20Rulebook%202026_vFinal_0.pdf',
   },
   {
-    title: 'Classification Rules & Procedures',
-    description: 'Complete guide to WSPS classification system',
+    title: 'WSPS Rulebook Appendices 2026',
+    description: 'Appendices to the Official WSPS Rulebook 2026',
     fileType: 'PDF',
-    size: '890 KB',
-    href: '/downloads/rules/classification-rules.pdf',
-  },
-  {
-    title: 'Equipment Regulations',
-    description: 'Specifications and regulations for rifles and pistols',
-    fileType: 'PDF',
-    size: '1.2 MB',
-    href: '/downloads/rules/equipment-regulations.pdf',
-  },
-  {
-    title: 'Anti-Doping Guidelines',
-    description: 'WADA compliant anti-doping policies',
-    fileType: 'PDF',
-    size: '567 KB',
-    href: '/downloads/rules/anti-doping.pdf',
-  },
-  {
-    title: 'National Championship Regulations',
-    description: 'Rules specific to NSCC events',
-    fileType: 'PDF',
-    size: '445 KB',
-    href: '/downloads/rules/nscc-regulations.pdf',
-  },
-]
-
-const circulars = [
-  {
-    title: 'Circular No. 45/2025 - Election Notice',
-    description: 'Regarding upcoming elections for Executive Committee',
-    date: 'Dec 20, 2025',
-    fileType: 'PDF',
-    href: '/downloads/circulars/45-2025-election.pdf',
-  },
-  {
-    title: 'Circular No. 44/2025 - NSCC Dates',
-    description: '68th National Championship schedule announcement',
-    date: 'Dec 15, 2025',
-    fileType: 'PDF',
-    href: '/downloads/circulars/44-2025-nscc.pdf',
-  },
-  {
-    title: 'Circular No. 43/2025 - Selection Policy',
-    description: 'Updated selection criteria for international events',
-    date: 'Dec 10, 2025',
-    fileType: 'PDF',
-    href: '/downloads/circulars/43-2025-selection.pdf',
-  },
-  {
-    title: 'Circular No. 42/2025 - Fee Revision',
-    description: 'Revised membership and entry fees for 2026',
-    date: 'Dec 5, 2025',
-    fileType: 'PDF',
-    href: '/downloads/circulars/42-2025-fees.pdf',
+    size: 'External',
+    href: 'https://www.paralympic.org/sites/default/files/2025-12/WSPS%20Rulebook%20Appendices%202026_vFinal.pdf',
   },
 ]
 
@@ -156,10 +59,11 @@ const DownloadCard = ({
       <a
         href={href}
         className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-accent transition-colors"
-        download
+        target="_blank"
+        rel="noopener noreferrer"
       >
         <Download className="w-4 h-4" />
-        Download {fileType}
+        View {fileType}
       </a>
     </div>
   </div>
@@ -175,7 +79,7 @@ const DownloadsPage = () => {
             Downloads
           </h1>
           <p className="text-white/90 max-w-2xl mx-auto">
-            Access official forms, rules, circulars, and guidelines for para shooting in India
+            Access official rules and guidelines for para shooting in India
           </p>
         </div>
       </section>
@@ -196,9 +100,7 @@ const DownloadsPage = () => {
         <div className="container-main">
           <div className="flex flex-wrap justify-center gap-4">
             {[
-              { label: 'Forms', icon: ClipboardList, href: '#forms' },
               { label: 'Rules & Guidelines', icon: BookOpen, href: '#rules' },
-              { label: 'Circulars', icon: FileText, href: '#circulars' },
               { label: 'Results', icon: Award, href: '/results' },
             ].map((item) => (
               <a
@@ -209,22 +111,6 @@ const DownloadsPage = () => {
                 <item.icon className="w-5 h-5" />
                 <span className="font-medium">{item.label}</span>
               </a>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Forms Section */}
-      <section id="forms" className="section bg-neutral-50">
-        <div className="container-main">
-          <h2 className="section-title">Forms</h2>
-          <p className="text-neutral-600 mb-8 max-w-2xl">
-            Download official forms for registration, competition entries, and administrative purposes.
-            All forms must be submitted to the PSCI office or uploaded through the shooter portal.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {forms.map((form) => (
-              <DownloadCard key={form.title} {...form} />
             ))}
           </div>
         </div>
@@ -246,47 +132,6 @@ const DownloadsPage = () => {
         </div>
       </section>
 
-      {/* Circulars Section */}
-      <section id="circulars" className="section bg-neutral-50">
-        <div className="container-main">
-          <h2 className="section-title">Circulars & Notifications</h2>
-          <p className="text-neutral-600 mb-8 max-w-2xl">
-            Latest circulars, notifications, and official communications from PSCI.
-          </p>
-          <div className="space-y-4">
-            {circulars.map((circular) => (
-              <div key={circular.title} className="card-hover">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 bg-accent/10 rounded-card flex items-center justify-center flex-shrink-0">
-                      <FileText className="w-5 h-5 text-accent" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-primary">{circular.title}</h3>
-                      <p className="text-sm text-neutral-600">{circular.description}</p>
-                      <span className="text-xs text-neutral-400 mt-1 block">{circular.date}</span>
-                    </div>
-                  </div>
-                  <a
-                    href={circular.href}
-                    className="btn-primary text-sm py-2 self-start sm:self-center"
-                    download
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Download
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-8 text-center">
-            <a href="/circulars" className="text-interactive hover:text-primary font-semibold">
-              View All Circulars →
-            </a>
-          </div>
-        </div>
-      </section>
-
       {/* Help Section */}
       <section className="section bg-white">
         <div className="container-main">
@@ -300,7 +145,7 @@ const DownloadsPage = () => {
                   Need Help with Downloads?
                 </h3>
                 <p className="text-neutral-600">
-                  If you're having trouble accessing any documents or need assistance with forms, 
+                  If you're having trouble accessing any documents or need assistance, 
                   please contact our support team. We're here to help.
                 </p>
               </div>

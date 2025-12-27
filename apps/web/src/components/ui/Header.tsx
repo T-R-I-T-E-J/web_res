@@ -37,7 +37,6 @@ const navItems: NavItem[] = [
     label: 'Downloads',
     href: '/downloads',
     children: [
-      { label: 'Forms', href: '/downloads#forms' },
       { label: 'Rules & Guidelines', href: '/downloads#rules' },
     ],
   },
@@ -62,7 +61,7 @@ const Header = () => {
     <header className="bg-white">
       {/* Top Bar with Navigation */}
       <nav className="bg-secondary text-white py-1 text-sm hidden md:block">
-        <div className="container-main flex justify-end items-center">
+        <div className="container-main flex justify-center items-center">
           <ul className="flex items-center gap-1">
             {navItems.map((item) => (
               <li key={item.href} className="relative group">
@@ -176,24 +175,29 @@ const Header = () => {
       )}
 
       {/* Logo Section */}
-      <div className="bg-white py-12 text-center">
-        <div className="container-main">
-          <Link href="/" className="inline-block relative">
-            <div className="absolute -inset-8 bg-white rounded-full shadow-[0_0_40px_rgba(0,0,0,0.05)] -z-10"></div>
+      <div className="bg-white py-8">
+        <div className="container-main relative flex items-center justify-center min-h-[160px]">
+          <Link href="/" className="absolute left-0 top-1/2 -translate-y-1/2">
             <Image
               src="/logo.png"
               alt="Paralympic Committee India - Para Shooting"
-              width={220}
-              height={245}
-              className="mx-auto"
+              width={111}
+              height={104}
+              className="object-contain"
               priority
             />
           </Link>
+          <div className="text-center">
+            <h1 className="font-heading text-2xl md:text-4xl font-bold text-primary tracking-tight leading-tight uppercase">
+              Para Shooting Committee of India
+            </h1>
+            <p className="text-neutral-500 font-medium tracking-[0.2em] uppercase mt-1 text-xs md:text-sm">
+              Empowering para-athletes to achieve excellence
+            </p>
+          </div>
         </div>
       </div>
     </header>
-  )
-}
   )
 }
 

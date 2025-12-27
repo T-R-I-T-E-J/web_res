@@ -51,29 +51,6 @@ const upcomingEvents = [
   },
 ]
 
-const features = [
-  {
-    icon: Target,
-    title: 'World-Class Training',
-    description: 'Access to state-of-the-art shooting ranges and equipment across India.',
-  },
-  {
-    icon: Medal,
-    title: 'International Success',
-    description: 'Our athletes have won numerous medals at Paralympics and World Championships.',
-  },
-  {
-    icon: Users,
-    title: 'Inclusive Community',
-    description: 'Supporting para-athletes from all backgrounds and ability levels.',
-  },
-  {
-    icon: Calendar,
-    title: 'Regular Events',
-    description: 'National and international competitions throughout the year.',
-  },
-]
-
 const HomePage = () => {
   return (
     <>
@@ -119,49 +96,28 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Features/Why Choose Us Section */}
+      {/* Featured Videos Section */}
       <section className="section bg-white">
         <div className="container-main">
-          <div className="text-center mb-12">
-            <h2 className="section-title">Why Para Shooting India</h2>
-            <p className="text-neutral-600 max-w-2xl mx-auto mt-4">
-              We are committed to developing world-class para-shooters through excellence in training, 
-              competition, and support services.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature) => (
-              <div key={feature.title} className="text-center p-6">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <feature.icon className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="font-heading font-semibold text-lg text-primary mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-sm text-neutral-600">{feature.description}</p>
+          <h2 className="section-title text-center mb-12">Featured Videos</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {[
+              'PVKBcmWnlHw',
+              'CC5oe68AkqE',
+              'dxT_9RBQpjc',
+              'Hmffj6csbr8'
+            ].map((videoId) => (
+              <div key={videoId} className="aspect-video rounded-card overflow-hidden shadow-card">
+                <iframe
+                  className="w-full h-full"
+                  src={`https://www.youtube.com/embed/${videoId}`}
+                  title="YouTube video player"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                ></iframe>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="gradient-hero py-16">
-        <div className="container-main text-center">
-          <h2 className="font-heading text-2xl md:text-3xl font-bold text-white mb-4">
-            Ready to Start Your Journey?
-          </h2>
-          <p className="text-white/90 max-w-xl mx-auto mb-8">
-            Join the Para Shooting Committee of India and become part of a community dedicated to 
-            excellence in para shooting sports.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/register" className="btn bg-accent text-white hover:bg-accent-dark">
-              Register as Shooter
-            </Link>
-            <Link href="/contact" className="btn bg-white/10 text-white border-2 border-white/30 hover:bg-white/20">
-              Contact Us
-            </Link>
           </div>
         </div>
       </section>

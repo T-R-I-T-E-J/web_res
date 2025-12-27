@@ -15,8 +15,8 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
             <Image
               src="/logo.png"
               alt="Paralympic Committee India"
-              width={60}
-              height={67}
+              width={111}
+              height={104}
               className="object-contain"
             />
             <span className="font-heading font-bold text-lg text-primary hidden sm:block">
