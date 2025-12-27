@@ -77,14 +77,8 @@ const features = [
 const HomePage = () => {
   return (
     <>
-      {/* Hero Section */}
-      <HeroSection />
-
-      {/* Search Bar */}
-      <SearchBar />
-
       {/* Latest News Section */}
-      <section className="section bg-white">
+      <section className="section bg-white pt-12">
         <div className="container-main">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
             <h2 className="section-title">Latest News & Updates</h2>
@@ -168,31 +162,6 @@ const HomePage = () => {
             <Link href="/contact" className="btn bg-white/10 text-white border-2 border-white/30 hover:bg-white/20">
               Contact Us
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Quick Links Section */}
-      <section className="section bg-neutral-100">
-        <div className="container-main">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { label: 'Download Forms', href: '/downloads#forms', icon: '📝' },
-              { label: 'View Rankings', href: '/rankings', icon: '🏆' },
-              { label: 'Event Calendar', href: '/events', icon: '📅' },
-              { label: 'Contact Support', href: '/contact', icon: '📞' },
-            ].map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="card-hover text-center p-6 group"
-              >
-                <span className="text-3xl mb-2 block">{link.icon}</span>
-                <span className="font-semibold text-primary group-hover:text-interactive transition-colors">
-                  {link.label}
-                </span>
-              </Link>
-            ))}
           </div>
         </div>
       </section>
