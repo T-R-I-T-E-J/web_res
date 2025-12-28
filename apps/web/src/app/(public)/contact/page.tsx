@@ -116,14 +116,17 @@ const ContactPage = () => {
                       </a>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-start gap-4">
                     <div className="w-10 h-10 bg-primary/10 rounded-card flex items-center justify-center flex-shrink-0">
                       <Mail className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm text-neutral-500">Email</p>
-                      <a href="mailto:info@parashooting.org" className="text-neutral-700 hover:text-interactive">
-                        info@parashooting.org
+                      <p className="text-sm text-neutral-500">Official Communication Email</p>
+                      <a href="mailto:stcparashooting@gmail.com" className="block text-neutral-700 hover:text-interactive">
+                        stcparashooting@gmail.com
+                      </a>
+                      <a href="mailto:theparashootingindia@gmail.com" className="block text-neutral-700 hover:text-interactive">
+                        theparashootingindia@gmail.com
                       </a>
                     </div>
                   </div>

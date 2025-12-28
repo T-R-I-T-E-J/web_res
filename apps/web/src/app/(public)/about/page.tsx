@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Users, Award, Target, History, FileText, Shield } from 'lucide-react'
+import { Users, History } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'About Us',
@@ -64,18 +64,13 @@ const AboutPage = () => {
                 of India, we organize national championships, selection trials, and training 
                 programs to identify and nurture shooting talent among athletes with disabilities.
               </p>
-              <p>
-                Our mission is to provide equal opportunities for para-athletes to excel in 
-                shooting sports, representing India at international competitions including 
-                the Paralympic Games, World Championships, and Asian Para Games.
-              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* History Section */}
-      <section id="history" className="section bg-neutral-50">
+      <section id="history" className="section bg-white">
         <div className="container-main">
           <h2 className="section-title">Our History</h2>
           <div className="max-w-3xl">
@@ -152,45 +147,6 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Constitution Section */}
-      <section id="constitution" className="section bg-white">
-        <div className="container-main">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="card">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-primary/10 rounded-card flex items-center justify-center flex-shrink-0">
-                  <FileText className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-heading font-semibold text-lg text-primary mb-2">Constitution</h3>
-                  <p className="text-neutral-600 text-sm mb-4">
-                    Download the official constitution and bylaws of the Para Shooting Committee of India.
-                  </p>
-                  <a href="/downloads/constitution.pdf" className="btn-primary text-sm py-2">
-                    Download PDF
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="card">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-primary/10 rounded-card flex items-center justify-center flex-shrink-0">
-                  <Shield className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-heading font-semibold text-lg text-primary mb-2">Anti-Doping Policy</h3>
-                  <p className="text-neutral-600 text-sm mb-4">
-                    We are committed to clean sport. Read our anti-doping policies and guidelines.
-                  </p>
-                  <a href="/downloads/anti-doping.pdf" className="btn-primary text-sm py-2">
-                    View Policy
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
     </>
   )
 }

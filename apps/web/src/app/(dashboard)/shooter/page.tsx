@@ -110,7 +110,7 @@ const ShooterDashboardPage = () => {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-heading font-bold text-lg text-primary flex items-center gap-2">
                   <TrendingUp className="w-5 h-5" />
-                  Results & Ranking
+                  Results & Performance
                 </h3>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

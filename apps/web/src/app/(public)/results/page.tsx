@@ -118,17 +118,6 @@ const ResultsPage = () => {
         </div>
       </section>
 
-      {/* Archive Info */}
-      <section className="section bg-white border-t border-neutral-200">
-        <div className="container-main text-center max-w-2xl mx-auto">
-          <h3 className="font-heading font-semibold text-xl text-primary mb-4">Looking for older results?</h3>
-          <p className="text-neutral-600 mb-8">
-            Our digital archive contains records from championships dating back to 2015. 
-            If you need a specific result sheet not listed here, please contact our technical department.
-          </p>
-          <a href="/contact" className="btn-primary">Contact Technical Team</a>
-        </div>
-      </section>
     </>
   )
 }
