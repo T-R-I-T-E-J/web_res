@@ -32,7 +32,9 @@ export class CreateUserDto {
   last_name: string;
 
   @IsOptional()
-  @IsPhoneNumber('IN', { message: 'Please provide a valid Indian phone number' })
+  @IsPhoneNumber('IN', {
+    message: 'Please provide a valid Indian phone number',
+  })
   phone?: string;
 
   @IsOptional()

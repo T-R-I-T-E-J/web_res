@@ -1,10 +1,4 @@
-import {
-  IsString,
-  IsOptional,
-  IsBoolean,
-  Length,
-  IsIn,
-} from 'class-validator';
+import { IsString, IsOptional, IsBoolean, Length, IsIn } from 'class-validator';
 
 export class CreateDisabilityCategoryDto {
   @IsString()

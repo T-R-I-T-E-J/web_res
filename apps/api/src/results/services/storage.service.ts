@@ -6,11 +6,11 @@ import { randomUUID } from 'crypto';
 
 /**
  * Storage Service
- * 
+ *
  * Abstracted storage layer that supports:
  * - Local file system (development)
  * - Cloud storage (production) - AWS S3, Cloudflare R2, etc.
- * 
+ *
  * This implementation uses local storage but is designed to be
  * easily swapped for cloud storage by implementing the same interface.
  */
@@ -64,7 +64,7 @@ export class StorageService {
     const uuid = randomUUID();
     const ext = path.extname(originalName);
     const nameWithoutExt = path.basename(originalName, ext);
-    
+
     // Sanitize filename (remove special characters)
     const sanitized = nameWithoutExt
       .replace(/[^a-zA-Z0-9-_]/g, '-')
@@ -76,7 +76,7 @@ export class StorageService {
 
   /**
    * Upload file to storage
-   * 
+   *
    * @param file - Multer file object
    * @returns Storage result with file metadata
    */
@@ -110,7 +110,7 @@ export class StorageService {
 
   /**
    * Delete file from storage
-   * 
+   *
    * @param storedFileName - Filename to delete
    */
   async deleteFile(storedFileName: string): Promise<void> {
@@ -120,17 +120,14 @@ export class StorageService {
       await fs.unlink(filePath);
       this.logger.log(`File deleted successfully: ${storedFileName}`);
     } catch (error) {
-      this.logger.error(
-        `Failed to delete file: ${error.message}`,
-        error.stack,
-      );
+      this.logger.error(`Failed to delete file: ${error.message}`, error.stack);
       throw new Error(`File deletion failed: ${error.message}`);
     }
   }
 
   /**
    * Check if file exists
-   * 
+   *
    * @param storedFileName - Filename to check
    * @returns True if file exists
    */
@@ -147,7 +144,7 @@ export class StorageService {
 
   /**
    * Get file metadata
-   * 
+   *
    * @param storedFileName - Filename to get metadata for
    * @returns File stats
    */
@@ -177,18 +174,18 @@ export class StorageService {
 
 /**
  * Cloud Storage Service (Future Implementation)
- * 
+ *
  * To use cloud storage (AWS S3, Cloudflare R2, etc.):
- * 
+ *
  * 1. Install cloud SDK:
  *    npm install @aws-sdk/client-s3
- * 
+ *
  * 2. Create CloudStorageService implementing same interface:
  *    - uploadFile()
  *    - deleteFile()
  *    - fileExists()
  *    - getFileMetadata()
- * 
+ *
  * 3. Update module to use CloudStorageService in production:
  *    providers: [
  *      {
@@ -198,20 +195,20 @@ export class StorageService {
  *          : StorageService
  *      }
  *    ]
- * 
+ *
  * Example AWS S3 implementation:
- * 
+ *
  * async uploadFile(file: Express.Multer.File): Promise<StorageResult> {
  *   const s3 = new S3Client({ region: 'us-east-1' });
  *   const key = this.generateUniqueFileName(file.originalname);
- *   
+ *
  *   await s3.send(new PutObjectCommand({
  *     Bucket: 'my-bucket',
  *     Key: key,
  *     Body: file.buffer,
  *     ContentType: file.mimetype,
  *   }));
- *   
+ *
  *   return {
  *     fileName: file.originalname,
  *     storedFileName: key,

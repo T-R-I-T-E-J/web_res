@@ -51,7 +51,7 @@ export class PermissionsGuard implements CanActivate {
 
     // Collect all permissions from user's roles (including parent roles)
     const userPermissions = new Set<string>();
-    
+
     for (const userRole of userRoles) {
       const role = userRole.role;
       await this.collectPermissions(role, userPermissions);

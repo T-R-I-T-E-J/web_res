@@ -97,7 +97,10 @@ export class VenuesController {
   @UseGuards(RolesGuard, PermissionsGuard)
   @RequirePermissions('system:admin')
   @Delete(':id')
-  async remove(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+  async remove(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
     const existing = await this.venuesService.findOne(+id);
     await this.venuesService.remove(+id);
 

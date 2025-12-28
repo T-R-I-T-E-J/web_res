@@ -11,7 +11,7 @@ import { User } from '../../users/entities/user.entity';
 
 /**
  * Result Entity
- * 
+ *
  * Stores metadata about uploaded competition results (PDFs)
  * The actual PDF files are stored in the file system or cloud storage
  */

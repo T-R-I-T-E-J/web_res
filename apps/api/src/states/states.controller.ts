@@ -99,7 +99,10 @@ export class StatesController {
   @UseGuards(RolesGuard, PermissionsGuard)
   @RequirePermissions('system:admin')
   @Delete(':id')
-  async remove(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+  async remove(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
     const existing = await this.statesService.findOne(+id);
     await this.statesService.remove(+id);
 

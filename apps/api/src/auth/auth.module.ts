@@ -26,7 +26,8 @@ import { UsersModule } from '../users/users.module.js';
         return {
           secret: secret,
           signOptions: {
-            expiresIn: (configService.get<string>('config.jwt.expiresIn') || '7d') as any,
+            expiresIn: (configService.get<string>('config.jwt.expiresIn') ||
+              '7d') as any,
           },
         };
       },

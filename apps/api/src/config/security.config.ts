@@ -146,8 +146,7 @@ export const productionSecurityConfig: HelmetOptions = {
 export function getSecurityConfig(
   environment: string = 'development',
 ): HelmetOptions {
-  const isProduction =
-    environment === 'production' || environment === 'prod';
+  const isProduction = environment === 'production' || environment === 'prod';
 
   if (isProduction) {
     return productionSecurityConfig;

@@ -32,24 +32,38 @@ This document outlines the step-by-step plan to bring the _Para Shooting Committ
 
 ---
 
+---
+
+## Phase 5A: News & Announcements System (🚀 IN PROGRESS)
+
+**Goal:** Implement full News/Announcements system (API + Admin + Public).
+
+**Status:** In Progress
+
+1.  **Backend (NestJS)**:
+    - [x] Database Schema (`news_articles` table exists).
+    - [ ] Create `News` Module (Controller, Service, Repository).
+    - [ ] Implement CRUD for Admin.
+    - [ ] Implement Public Endpoints (List, Get One).
+2.  **Frontend (Admin)**:
+    - [ ] News Management Page (List, Create, Edit, Delete).
+3.  **Frontend (Public)**:
+    - [ ] Home Page News Section.
+    - [ ] News Listing Page.
+    - [ ] News Detail Page.
+
+---
+
 ## 🚦 Immediate Next Action
 
-**Initialize Phase 2 (Frontend Core)**:
+**Implement News API**:
 
-The database foundation is solid and running. Next step is to initialize the Next.js frontend application in `apps/web`.
+The database table `news_articles` is ready. We are starting the backend implementation.
 
-**Command to run:**
+**Tasks:**
 
-```bash
-cd apps
-npx create-next-app@latest web --typescript --tailwind --eslint --app --src-dir --import-alias "@/*"
-```
+1.  Create `News` entity and DTOs.
+2.  Implement `NewsService` and `NewsController`.
+3.  Register `NewsModule`.
 
-This will create a production-ready Next.js 14+ application with:
-
-- ✅ TypeScript
-- ✅ Tailwind CSS
-- ✅ ESLint
-- ✅ App Router
-- ✅ `src/` directory structure
-- ✅ Path aliases configured
+---

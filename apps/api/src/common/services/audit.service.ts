@@ -44,10 +44,7 @@ export class AuditService {
   /**
    * Get audit logs for a specific user
    */
-  async getUserLogs(
-    userId: number,
-    limit: number = 100,
-  ): Promise<AuditLog[]> {
+  async getUserLogs(userId: number, limit: number = 100): Promise<AuditLog[]> {
     return this.auditLogRepository.find({
       where: { user_id: userId },
       order: { created_at: 'DESC' },

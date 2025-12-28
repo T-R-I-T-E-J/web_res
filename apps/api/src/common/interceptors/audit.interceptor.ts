@@ -42,7 +42,9 @@ export class AuditInterceptor implements NestInterceptor {
           userId: user?.id,
           action,
           tableName: this.extractTableName(url),
-          ipAddress: (ip || headers['x-forwarded-for'] || headers['x-real-ip']) as string,
+          ipAddress: (ip ||
+            headers['x-forwarded-for'] ||
+            headers['x-real-ip']) as string,
           userAgent: headers['user-agent'] as string,
         });
       }),

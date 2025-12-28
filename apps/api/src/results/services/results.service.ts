@@ -23,7 +23,7 @@ export class ResultsService {
 
   /**
    * Upload a new result PDF
-   * 
+   *
    * @param file - Uploaded PDF file
    * @param uploadDto - Result metadata
    * @param userId - ID of admin user uploading
@@ -34,9 +34,7 @@ export class ResultsService {
     uploadDto: UploadResultDto,
     userId: number,
   ): Promise<ResultResponseDto> {
-    this.logger.log(
-      `Uploading result: ${uploadDto.title} by user ${userId}`,
-    );
+    this.logger.log(`Uploading result: ${uploadDto.title} by user ${userId}`);
 
     // Validate file
     this.validateFile(file);
@@ -75,7 +73,7 @@ export class ResultsService {
 
   /**
    * Get all published results
-   * 
+   *
    * @returns List of all published results
    */
   async findAll(): Promise<ResultResponseDto[]> {
@@ -89,7 +87,7 @@ export class ResultsService {
 
   /**
    * Get a single result by ID
-   * 
+   *
    * @param id - Result ID
    * @returns Result details
    */
@@ -107,7 +105,7 @@ export class ResultsService {
 
   /**
    * Delete a result (soft delete)
-   * 
+   *
    * @param id - Result ID
    * @param userId - ID of admin user deleting
    */
@@ -135,7 +133,7 @@ export class ResultsService {
 
   /**
    * Validate uploaded file
-   * 
+   *
    * @param file - File to validate
    * @throws BadRequestException if validation fails
    */
@@ -158,7 +156,7 @@ export class ResultsService {
     const fileExtension = file.originalname
       .toLowerCase()
       .substring(file.originalname.lastIndexOf('.'));
-    
+
     if (!allowedExtensions.includes(fileExtension)) {
       throw new BadRequestException(
         `Invalid file extension. Only .pdf files are allowed. Received: ${fileExtension}`,
@@ -185,7 +183,7 @@ export class ResultsService {
 
   /**
    * Map entity to response DTO
-   * 
+   *
    * @param result - Result entity
    * @returns Response DTO
    */

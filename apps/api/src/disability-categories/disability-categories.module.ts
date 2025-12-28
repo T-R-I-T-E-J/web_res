@@ -10,12 +10,7 @@ import { UserRole } from '../auth/entities/user-role.entity.js';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      DisabilityCategory,
-      AuditLog,
-      Role,
-      UserRole,
-    ]),
+    TypeOrmModule.forFeature([DisabilityCategory, AuditLog, Role, UserRole]),
   ],
   controllers: [DisabilityCategoriesController],
   providers: [DisabilityCategoriesService, AuditService],

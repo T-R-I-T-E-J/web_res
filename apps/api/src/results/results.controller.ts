@@ -21,9 +21,9 @@ import { Public } from '../auth/decorators/public.decorator';
 
 /**
  * Results Controller
- * 
+ *
  * Handles PDF upload and management for competition results
- * 
+ *
  * Security:
  * - Upload: Admin only (@Roles('admin'))
  * - Delete: Admin only (@Roles('admin'))
@@ -35,11 +35,11 @@ export class ResultsController {
 
   /**
    * Upload a new result PDF
-   * 
+   *
    * POST /api/v1/results/upload
-   * 
+   *
    * Security: Admin only
-   * 
+   *
    * Request:
    * - Content-Type: multipart/form-data
    * - Authorization: Bearer <admin-token>
@@ -48,13 +48,13 @@ export class ResultsController {
    *   - title: string (required)
    *   - date: string (required)
    *   - description: string (optional)
-   * 
+   *
    * Response:
    * - 201 Created: Result uploaded successfully
    * - 400 Bad Request: Invalid file or validation error
    * - 401 Unauthorized: Not authenticated
    * - 403 Forbidden: Not an admin
-   * 
+   *
    * Example:
    * ```bash
    * curl -X POST http://localhost:8080/api/v1/results/upload \
@@ -87,14 +87,14 @@ export class ResultsController {
 
   /**
    * Get all published results
-   * 
+   *
    * GET /api/v1/results
-   * 
+   *
    * Security: Public (no authentication required)
-   * 
+   *
    * Response:
    * - 200 OK: List of results
-   * 
+   *
    * Example:
    * ```bash
    * curl http://localhost:8080/api/v1/results
@@ -108,15 +108,15 @@ export class ResultsController {
 
   /**
    * Get a single result by ID
-   * 
+   *
    * GET /api/v1/results/:id
-   * 
+   *
    * Security: Public (no authentication required)
-   * 
+   *
    * Response:
    * - 200 OK: Result details
    * - 404 Not Found: Result not found
-   * 
+   *
    * Example:
    * ```bash
    * curl http://localhost:8080/api/v1/results/123e4567-e89b-12d3-a456-426614174000
@@ -132,17 +132,17 @@ export class ResultsController {
 
   /**
    * Delete a result (soft delete)
-   * 
+   *
    * DELETE /api/v1/results/:id
-   * 
+   *
    * Security: Admin only
-   * 
+   *
    * Response:
    * - 204 No Content: Result deleted successfully
    * - 404 Not Found: Result not found
    * - 401 Unauthorized: Not authenticated
    * - 403 Forbidden: Not an admin
-   * 
+   *
    * Example:
    * ```bash
    * curl -X DELETE http://localhost:8080/api/v1/results/123e4567-e89b-12d3-a456-426614174000 \
@@ -163,22 +163,22 @@ export class ResultsController {
 
 /**
  * API Contract Summary
- * 
+ *
  * Endpoints:
  * 1. POST   /api/v1/results/upload  - Upload PDF (Admin only)
  * 2. GET    /api/v1/results         - List all results (Public)
  * 3. GET    /api/v1/results/:id     - Get single result (Public)
  * 4. DELETE /api/v1/results/:id     - Delete result (Admin only)
- * 
+ *
  * Authentication:
  * - Admin endpoints require JWT token with 'admin' role
  * - Public endpoints require no authentication
- * 
+ *
  * File Validation:
  * - Type: PDF only (application/pdf)
  * - Size: Max 10MB
  * - Extension: .pdf only
- * 
+ *
  * Response Codes:
  * - 200 OK: Success (GET)
  * - 201 Created: Success (POST)

@@ -13,6 +13,7 @@ import { DisabilityCategoriesModule } from './disability-categories/disability-c
 import { VenuesModule } from './venues/venues.module.js';
 import { ShootersModule } from './shooters/shooters.module.js';
 import { ResultsModule } from './results/results.module.js';
+import { NewsModule } from './news/news.module.js';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard.js';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { AuditLog } from './common/entities/audit-log.entity.js';
@@ -60,6 +61,7 @@ import { getDatabaseConfig } from './config/database.config';
     VenuesModule,
     ShootersModule,
     ResultsModule,
+    NewsModule,
   ],
   controllers: [AppController],
   providers: [

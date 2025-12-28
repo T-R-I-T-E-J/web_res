@@ -64,8 +64,7 @@ export function httpsRedirectMiddleware(
 export function createHttpsRedirectMiddleware(
   environment: string = 'development',
 ): ((req: Request, res: Response, next: NextFunction) => void) | null {
-  const isProduction =
-    environment === 'production' || environment === 'prod';
+  const isProduction = environment === 'production' || environment === 'prod';
 
   if (!isProduction) {
     logger.log(
