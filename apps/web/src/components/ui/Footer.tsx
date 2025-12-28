@@ -140,6 +140,7 @@ const Footer = () => {
       <div className="bg-secondary text-white">
         <div className="container-main py-4 flex flex-col md:flex-row justify-between items-center gap-2 text-sm">
           <p>© {currentYear} Para Shooting Committee of India. All rights reserved.</p>
+          <p className="text-white/70">Sponsored by <span className="text-accent font-semibold">VSK</span></p>
           <div className="flex gap-4">
             <Link href="/privacy" className="hover:text-accent transition-colors">
               Privacy Policy
