@@ -122,4 +122,109 @@ export class AuditService {
       unique_users: new Set(logs.map((l) => l.user_id).filter(Boolean)).size,
     };
   }
+
+  /**
+   * GDPR/DPDP Compliance: Log consent changes
+   */
+  async logConsentChange(
+    userId: number,
+    consentType: 'analytics' | 'marketing' | 'necessary',
+    granted: boolean,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<AuditLog> {
+    return this.log({
+      userId,
+      action: 'UPDATE',
+      tableName: 'user_consent',
+      newValues: {
+        consent_type: consentType,
+        granted,
+        timestamp: new Date().toISOString(),
+      },
+      ipAddress,
+      userAgent,
+    });
+  }
+
+  /**
+   * GDPR/DPDP Compliance: Log data export requests
+   */
+  async logDataExport(
+    userId: number,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<AuditLog> {
+    return this.log({
+      userId,
+      action: 'SELECT',
+      tableName: 'user_data_export',
+      newValues: {
+        export_requested_at: new Date().toISOString(),
+        status: 'initiated',
+      },
+      ipAddress,
+      userAgent,
+    });
+  }
+
+  /**
+   * GDPR/DPDP Compliance: Log data deletion requests (Right to be Forgotten)
+   */
+  async logDataDeletion(
+    userId: number,
+    reason?: string,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<AuditLog> {
+    return this.log({
+      userId,
+      action: 'DELETE',
+      tableName: 'user_data_deletion',
+      newValues: {
+        deletion_requested_at: new Date().toISOString(),
+        reason,
+        status: 'pending',
+      },
+      ipAddress,
+      userAgent,
+    });
+  }
+
+  /**
+   * GDPR/DPDP Compliance: Get user's complete audit trail
+   * Required for transparency and accountability
+   */
+  async getUserCompleteAuditTrail(userId: number): Promise<{
+    user_id: number;
+    total_actions: number;
+    actions_by_type: Record<string, number>;
+    consent_history: AuditLog[];
+    data_access_history: AuditLog[];
+    data_modification_history: AuditLog[];
+    first_activity: Date | null;
+    last_activity: Date | null;
+  }> {
+    const allLogs = await this.getUserLogs(userId, 10000);
+
+    const actionsByType: Record<string, number> = {};
+    allLogs.forEach((log) => {
+      actionsByType[log.action] = (actionsByType[log.action] || 0) + 1;
+    });
+
+    return {
+      user_id: userId,
+      total_actions: allLogs.length,
+      actions_by_type: actionsByType,
+      consent_history: allLogs.filter((log) =>
+        log.table_name.includes('consent'),
+      ),
+      data_access_history: allLogs.filter((log) => log.action === 'SELECT'),
+      data_modification_history: allLogs.filter(
+        (log) => log.action === 'UPDATE' || log.action === 'DELETE',
+      ),
+      first_activity: allLogs.length > 0 ? allLogs[allLogs.length - 1].created_at : null,
+      last_activity: allLogs.length > 0 ? allLogs[0].created_at : null,
+    };
+  }
 }

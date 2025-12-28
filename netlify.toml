@@ -6,3 +6,53 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+# Force HTTPS redirect for all HTTP traffic
+[[redirects]]
+  from = "http://parashootingindia.org/*"
+  to = "https://parashootingindia.org/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.parashootingindia.org/*"
+  to = "https://www.parashootingindia.org/:splat"
+  status = 301
+  force = true
+
+# Security Headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # HSTS - Force HTTPS for 1 year (31536000 seconds)
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    
+    # Prevent clickjacking attacks
+    X-Frame-Options = "DENY"
+    
+    # Prevent MIME type sniffing
+    X-Content-Type-Options = "nosniff"
+    
+    # XSS Protection (legacy browsers)
+    X-XSS-Protection = "1; mode=block"
+    
+    # Referrer Policy - Don't leak referrer to external sites
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+    # Permissions Policy - Restrict browser features
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), speaker=()"
+    
+    # Content Security Policy - Prevent XSS attacks
+    Content-Security-Policy = "upgrade-insecure-requests"
+
+# Cache static assets for 1 year
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache images for 1 week
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+

@@ -81,11 +81,32 @@ export const productionSecurityConfig: HelmetOptions = {
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"], // No inline scripts
-      styleSrc: ["'self'"], // No inline styles
-      imgSrc: ["'self'", 'data:', 'https:'],
-      connectSrc: ["'self'"], // Only allow connections to same origin
-      fontSrc: ["'self'", 'data:'],
+      scriptSrc: [
+        "'self'",
+        "'unsafe-inline'", // Required for CookieYes and GA
+        'https://cdn-cookieyes.com',
+        'https://www.googletagmanager.com',
+        'https://www.google-analytics.com',
+      ],
+      styleSrc: [
+        "'self'",
+        "'unsafe-inline'", // Required for CookieYes banner
+        'https://cdn-cookieyes.com',
+      ],
+      imgSrc: [
+        "'self'",
+        'data:',
+        'https:',
+        'https://www.google-analytics.com',
+        'https://www.googletagmanager.com',
+      ],
+      connectSrc: [
+        "'self'",
+        'https://www.google-analytics.com',
+        'https://analytics.google.com',
+        'https://stats.g.doubleclick.net',
+      ],
+      fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
       frameSrc: ["'none'"],
