@@ -20,28 +20,20 @@ const navItems: NavItem[] = [
     children: [
       { label: 'Introduction', href: '/about#intro' },
       { label: 'History', href: '/about#history' },
-      { label: 'Executive Committee', href: '/about#committee' },
-      { label: 'Constitution', href: '/about#constitution' },
+      { label: 'Leadership', href: '/leadership' },
     ],
   },
   {
-    label: 'Championships',
-    href: '/events',
+    label: 'News',
+    href: '/news',
     children: [
-      { label: 'Shooting Events', href: '/events#events' },
-      { label: 'International', href: '/events#international' },
-      { label: 'National Competitions', href: '/events#national' },
+      { label: 'Latest News', href: '/news' },
+      { label: 'Upcoming Events', href: '/events' },
     ],
   },
-  {
-    label: 'Downloads',
-    href: '/downloads',
-    children: [
-      { label: 'Rules & Guidelines', href: '/downloads#rules' },
-    ],
-  },
-  { label: 'Rankings', href: '/rankings' },
   { label: 'Results', href: '/results' },
+  { label: 'Media', href: '/gallery' },
+  { label: 'Criteria', href: '/downloads' },
   { label: 'Contact', href: '/contact' },
 ]
 

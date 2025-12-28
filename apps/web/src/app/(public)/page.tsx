@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { ArrowRight, Medal, Target, Users, Calendar } from 'lucide-react'
-import { HeroSection, SearchBar, NewsCard, EventCard } from '@/components/ui'
+import { ArrowRight } from 'lucide-react'
+import { NewsCard, EventCard } from '@/components/ui'
 
 // Sample data - would come from API in production
 const latestNews = [
@@ -55,7 +55,7 @@ const HomePage = () => {
   return (
     <>
       {/* Latest News Section */}
-      <section className="section bg-white pt-12">
+      <section className="section bg-white">
         <div className="container-main">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
             <h2 className="section-title">Latest News & Updates</h2>
@@ -126,4 +126,5 @@ const HomePage = () => {
 }
 
 export default HomePage
+
 

@@ -6,8 +6,7 @@ import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube } from 'luci
 const quickLinks = [
   { label: 'About Us', href: '/about' },
   { label: 'Championships', href: '/events' },
-  { label: 'Downloads', href: '/downloads' },
-  { label: 'Rankings', href: '/rankings' },
+  { label: 'Criteria', href: '/downloads' },
   { label: 'Contact', href: '/contact' },
   { label: 'Accessibility', href: '/accessibility' },
 ]

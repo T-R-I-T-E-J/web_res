@@ -44,12 +44,11 @@ const shooterNavItems = [
     ]
   },
   {
-    label: 'Results & Ranking',
+    label: 'Results',
     href: '/shooter/scores',
     icon: Trophy,
     subItems: [
       { label: 'My Scores', href: '/shooter/scores' },
-      { label: 'National Ranking', href: '/shooter/rankings' },
       { label: 'International Medalist', href: '/shooter/international-medalist' },
       { label: 'Certificates', href: '/shooter/certificates' },
     ]
