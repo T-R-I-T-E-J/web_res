@@ -15,6 +15,7 @@ type NavItem = {
   href: string
   icon: typeof Home
   badge?: number
+  subItems?: { label: string; href: string }[]
 }
 
 type SidebarProps = {
@@ -30,36 +31,88 @@ const Sidebar = ({ items, user }: SidebarProps) => {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [expandedItems, setExpandedItems] = useState<string[]>([])
 
   const handleToggle = () => setCollapsed(!collapsed)
   const handleMobileToggle = () => setMobileOpen(!mobileOpen)
 
+  const toggleExpand = (label: string) => {
+    if (collapsed) setCollapsed(false)
+    setExpandedItems(prev =>
+      prev.includes(label) ? prev.filter(i => i !== label) : [...prev, label]
+    )
+  }
+
   const NavLink = ({ item }: { item: NavItem }) => {
-    const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
+    const isActive = pathname === item.href || (item.subItems ? item.subItems.some(sub => pathname === sub.href) : pathname.startsWith(item.href + '/'))
+    const isExpanded = expandedItems.includes(item.label)
+    const hasSubItems = item.subItems && item.subItems.length > 0
 
     return (
-      <Link
-        href={item.href}
-        onClick={() => setMobileOpen(false)}
-        className={clsx(
-          'flex items-center gap-3 px-4 py-3 rounded-card transition-all duration-200',
-          isActive
-            ? 'bg-primary text-white shadow-md'
-            : 'text-neutral-600 hover:bg-neutral-100 hover:text-primary'
-        )}
-      >
-        <item.icon className="w-5 h-5 flex-shrink-0" />
-        {!collapsed && (
-          <>
-            <span className="font-medium flex-1">{item.label}</span>
-            {item.badge && item.badge > 0 && (
-              <span className="bg-accent text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                {item.badge}
-              </span>
+      <div className="space-y-1">
+        {hasSubItems ? (
+          <button
+            onClick={() => toggleExpand(item.label)}
+            className={clsx(
+              'w-full flex items-center gap-3 px-4 py-3 rounded-card transition-all duration-200',
+              isActive
+                ? 'bg-primary/10 text-primary'
+                : 'text-neutral-600 hover:bg-neutral-100 hover:text-primary'
             )}
-          </>
+          >
+            <item.icon className="w-5 h-5 flex-shrink-0" />
+            {!collapsed && (
+              <>
+                <span className="font-medium flex-1 text-left">{item.label}</span>
+                <ChevronRight className={clsx('w-4 h-4 transition-transform', isExpanded && 'rotate-90')} />
+              </>
+            )}
+          </button>
+        ) : (
+          <Link
+            href={item.href}
+            onClick={() => setMobileOpen(false)}
+            className={clsx(
+              'flex items-center gap-3 px-4 py-3 rounded-card transition-all duration-200',
+              isActive
+                ? 'bg-primary text-white shadow-md'
+                : 'text-neutral-600 hover:bg-neutral-100 hover:text-primary'
+            )}
+          >
+            <item.icon className="w-5 h-5 flex-shrink-0" />
+            {!collapsed && (
+              <>
+                <span className="font-medium flex-1">{item.label}</span>
+                {item.badge && item.badge > 0 && (
+                  <span className="bg-accent text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                    {item.badge}
+                  </span>
+                )}
+              </>
+            )}
+          </Link>
         )}
-      </Link>
+
+        {!collapsed && hasSubItems && isExpanded && (
+          <div className="ml-9 space-y-1">
+            {item.subItems!.map((sub) => (
+              <Link
+                key={sub.href}
+                href={sub.href}
+                onClick={() => setMobileOpen(false)}
+                className={clsx(
+                  'block px-4 py-2 text-sm rounded-card transition-colors',
+                  pathname === sub.href
+                    ? 'bg-primary/5 text-primary font-medium'
+                    : 'text-neutral-500 hover:text-primary hover:bg-neutral-50'
+                )}
+              >
+                {sub.label}
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
     )
   }
 
