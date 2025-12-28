@@ -1,7 +1,7 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -14,11 +14,12 @@ import { VenuesModule } from './venues/venues.module.js';
 import { ShootersModule } from './shooters/shooters.module.js';
 import { ResultsModule } from './results/results.module.js';
 import { NewsModule } from './news/news.module.js';
+import { UploadModule } from './upload/upload.module.js';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard.js';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { AuditLog } from './common/entities/audit-log.entity.js';
 import { AuditService } from './common/services/audit.service.js';
-import { AuditInterceptor } from './common/interceptors/audit.interceptor.js';
+import { EncryptionService } from './common/services/encryption.service.js';
 import { PermissionsGuard } from './common/guards/permissions.guard.js';
 import { Role } from './auth/entities/role.entity.js';
 import { UserRole } from './auth/entities/user-role.entity.js';
@@ -34,11 +35,22 @@ import { getDatabaseConfig } from './config/database.config';
       envFilePath: '.env',
     }),
 
-    // Rate Limiting
+    // Rate Limiting - Multi-tier strategy for 40k peak users
     ThrottlerModule.forRoot([
       {
-        ttl: 60000, // 60 seconds
-        limit: 100, // 100 requests per minute
+        name: 'short',
+        ttl: 1000,    // 1 second
+        limit: 10,    // 10 requests per second (burst protection)
+      },
+      {
+        name: 'medium',
+        ttl: 60000,   // 1 minute
+        limit: 100,   // 100 requests per minute (standard protection)
+      },
+      {
+        name: 'long',
+        ttl: 900000,  // 15 minutes
+        limit: 1000,  // 1000 requests per 15 min (sustained load protection)
       },
     ]),
 
@@ -62,11 +74,13 @@ import { getDatabaseConfig } from './config/database.config';
     ShootersModule,
     ResultsModule,
     NewsModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
     AuditService,
+    EncryptionService,
     PermissionsGuard,
     // Global JWT Guard - all routes require authentication by default
     // Use @Public() decorator to make routes public
