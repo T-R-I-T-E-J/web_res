@@ -179,7 +179,7 @@ const Header = () => {
               priority
             />
           </Link>
-          <div className="text-center">
+          <div className="text-center pl-28 md:pl-0">
             <h1 className="font-heading text-2xl md:text-4xl font-bold text-primary tracking-tight leading-tight uppercase">
               Para Shooting Committee of India
             </h1>
