@@ -13,10 +13,12 @@ import { DisabilityCategoriesModule } from './disability-categories/disability-c
 import { VenuesModule } from './venues/venues.module.js';
 import { ShootersModule } from './shooters/shooters.module.js';
 import { ResultsModule } from './results/results.module.js';
+import { UploadModule } from './upload/upload.module.js';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard.js';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { AuditLog } from './common/entities/audit-log.entity.js';
 import { AuditService } from './common/services/audit.service.js';
+import { EncryptionService } from './common/services/encryption.service.js';
 import { PermissionsGuard } from './common/guards/permissions.guard.js';
 import { Role } from './auth/entities/role.entity.js';
 import { UserRole } from './auth/entities/user-role.entity.js';
@@ -70,11 +72,13 @@ import { getDatabaseConfig } from './config/database.config';
     VenuesModule,
     ShootersModule,
     ResultsModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
     AuditService,
+    EncryptionService,
     PermissionsGuard,
     // Global JWT Guard - all routes require authentication by default
     // Use @Public() decorator to make routes public

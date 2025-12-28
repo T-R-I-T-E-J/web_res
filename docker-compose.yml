@@ -1,5 +1,5 @@
 services:
-  # Primary Database
+  # Primary Database - SECURED
   postgres:
     container_name: psci_postgres
     image: postgres:16-alpine
@@ -8,11 +8,47 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - "5432:5432"
+      # Security: Disable trust authentication
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+      # Security: Set strong password encryption
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
+    # SECURITY: Remove public port exposure - only accessible within Docker network
+    # ports:
+    #   - "5432:5432"  # DISABLED - Database not accessible from outside
+    expose:
+      - "5432"  # Only accessible to other Docker containers
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./infrastructure/database/01-init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./infrastructure/database/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      - ./infrastructure/database/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+    # Security: Run as non-root user
+    user: postgres
+    # Security: Read-only root filesystem (except data directory)
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+    # Security: Limit resources to prevent DoS
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    # Security: Drop unnecessary capabilities
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - SETGID
+      - SETUID
+    # Security: Enable security options
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test:
         [
@@ -22,8 +58,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    # Security: Isolate network
+    networks:
+      - db_network
 
-  # DB Visualizer (Optional but helpful)
+  # DB Visualizer (Optional but helpful) - SECURED
   pgadmin:
     container_name: psci_pgadmin
     image: dpage/pgadmin4
@@ -31,10 +70,72 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@psci.in}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin123}
+      # Security: Disable password saving
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'True'
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: 'True'
+    # SECURITY: Only expose on localhost (not accessible from internet)
     ports:
-      - "8081:80"
+      - "127.0.0.1:8081:80"  # Only accessible from localhost
     depends_on:
       - postgres
+    # Security: Read-only root filesystem
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/lib/pgadmin
+    # Security: Run as non-root user
+    user: "5050:5050"
+    # Security: Drop capabilities
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    # Security: Enable security options
+    security_opt:
+      - no-new-privileges:true
+    # Security: Limit resources
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+    networks:
+      - db_network
+
+  # API Server (connects to database)
+  # Uncomment when deploying with Docker
+  # api:
+  #   container_name: psci_api
+  #   build:
+  #     context: ./apps/api
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   environment:
+  #     DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+  #     NODE_ENV: production
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - db_network
+  #     - app_network
 
 volumes:
   postgres_data:
+    driver: local
+
+# Security: Isolated networks
+networks:
+  db_network:
+    driver: bridge
+    internal: true  # Database network is internal only
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16  # Changed from 172.20 to avoid conflicts
+  app_network:
+    driver: bridge
+    # Application network can access internet
