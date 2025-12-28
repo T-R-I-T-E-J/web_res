@@ -1,9 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { getSecurityConfig } from './config/security.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,6 +19,39 @@ async function bootstrap() {
   const corsOrigin =
     configService.get<string>('config.app.corsOrigin') ||
     'http://localhost:3000';
+  const environment = process.env.NODE_ENV || 'development';
+
+  // ============================================
+  // SECURITY: Helmet.js Middleware
+  // ============================================
+  // Apply security headers based on environment
+  const securityConfig = getSecurityConfig(environment);
+  app.use(helmet(securityConfig));
+
+  logger.log(`🔒 Security headers enabled for: ${environment}`);
+
+  // ============================================
+  // SECURITY: HTTPS Redirect (Production Only)
+  // ============================================
+  // Trust proxy to read X-Forwarded-Proto header
+  if (environment === 'production' || environment === 'prod') {
+    const expressInstance = app.getHttpAdapter().getInstance() as {
+      set: (key: string, value: unknown) => void;
+    };
+    expressInstance.set('trust proxy', 1);
+    logger.log('🔐 Trust proxy enabled for production');
+
+    // Note: HTTPS redirect is typically handled by the hosting platform
+    // (Netlify, Vercel, Railway, Render, etc.) or reverse proxy (Nginx, Cloudflare)
+    // If you need application-level HTTPS redirect, uncomment below:
+    /*
+    const httpsMiddleware = createHttpsRedirectMiddleware(environment);
+    if (httpsMiddleware) {
+      app.use(httpsMiddleware);
+      logger.log('🔐 HTTPS redirect enabled');
+    }
+    */
+  }
 
   // Set global prefix
   app.setGlobalPrefix(apiPrefix);

@@ -52,8 +52,8 @@ export class ShootersController {
     await this.auditService.log({
       userId: user.id,
       action: AuditAction.UPDATE,
-      entityType: 'shooter',
-      entityId: profile.id.toString(),
+      tableName: 'shooter',
+      recordId: profile.id,
       newValues: profile as unknown as Record<string, any>,
     });
 
@@ -71,8 +71,8 @@ export class ShootersController {
     await this.auditService.log({
       userId: user.id,
       action: AuditAction.UPDATE,
-      entityType: 'shooter',
-      entityId: id,
+      tableName: 'shooter',
+      recordId: +id,
       newValues: { verified: true, verifiedAt: new Date() },
     });
 
@@ -101,8 +101,8 @@ export class ShootersController {
     await this.auditService.log({
       userId: user.id,
       action: AuditAction.CREATE,
-      entityType: 'shooter_classification',
-      entityId: classification.id.toString(),
+      tableName: 'shooter_classification',
+      recordId: classification.id,
       newValues: classification as unknown as Record<string, any>,
     });
 
@@ -125,8 +125,8 @@ export class ShootersController {
     await this.auditService.log({
       userId: user.id,
       action: AuditAction.UPDATE,
-      entityType: 'shooter_classification',
-      entityId: id,
+      tableName: 'shooter_classification',
+      recordId: +id,
       newValues: classification as unknown as Record<string, any>,
     });
 

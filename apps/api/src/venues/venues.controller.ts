@@ -63,8 +63,8 @@ export class VenuesController {
     await this.auditService.log({
       userId: user.id,
       action: AuditAction.CREATE,
-      entityType: 'venue',
-      entityId: venue.id.toString(),
+      tableName: 'venue',
+      recordId: venue.id,
       newValues: venue as unknown as Record<string, any>,
     });
 
@@ -85,8 +85,8 @@ export class VenuesController {
     await this.auditService.log({
       userId: user.id,
       action: AuditAction.UPDATE,
-      entityType: 'venue',
-      entityId: id,
+      tableName: 'venue',
+      recordId: +id,
       oldValues: existing as unknown as Record<string, any>,
       newValues: updated as unknown as Record<string, any>,
     });
@@ -104,8 +104,8 @@ export class VenuesController {
     await this.auditService.log({
       userId: user.id,
       action: AuditAction.DELETE,
-      entityType: 'venue',
-      entityId: id,
+      tableName: 'venue',
+      recordId: +id,
       oldValues: existing as unknown as Record<string, any>,
     });
 

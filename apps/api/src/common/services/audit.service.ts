@@ -5,14 +5,14 @@ import { AuditLog, AuditAction } from '../entities/audit-log.entity.js';
 
 export interface AuditLogOptions {
   userId?: number;
-  action: AuditAction;
-  entityType?: string;
-  entityId?: string;
+  action: AuditAction | string;
+  tableName: string;
+  recordId?: number;
   oldValues?: Record<string, any>;
   newValues?: Record<string, any>;
   ipAddress?: string;
   userAgent?: string;
-  description?: string;
+  requestId?: string;
 }
 
 @Injectable()
@@ -28,14 +28,14 @@ export class AuditService {
   async log(options: AuditLogOptions): Promise<AuditLog> {
     const auditLog = this.auditLogRepository.create({
       user_id: options.userId,
-      action: options.action,
-      entity_type: options.entityType,
-      entity_id: options.entityId,
+      action: options.action as any,
+      table_name: options.tableName,
+      record_id: options.recordId,
       old_values: options.oldValues,
       new_values: options.newValues,
       ip_address: options.ipAddress,
       user_agent: options.userAgent,
-      description: options.description,
+      request_id: options.requestId,
     });
 
     return this.auditLogRepository.save(auditLog);
@@ -56,15 +56,19 @@ export class AuditService {
   }
 
   /**
-   * Get audit logs for a specific entity
+   * Get audit logs for a specific table/record
    */
-  async getEntityLogs(
-    entityType: string,
-    entityId: string,
+  async getTableLogs(
+    tableName: string,
+    recordId?: number,
     limit: number = 100,
   ): Promise<AuditLog[]> {
+    const where: any = { table_name: tableName };
+    if (recordId) {
+      where.record_id = recordId;
+    }
     return this.auditLogRepository.find({
-      where: { entity_type: entityType, entity_id: entityId },
+      where,
       order: { created_at: 'DESC' },
       take: limit,
     });

@@ -1,268 +1,300 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { DashboardHeader } from '@/components/dashboard'
-import { Upload, FileSpreadsheet, Save, Eye, Check, AlertCircle, RefreshCw } from 'lucide-react'
+import { Upload, Trash2, FileText, Download } from 'lucide-react'
 import clsx from 'clsx'
 
-const competitions = [
-  { id: 1, name: '68th NSCC (Rifle)', date: 'Dec 2024', status: 'in_progress' },
-  { id: 2, name: 'State Championship - Maharashtra', date: 'Nov 2024', status: 'published' },
-  { id: 3, name: 'Selection Trial - Asian Games', date: 'Oct 2024', status: 'published' },
-]
 
-const events = [
-  { code: 'R1', name: '10m Air Rifle Standing SH1' },
-  { code: 'R2', name: '10m Air Rifle Standing SH2' },
-  { code: 'P1', name: '10m Air Pistol SH1' },
-]
-
-const sampleScores = [
-  { rank: 1, name: 'Avani Lekhara', state: 'Rajasthan', qualification: 628.5, final: 249.7, total: 634.5, verified: true },
-  { rank: 2, name: 'Deepender Singh', state: 'Haryana', qualification: 624.2, final: 247.1, total: 629.8, verified: true },
-  { rank: 3, name: 'Swaroop Unhalkar', state: 'Maharashtra', qualification: 621.8, final: 244.5, total: 625.3, verified: false },
-  { rank: 4, name: 'Pooja Agarwal', state: 'Uttar Pradesh', qualification: 618.4, final: 241.2, total: 621.4, verified: false },
-]
+interface Result {
+  id: string
+  title: string
+  date: string // Represents "Year"
+  description?: string
+  fileName: string
+  fileSize: number
+  uploadedAt: string
+  url: string
+}
 
 const AdminScoresPage = () => {
-  const [selectedCompetition, setSelectedCompetition] = useState(1)
-  const [selectedEvent, setSelectedEvent] = useState('R1')
+  const [results, setResults] = useState<Result[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [isUploading, setIsUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+  
+  // Form State
+  const [title, setTitle] = useState('')
+  const [year, setYear] = useState(new Date().getFullYear().toString())
+  const [description, setDescription] = useState('')
+  const [file, setFile] = useState<File | null>(null)
 
-  const handleUpload = () => {
-    setIsUploading(true)
-    setTimeout(() => setIsUploading(false), 2000)
+  // Fetch Results
+  const fetchResults = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082'}/api/v1/results`)
+      if (!response.ok) throw new Error('Failed to fetch results')
+      const responseData = await response.json()
+      setResults(responseData.data || [])
+    } catch (error) {
+      console.error('Error fetching results:', error)
+      alert('Failed to load results')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchResults()
+  }, [])
+
+  // Handle Upload
+  const handleUpload = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!file) {
+      setUploadError('Please select a PDF file')
+      return
+    }
+
+    if (file.type !== 'application/pdf') {
+      setUploadError('Only PDF files are allowed')
+      return
+    }
+
+    try {
+      setIsUploading(true)
+      setUploadError(null)
+
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('title', title)
+      formData.append('date', year)
+      if (description) formData.append('description', description)
+
+      const token = localStorage.getItem('access_token') // Simple auth for Phase 4
+      
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082'}/api/v1/results/upload`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Upload failed')
+      }
+
+      alert('Result uploaded successfully')
+      
+      // Reset form
+      setTitle('')
+      setYear(new Date().getFullYear().toString())
+      setDescription('')
+      setFile(null)
+      
+      // Refresh list
+      fetchResults()
+
+    } catch (error: any) {
+      console.error('Upload error:', error)
+      setUploadError(error.message)
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  // Handle Delete
+  const handleDelete = async (id: string, resultTitle: string) => {
+    if (!confirm(`Are you sure you want to delete "${resultTitle}"?`)) return
+
+    try {
+      const token = localStorage.getItem('access_token')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082'}/api/v1/results/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (!response.ok) throw new Error('Delete failed')
+
+      setResults(results.filter(r => r.id !== id))
+      alert('Result deleted successfully')
+    } catch (error) {
+      console.error('Delete error:', error)
+      alert('Failed to delete result')
+    }
   }
 
   return (
     <>
       <DashboardHeader
-        title="Scores & Results"
-        subtitle="Upload, verify, and publish competition scores"
+        title="Results Management"
+        subtitle="Upload and manage PDF competition results"
       />
 
       <div className="p-6 space-y-6">
-        {/* Competition & Event Selection */}
+        
+        {/* Upload Card */}
         <div className="card">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Competition
-              </label>
-              <select
-                value={selectedCompetition}
-                onChange={(e) => setSelectedCompetition(Number(e.target.value))}
-                className="input"
-              >
-                {competitions.map((comp) => (
-                  <option key={comp.id} value={comp.id}>
-                    {comp.name} - {comp.date}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
-                Event
-              </label>
-              <select
-                value={selectedEvent}
-                onChange={(e) => setSelectedEvent(e.target.value)}
-                className="input"
-              >
-                {events.map((event) => (
-                  <option key={event.code} value={event.code}>
-                    {event.code} - {event.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex items-end">
-              <button className="btn-primary gap-2">
-                <RefreshCw className="w-4 h-4" />
-                Load Scores
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Upload Section */}
-        <div className="card">
-          <h2 className="font-heading font-semibold text-lg text-primary mb-4">
-            Upload Scores
+          <h2 className="font-heading font-semibold text-lg text-primary mb-4 flex items-center gap-2">
+            <Upload className="w-5 h-5" />
+            Upload New Result
           </h2>
-          <div className="border-2 border-dashed border-neutral-200 rounded-card p-8 text-center">
-            <div className="flex flex-col items-center">
-              <FileSpreadsheet className="w-12 h-12 text-neutral-400 mb-4" />
-              <p className="text-neutral-600 mb-2">
-                Drag and drop your score file here, or click to browse
-              </p>
-              <p className="text-sm text-neutral-400 mb-4">
-                Supported formats: CSV, Excel (.xlsx), Sius-Ascor export
-              </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={handleUpload}
-                  disabled={isUploading}
-                  className="btn-primary gap-2"
-                >
-                  {isUploading ? (
-                    <>
-                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Uploading...
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="w-4 h-4" />
-                      Upload File
-                    </>
-                  )}
-                </button>
-                <button className="btn-outline gap-2">
-                  Download Template
-                </button>
+          
+          <form onSubmit={handleUpload} className="space-y-4 max-w-2xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  Competition Title *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={title}
+                  onChange={e => setTitle(e.target.value)}
+                  className="input w-full"
+                  placeholder="e.g. 68th National Championship"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  Year *
+                </label>
+                <input
+                  type="number"
+                  required
+                  value={year}
+                  onChange={e => setYear(e.target.value)}
+                  className="input w-full"
+                  placeholder="YYYY"
+                />
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Scores Table */}
-        <div className="card">
-          <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="font-heading font-semibold text-lg text-primary">
-                Score Entry - {events.find(e => e.code === selectedEvent)?.name}
-              </h2>
-              <p className="text-sm text-neutral-500">
-                Verify scores before publishing. Click on a score to edit.
-              </p>
+              <label className="block text-sm font-medium text-neutral-700 mb-1">
+                Description (Optional)
+              </label>
+              <input
+                type="text"
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                className="input w-full"
+                placeholder="Brief description or category"
+              />
             </div>
-            <div className="flex gap-2">
-              <button className="btn-outline gap-2">
-                <Eye className="w-4 h-4" />
-                Preview
+
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-1">
+                Result File (PDF) *
+              </label>
+              <input
+                type="file"
+                required
+                accept=".pdf"
+                onChange={e => setFile(e.target.files?.[0] || null)}
+                className="block w-full text-sm text-neutral-500
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-full file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-primary file:text-white
+                  hover:file:bg-primary-dark
+                "
+              />
+              <p className="mt-1 text-xs text-neutral-500">Max size: 10MB. PDF only.</p>
+            </div>
+
+            {uploadError && (
+              <div className="p-3 bg-red-50 text-red-700 text-sm rounded border border-red-200">
+                {uploadError}
+              </div>
+            )}
+
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={isUploading}
+                className={clsx("btn-primary", isUploading && "opacity-75 cursor-not-allowed")}
+              >
+                {isUploading ? 'Uploading...' : 'Upload Result'}
               </button>
-              <button className="btn-accent gap-2">
-                <Save className="w-4 h-4" />
-                Save Draft
-              </button>
             </div>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th className="w-16">Rank</th>
-                  <th>Athlete</th>
-                  <th>State</th>
-                  <th className="text-right">Qualification</th>
-                  <th className="text-right">Final</th>
-                  <th className="text-right">Total</th>
-                  <th className="text-center w-24">Verified</th>
-                  <th className="w-20">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sampleScores.map((score) => (
-                  <tr key={score.rank}>
-                    <td>
-                      <span className={clsx(
-                        'inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-bold',
-                        score.rank === 1 && 'bg-accent text-white',
-                        score.rank === 2 && 'bg-neutral-300 text-neutral-700',
-                        score.rank === 3 && 'bg-amber-600 text-white',
-                        score.rank > 3 && 'bg-neutral-100 text-neutral-600'
-                      )}>
-                        {score.rank}
-                      </span>
-                    </td>
-                    <td className="font-medium text-neutral-700">{score.name}</td>
-                    <td className="text-neutral-600">{score.state}</td>
-                    <td className="text-right">
-                      <input
-                        type="number"
-                        value={score.qualification}
-                        className="w-20 px-2 py-1 text-right font-data border border-transparent hover:border-neutral-200 rounded focus:border-primary focus:outline-none"
-                        step="0.1"
-                      />
-                    </td>
-                    <td className="text-right">
-                      <input
-                        type="number"
-                        value={score.final}
-                        className="w-20 px-2 py-1 text-right font-data border border-transparent hover:border-neutral-200 rounded focus:border-primary focus:outline-none"
-                        step="0.1"
-                      />
-                    </td>
-                    <td className="text-right">
-                      <span className="font-data font-semibold text-neutral-700">
-                        {score.total.toFixed(1)}
-                      </span>
-                    </td>
-                    <td className="text-center">
-                      {score.verified ? (
-                        <span className="inline-flex items-center text-success">
-                          <Check className="w-5 h-5" />
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center text-data-medium">
-                          <AlertCircle className="w-5 h-5" />
-                        </span>
-                      )}
-                    </td>
-                    <td>
-                      <button
-                        className={clsx(
-                          'px-3 py-1 text-xs font-medium rounded',
-                          score.verified
-                            ? 'bg-success/10 text-success'
-                            : 'bg-primary text-white hover:bg-primary-dark'
-                        )}
-                      >
-                        {score.verified ? 'Verified' : 'Verify'}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Validation Summary */}
-          <div className="mt-6 p-4 bg-neutral-50 rounded-card">
-            <h3 className="font-semibold text-neutral-700 mb-3">Validation Summary</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-success">2</p>
-                <p className="text-xs text-neutral-500">Verified</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-data-medium">2</p>
-                <p className="text-xs text-neutral-500">Pending</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-error">0</p>
-                <p className="text-xs text-neutral-500">Errors</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-neutral-700">4</p>
-                <p className="text-xs text-neutral-500">Total</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Publish Button */}
-          <div className="mt-6 flex justify-end gap-3">
-            <button className="btn-outline">
-              Save as Draft
-            </button>
-            <button className="btn-primary bg-success hover:bg-success/90 gap-2">
-              <Check className="w-4 h-4" />
-              Publish Results
-            </button>
-          </div>
+          </form>
         </div>
+
+        {/* Results List */}
+        <div className="card">
+          <h2 className="font-heading font-semibold text-lg text-primary mb-4 flex items-center gap-2">
+            <FileText className="w-5 h-5" />
+            Published Results
+          </h2>
+
+          {isLoading ? (
+            <div className="text-center py-8 text-neutral-500">Loading results...</div>
+          ) : results.length === 0 ? (
+            <div className="text-center py-8 text-neutral-500 bg-neutral-50 rounded border border-dashed border-neutral-200">
+              No results found. Upload your first result above.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-neutral-50 border-b border-neutral-200">
+                    <th className="p-3 font-semibold text-sm text-neutral-700">Year</th>
+                    <th className="p-3 font-semibold text-sm text-neutral-700">Title</th>
+                    <th className="p-3 font-semibold text-sm text-neutral-700">File</th>
+                    <th className="p-3 font-semibold text-sm text-neutral-700">Size</th>
+                    <th className="p-3 font-semibold text-sm text-neutral-700">Uploaded At</th>
+                    <th className="p-3 font-semibold text-sm text-neutral-700 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-neutral-200">
+                  {results.map((result) => (
+                    <tr key={result.id} className="hover:bg-neutral-50 transition-colors">
+                      <td className="p-3 text-sm text-neutral-600 font-data">{result.date}</td>
+                      <td className="p-3 text-sm text-neutral-800 font-medium">
+                        {result.title}
+                        {result.description && (
+                          <span className="block text-xs text-neutral-500 font-normal">{result.description}</span>
+                        )}
+                      </td>
+                      <td className="p-3 text-sm text-neutral-600 font-data">{result.fileName}</td>
+                      <td className="p-3 text-sm text-neutral-600 font-data">
+                        {(result.fileSize / 1024 / 1024).toFixed(2)} MB
+                      </td>
+                      <td className="p-3 text-sm text-neutral-600 font-data">
+                        {new Date(result.uploadedAt).toLocaleDateString()}
+                      </td>
+                      <td className="p-3 text-right space-x-2">
+                        <a 
+                          href={result.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center p-2 text-primary hover:bg-primary/10 rounded transition-colors"
+                          title="Download PDF"
+                        >
+                          <Download className="w-4 h-4" />
+                        </a>
+                        <button
+                          onClick={() => handleDelete(result.id, result.title)}
+                          className="inline-flex items-center justify-center p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                          title="Delete Result"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
       </div>
     </>
   )

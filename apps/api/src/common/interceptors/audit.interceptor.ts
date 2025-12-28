@@ -38,19 +38,18 @@ export class AuditInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap(() => {
         // Log after successful request
-        this.auditService.log({
+        void this.auditService.log({
           userId: user?.id,
           action,
-          entityType: this.extractEntityType(url),
-          ipAddress: ip || headers['x-forwarded-for'] || headers['x-real-ip'],
-          userAgent: headers['user-agent'],
-          description: `${method} ${url}`,
+          tableName: this.extractTableName(url),
+          ipAddress: (ip || headers['x-forwarded-for'] || headers['x-real-ip']) as string,
+          userAgent: headers['user-agent'] as string,
         });
       }),
     );
   }
 
-  private extractEntityType(url: string): string {
+  private extractTableName(url: string): string {
     const parts = url.split('/').filter(Boolean);
     return parts[parts.length - 2] || parts[parts.length - 1] || 'unknown';
   }

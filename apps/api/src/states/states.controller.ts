@@ -64,8 +64,8 @@ export class StatesController {
     await this.auditService.log({
       userId: user.id,
       action: AuditAction.CREATE,
-      entityType: 'state_association',
-      entityId: state.id.toString(),
+      tableName: 'state_association',
+      recordId: state.id,
       newValues: state as unknown as Record<string, any>,
     });
 
@@ -87,8 +87,8 @@ export class StatesController {
     await this.auditService.log({
       userId: user.id,
       action: AuditAction.UPDATE,
-      entityType: 'state_association',
-      entityId: id,
+      tableName: 'state_association',
+      recordId: +id,
       oldValues: existing as unknown as Record<string, any>,
       newValues: updated as unknown as Record<string, any>,
     });
@@ -107,8 +107,8 @@ export class StatesController {
     await this.auditService.log({
       userId: user.id,
       action: AuditAction.DELETE,
-      entityType: 'state_association',
-      entityId: id,
+      tableName: 'state_association',
+      recordId: +id,
       oldValues: existing as unknown as Record<string, any>,
     });
 

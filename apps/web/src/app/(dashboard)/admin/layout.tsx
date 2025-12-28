@@ -1,17 +1,12 @@
 'use client'
 
-import { Home, Users, Calendar, Trophy, FileText, CreditCard, Settings, BarChart3, Shield } from 'lucide-react'
+import { Home, Users, Trophy } from 'lucide-react'
 import { Sidebar } from '@/components/dashboard'
 
 const adminNavItems = [
   { label: 'Overview', href: '/admin', icon: Home },
-  { label: 'User Management', href: '/admin/users', icon: Users, badge: 5 },
-  { label: 'Competitions', href: '/admin/competitions', icon: Calendar },
+  { label: 'User Management', href: '/admin/users', icon: Users },
   { label: 'Scores & Results', href: '/admin/scores', icon: Trophy },
-  { label: 'Content (CMS)', href: '/admin/content', icon: FileText },
-  { label: 'Financials', href: '/admin/finance', icon: CreditCard },
-  { label: 'Reports', href: '/admin/reports', icon: BarChart3 },
-  { label: 'Access Control', href: '/admin/access', icon: Shield },
 ]
 
 type AdminLayoutProps = {

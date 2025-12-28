@@ -18,15 +18,18 @@ import { UsersModule } from '../users/users.module.js';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        secret:
-          configService.get<string>('config.jwt.secret') ||
-          'default-secret-change-in-production',
-        signOptions: {
-          expiresIn:
-            configService.get<string | number>('config.jwt.expiresIn') || '1h',
-        },
-      }),
+      useFactory: (configService: ConfigService) => {
+        const secret = configService.get<string>('config.jwt.secret');
+        if (!secret) {
+          throw new Error('JWT_SECRET must be defined');
+        }
+        return {
+          secret: secret,
+          signOptions: {
+            expiresIn: (configService.get<string>('config.jwt.expiresIn') || '7d') as any,
+          },
+        };
+      },
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature([Role, UserRole]),

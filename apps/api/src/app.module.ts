@@ -12,6 +12,7 @@ import { StatesModule } from './states/states.module.js';
 import { DisabilityCategoriesModule } from './disability-categories/disability-categories.module.js';
 import { VenuesModule } from './venues/venues.module.js';
 import { ShootersModule } from './shooters/shooters.module.js';
+import { ResultsModule } from './results/results.module.js';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard.js';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { AuditLog } from './common/entities/audit-log.entity.js';
@@ -58,6 +59,7 @@ import { getDatabaseConfig } from './config/database.config';
     DisabilityCategoriesModule,
     VenuesModule,
     ShootersModule,
+    ResultsModule,
   ],
   controllers: [AppController],
   providers: [
@@ -75,11 +77,11 @@ import { getDatabaseConfig } from './config/database.config';
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
-    // Global Audit Logging
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: AuditInterceptor,
-    },
+    // Global Audit Logging (Temporarily disabled due to constraint error)
+    // {
+    //   provide: APP_INTERCEPTOR,
+    //   useClass: AuditInterceptor,
+    // },
   ],
 })
 export class AppModule implements NestModule {

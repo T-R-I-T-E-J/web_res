@@ -85,7 +85,7 @@ const AdminDashboardPage = () => {
                   {pendingApprovals.length}
                 </span>
               </h2>
-              <Link href="/admin/users?status=pending" className="text-sm text-interactive hover:text-primary">
+              <Link href="/admin/users" className="text-sm text-interactive hover:text-primary">
                 View All →
               </Link>
             </div>
@@ -154,9 +154,9 @@ const AdminDashboardPage = () => {
             <h2 className="font-heading font-semibold text-lg text-primary">
               Event Registration Status
             </h2>
-            <Link href="/admin/competitions" className="text-sm text-interactive hover:text-primary">
-              Manage Events →
-            </Link>
+            <span className="text-sm text-neutral-400">
+              Coming Soon
+            </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {upcomingEvents.map((event) => {
@@ -189,12 +189,10 @@ const AdminDashboardPage = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           {[
-            { label: 'Add New Shooter', href: '/admin/users/new', icon: Users },
-            { label: 'Create Event', href: '/admin/competitions/new', icon: Calendar },
-            { label: 'Publish Scores', href: '/admin/scores', icon: Trophy },
-            { label: 'Generate Report', href: '/admin/reports', icon: TrendingUp },
+            { label: 'Manage Users', href: '/admin/users', icon: Users },
+            { label: 'Upload Results', href: '/admin/scores', icon: Trophy },
           ].map((action) => (
             <Link
               key={action.label}

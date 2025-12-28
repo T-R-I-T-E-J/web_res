@@ -24,7 +24,7 @@ export enum AuditAction {
 @Entity('audit_logs')
 @Index(['user_id', 'created_at'])
 @Index(['action', 'created_at'])
-@Index(['entity_type', 'entity_id'])
+@Index(['table_name', 'record_id'])
 export class AuditLog {
   @PrimaryGeneratedColumn('increment', { type: 'bigint' })
   id: number;
@@ -33,13 +33,13 @@ export class AuditLog {
   user_id?: number;
 
   @Column({ type: 'varchar', length: 50 })
-  action: AuditAction;
+  action: AuditAction | string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  entity_type?: string;
+  @Column({ type: 'varchar', length: 100 })
+  table_name: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  entity_id?: string;
+  @Column({ type: 'bigint', nullable: true })
+  record_id?: number;
 
   @Column({ type: 'jsonb', nullable: true })
   old_values?: Record<string, any>;
@@ -53,8 +53,8 @@ export class AuditLog {
   @Column({ type: 'text', nullable: true })
   user_agent?: string;
 
-  @Column({ type: 'text', nullable: true })
-  description?: string;
+  @Column({ type: 'uuid', nullable: true })
+  request_id?: string;
 
   @CreateDateColumn({ type: 'timestamptz' })
   created_at: Date;

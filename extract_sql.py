@@ -1,53 +1,80 @@
 import re
+from pathlib import Path
 
-def extract_sql_blocks(md_path, sql_path):
-    with open(md_path, 'r', encoding='utf-8') as f:
+def extract_from_file(path):
+    path = Path(path)
+    if not path.exists():
+        print(f"⚠️ Warning: {path} not found.")
+        return []
+    
+    print(f"🔍 Processing {path.name}...")
+    
+    if path.suffix == '.sql':
+        with open(path, 'r', encoding='utf-8') as f:
+            return [f.read()]
+    
+    with open(path, 'r', encoding='utf-8') as f:
         lines = f.readlines()
     
-    sql_blocks = []
-    in_sql_block = False
-    current_block = []
-    block_start_line = 0
-    
-    for line_num, line in enumerate(lines, 1):
-        # Check for SQL block start
-        if line.strip() == '```sql':
-            in_sql_block = True
-            current_block = []
-            block_start_line = line_num
+    blocks = []
+    current = []
+    in_block = False
+    for line in lines:
+        stripped = line.strip()
+        # Handle 3 or more backticks + optional language name
+        if not in_block and stripped.startswith('```') and 'sql' in stripped.lower():
+            in_block = True
+            current = []
             continue
-        
-        # Check for SQL block end
-        if line.strip().startswith('```') and in_sql_block:
-            in_sql_block = False
-            # Join and add block if it's not empty
-            block_text = ''.join(current_block).strip()
-            if block_text:
-                sql_blocks.append(block_text)
-                if 'event_relays' in block_text:
-                    print(f"  → Found event_relays block at line {block_start_line}")
+        if in_block and stripped.startswith('```'):
+            in_block = False
+            text = ''.join(current).strip()
+            if text:
+                blocks.append(text)
             continue
-        
-        # Collect SQL lines
-        if in_sql_block:
-            current_block.append(line)
+        if in_block:
+            current.append(line)
+    return blocks
+
+if __name__ == '__main__':
+    base_dir = Path(__file__).parent
+    docs_dir = base_dir / 'docs' / 'database'
     
-    # Write output
-    header = """-- Auto-generated from documentation
--- Para Shooting Committee of India Platform
--- Database: PostgreSQL 16+
+    # Priority order for initialization
+    files_to_extract = [
+        docs_dir / '01-schema.md',            # Core tables
+        docs_dir / '08-audit-logging.md',     # Audit system (Table + Function)
+        docs_dir / '02-refinements.sql',      # Schema refinements & Triggers
+        docs_dir / '03-seed-data.md'          # Reference & Initial data
+    ]
+    
+    all_sql = []
+    for f in files_to_extract:
+        all_sql.extend(extract_from_file(f))
+    
+    output_path = base_dir / 'infrastructure' / 'database' / '01-init.sql'
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    header = """-- Auto-generated Master Database Initialization Script
+-- Generated: 2025-12-28
+-- Source: docs/database/*.md and 02-refinements.sql
+
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
 
 """
     
-    with open(sql_path, 'w', encoding='utf-8') as f:
+    with open(output_path, 'w', encoding='utf-8') as f:
         f.write(header)
-        f.write('\n\n'.join(sql_blocks))
+        for i, block in enumerate(all_sql):
+            f.write(f"\n\n-- Block {i+1} " + "="*40 + "\n")
+            f.write(block)
+            if not block.strip().endswith(';'):
+                f.write(';')
     
-    print(f"✓ Extracted {len(sql_blocks)} SQL blocks to {sql_path}")
-    return len(sql_blocks)
-
-if __name__ == '__main__':
-    count = extract_sql_blocks(
-        r'docs\database\01-schema.md',
-        r'infrastructure\database\01-init.sql'
-    )
+    print(f"\n✓ Master SQL generated at: {output_path}")
+    print(f"✓ Total blocks extracted: {len(all_sql)}")

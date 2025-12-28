@@ -63,8 +63,8 @@ export class DisabilityCategoriesController {
     await this.auditService.log({
       userId: user.id,
       action: AuditAction.CREATE,
-      entityType: 'disability_category',
-      entityId: category.id.toString(),
+      tableName: 'disability_category',
+      recordId: category.id,
       newValues: category as unknown as Record<string, any>,
     });
 
@@ -85,8 +85,8 @@ export class DisabilityCategoriesController {
     await this.auditService.log({
       userId: user.id,
       action: AuditAction.UPDATE,
-      entityType: 'disability_category',
-      entityId: id,
+      tableName: 'disability_category',
+      recordId: +id,
       oldValues: existing as unknown as Record<string, any>,
       newValues: updated as unknown as Record<string, any>,
     });
@@ -107,8 +107,8 @@ export class DisabilityCategoriesController {
     await this.auditService.log({
       userId: user.id,
       action: AuditAction.DELETE,
-      entityType: 'disability_category',
-      entityId: id,
+      tableName: 'disability_category',
+      recordId: +id,
       oldValues: existing as unknown as Record<string, any>,
     });
 

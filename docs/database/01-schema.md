@@ -167,6 +167,8 @@ create table public.roles (
     description text,
     permissions jsonb not null default '{}',
     is_system boolean not null default false,
+    parent_id bigint references public.roles(id),
+    level integer not null default 0,
     created_at timestamptz not null default now()
 );
 
@@ -719,6 +721,7 @@ create table public.competition_events (
 );
 
 comment on table public.competition_events is 'Individual shooting events within a competition with scheduling details.';
+```
 
 ---
 
@@ -751,7 +754,7 @@ create table public.event_relays (
 );
 
 comment on table public.event_relays is 'Specific relays and time slots for competition events.';
-
+```
 
 ---
 
@@ -809,7 +812,7 @@ create table public.competition_entries (
 );
 
 comment on table public.competition_entries is 'Shooter registrations for competition events with payment and status tracking.';
-````
+```
 
 ---
 
@@ -1425,7 +1428,7 @@ create table public.audit_logs (
     id bigint generated always as identity primary key,
     user_id bigint references public.users(id),
     action varchar(50) not null check (
-        action in ('CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'PASSWORD_CHANGE', 'ROLE_CHANGE', 'EXPORT', 'BULK_UPDATE')
+        action in ('CREATE', 'READ', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'REGISTER', 'PASSWORD_CHANGE', 'ROLE_CHANGE', 'ROLE_ASSIGN', 'ROLE_REMOVE', 'EXPORT', 'BULK_UPDATE')
     ),
     table_name varchar(100) not null,
     record_id bigint,
@@ -1724,3 +1727,4 @@ comment on view public.v_current_rankings is 'Current rankings with rank change 
 | Content        | 6      | News, documents, contacts               |
 | System         | 2      | Audit logs, scheduled jobs              |
 | **Total**      | **27** | Complete platform schema                |
+````
