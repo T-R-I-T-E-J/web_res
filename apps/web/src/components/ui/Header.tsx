@@ -173,8 +173,8 @@ const Header = () => {
             <Image
               src="/logo.png"
               alt="Paralympic Committee India - Para Shooting"
-              width={111}
-              height={104}
+              width={67}
+              height={62}
               className="object-contain"
               priority
             />
