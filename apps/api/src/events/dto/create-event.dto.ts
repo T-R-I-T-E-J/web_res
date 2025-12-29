@@ -1,4 +1,12 @@
-import { IsString, IsNotEmpty, IsOptional, IsDateString, IsEnum, IsBoolean, IsUrl } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsDateString,
+  IsEnum,
+  IsBoolean,
+  IsUrl,
+} from 'class-validator';
 import { EventStatus } from '../entities/event.entity';
 
 export class CreateEventDto {

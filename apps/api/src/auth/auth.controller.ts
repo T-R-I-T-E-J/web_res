@@ -14,6 +14,7 @@ import { RegisterDto } from './dto/register.dto.js';
 import { Public } from './decorators/public.decorator.js';
 import { CurrentUser } from './decorators/current-user.decorator.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
+import type { JwtPayload } from './interfaces/jwt-payload.interface.js';
 
 @Controller('auth')
 export class AuthController {
@@ -37,7 +38,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@CurrentUser() user: any) {
+  getProfile(@CurrentUser() user: JwtPayload) {
     return {
       message: 'Profile retrieved successfully',
       user,
@@ -46,10 +47,10 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('roles')
-  async getRoles(@CurrentUser() user: any) {
-    const roles = await this.authService.getUserRoles(user.id);
+  async getRoles(@CurrentUser() user: JwtPayload) {
+    const roles = await this.authService.getUserRoles(user.sub);
     return {
-      user_id: user.id,
+      user_id: user.sub,
       roles,
     };
   }

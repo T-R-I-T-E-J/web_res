@@ -41,13 +41,21 @@ export default function CreateEventPage() {
     try {
       const token = Cookies.get('auth_token')
       
+      // Clean up empty strings for optional fields
+      const payload = {
+        ...formData,
+        registration_link: formData.registration_link || undefined,
+        circular_link: formData.circular_link || undefined,
+        description: formData.description || undefined,
+      }
+      
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       })
 
       if (res.ok) {
