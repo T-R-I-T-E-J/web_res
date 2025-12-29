@@ -75,38 +75,6 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Embedded Document Section */}
-      <section className="section bg-neutral-50">
-        <div className="container-main">
-          <h2 className="section-title text-center">Para Shooting Criteria Document</h2>
-          <p className="text-neutral-600 text-center mb-8 max-w-2xl mx-auto">
-            View the official Para Shooting criteria and guidelines document below.
-          </p>
-          <div className="max-w-5xl mx-auto">
-            <div className="bg-white rounded-card shadow-card overflow-hidden border border-neutral-200">
-              <iframe
-                src="/para-shooting-criteria.pdf"
-                className="w-full h-[800px]"
-                title="Para Shooting Criteria Document"
-              />
-            </div>
-            <div className="mt-4 text-center">
-              <a
-                href="/para-shooting-criteria.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-primary inline-flex items-center gap-2"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Download Full Document
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* History Section */}
       <section id="history" className="section bg-white">
         <div className="container-main">
