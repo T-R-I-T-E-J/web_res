@@ -1,7 +1,12 @@
 {
   "name": "failure-handling-tests",
   "version": "1.0.0",
+  "private": true,
   "description": "Test environment for critical failure scenarios",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",

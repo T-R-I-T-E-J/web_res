@@ -21,7 +21,18 @@ This branch (`issues-solved`) addresses critical bugs and consolidates the failu
 **Issue**: TypeScript errors in `auth.module.ts` prevented the backend from building.
 **Fix**: Corrected type definitions for `JwtModule` configuration.
 
+## 4. Architecture & Configuration
+**Issue**: Multiple architecture and configuration errors.
+**Fixes**:
+- **Monorepo**: Converted to NPM workspace with `workspaces` in `package.json`.
+- **NestJS CLI**: Added root `nest-cli.json` for monorepo management.
+- **TypeScript**: Refactored `tsconfig.json` hierarchy (root as base config).
+- **Docker**: Added Redis service to `docker-compose.yml`.
+- **TypeScript Types**: Removed `as any` type casts using proper `StringValue` type.
+- **Env Validation**: Added `env.validation.ts` with Joi schema for startup validation.
+
 ## Verification
+- Run `npm install` -> **SUCCESS** (workspaces linked)
 - Run `npm run build` in `apps/api` -> **SUCCESS**
 - Run `npm run build` in `apps/web` -> **SUCCESS** (generates `out` directory)
 - Verify `apps/api/uploads/results/test.pdf` exists.

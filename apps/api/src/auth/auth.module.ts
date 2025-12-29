@@ -11,6 +11,7 @@ import { RolesGuard } from './guards/roles.guard.js';
 import { Role } from './entities/role.entity.js';
 import { UserRole } from './entities/user-role.entity.js';
 import { UsersModule } from '../users/users.module.js';
+import type { StringValue } from 'ms';
 
 @Module({
   imports: [
@@ -23,8 +24,8 @@ import { UsersModule } from '../users/users.module.js';
           configService.get<string>('config.jwt.secret') ||
           'default-secret-change-in-production',
         signOptions: {
-          expiresIn:
-            (configService.get<string | number>('config.jwt.expiresIn') || '1h') as any,
+          expiresIn: (configService.get<string>('config.jwt.expiresIn') ||
+            '1h') as StringValue,
         },
       }),
       inject: [ConfigService],

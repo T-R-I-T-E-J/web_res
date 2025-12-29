@@ -32,7 +32,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
       path: request.url,
       method: request.method,
-      message: typeof message === 'string' ? message : (message as any).message || message,
+      message:
+        typeof message === 'string'
+          ? message
+          : typeof message === 'object' && message !== null && 'message' in message
+            ? String((message as { message: unknown }).message)
+            : 'Unknown error',
     };
 
     // Log the error

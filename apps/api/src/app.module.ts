@@ -24,6 +24,7 @@ import { Role } from './auth/entities/role.entity.js';
 import { UserRole } from './auth/entities/user-role.entity.js';
 import configuration from './config/configuration';
 import { getDatabaseConfig } from './config/database.config';
+import { envValidationSchema } from './config/env.validation';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { getDatabaseConfig } from './config/database.config';
       isGlobal: true,
       load: [configuration],
       envFilePath: '.env',
+      validationSchema: envValidationSchema,
     }),
 
     // Rate Limiting
