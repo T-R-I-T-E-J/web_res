@@ -12,8 +12,25 @@ export class EventsService {
     private eventsRepository: Repository<Event>,
   ) {}
 
-  create(createEventDto: CreateEventDto) {
-    const event = this.eventsRepository.create(createEventDto);
+  async create(createEventDto: CreateEventDto) {
+    // Generate slug from title
+    const baseSlug = createEventDto.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    
+    // Ensure uniqueness
+    let slug = baseSlug;
+    let counter = 1;
+    while (await this.eventsRepository.findOne({ where: { slug } })) {
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+    }
+    
+    const event = this.eventsRepository.create({
+      ...createEventDto,
+      slug,
+    });
     return this.eventsRepository.save(event);
   }
 
@@ -28,6 +45,12 @@ export class EventsService {
   async findOne(id: number) {
     const event = await this.eventsRepository.findOne({ where: { id } });
     if (!event) throw new NotFoundException(`Event #${id} not found`);
+    return event;
+  }
+
+  async findOneBySlug(slug: string) {
+    const event = await this.eventsRepository.findOne({ where: { slug } });
+    if (!event) throw new NotFoundException(`Event with slug "${slug}" not found`);
     return event;
   }
 

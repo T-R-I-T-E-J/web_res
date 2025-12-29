@@ -22,7 +22,11 @@ export class EventsController {
   @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.eventsService.findOne(+id);
+    // Check if id is numeric (ID) or string (slug)
+    if (/^\d+$/.test(id)) {
+      return this.eventsService.findOne(+id);
+    }
+    return this.eventsService.findOneBySlug(id);
   }
 
   @Patch(':id')
