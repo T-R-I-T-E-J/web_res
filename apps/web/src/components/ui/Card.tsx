@@ -48,7 +48,7 @@ type EventCardProps = {
   title: string
   date: string
   location: string
-  status: 'upcoming' | 'ongoing' | 'completed'
+  status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled'
   href: string
 }
 
@@ -57,12 +57,14 @@ export const EventCard = ({ title, date, location, status, href }: EventCardProp
     upcoming: 'badge-info',
     ongoing: 'badge-warning',
     completed: 'badge-success',
+    cancelled: 'badge-error',
   }
 
   const statusLabels = {
     upcoming: 'Upcoming',
     ongoing: 'Live Now',
     completed: 'Completed',
+    cancelled: 'Cancelled',
   }
 
   return (

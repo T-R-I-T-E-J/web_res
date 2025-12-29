@@ -36,18 +36,55 @@ export default function CreateEventPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Validate required date fields
+    if (!formData.start_date || !formData.end_date) {
+      alert('Please fill in both start date and end date')
+      return
+    }
+
+    // Validate dates are valid
+    const startDate = new Date(formData.start_date)
+    const endDate = new Date(formData.end_date)
+    
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      alert('Please enter valid dates')
+      return
+    }
+
+    if (endDate < startDate) {
+      alert('End date must be after start date')
+      return
+    }
+
     setLoading(true)
 
     try {
       const token = Cookies.get('auth_token')
       
-      // Clean up empty strings for optional fields
-      const payload = {
-        ...formData,
-        registration_link: formData.registration_link || undefined,
-        circular_link: formData.circular_link || undefined,
-        description: formData.description || undefined,
+      // Transform the form data to match API requirements
+      const payload: any = {
+        title: formData.title,
+        location: formData.location,
+        status: formData.status,
+        is_featured: formData.is_featured,
+        // Convert datetime-local to ISO 8601 format
+        start_date: startDate.toISOString(),
+        end_date: endDate.toISOString(),
       }
+
+      // Only include optional fields if they have values
+      if (formData.description) {
+        payload.description = formData.description
+      }
+      if (formData.registration_link && formData.registration_link.trim()) {
+        payload.registration_link = formData.registration_link.trim()
+      }
+      if (formData.circular_link && formData.circular_link.trim()) {
+        payload.circular_link = formData.circular_link.trim()
+      }
+
+      console.log('Submitting event payload:', payload)
       
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events`, {
         method: 'POST',
@@ -63,10 +100,11 @@ export default function CreateEventPage() {
         router.refresh()
       } else {
         const error = await res.json()
-        alert(`Failed to create event: ${error.message || 'Unknown error'}`)
+        console.error('API Error:', error)
+        alert(`Failed to create event: ${JSON.stringify(error.message || error)}`)
       }
     } catch (error) {
-      console.error(error)
+      console.error('Submit error:', error)
       alert('An error occurred while creating the event.')
     } finally {
       setLoading(false)

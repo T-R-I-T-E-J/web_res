@@ -24,11 +24,11 @@ export class CreateEventDto {
 
   @IsDateString()
   @IsNotEmpty()
-  start_date: Date;
+  start_date: string;
 
   @IsDateString()
   @IsNotEmpty()
-  end_date: Date;
+  end_date: string;
 
   @IsEnum(EventStatus)
   @IsOptional()

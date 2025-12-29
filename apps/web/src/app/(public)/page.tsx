@@ -89,7 +89,7 @@ const HomePage = () => {
           if (Array.isArray(data)) {
             // Filter for upcoming events and sort by start date
             const upcoming = data
-              .filter((event: EventItem) => event.status === 'upcoming')
+              .filter((event: EventItem) => event.status === 'upcoming' || event.status === 'ongoing')
               .sort((a: EventItem, b: EventItem) => 
                 new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
               )
