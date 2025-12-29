@@ -6,33 +6,6 @@ import Image from 'next/image'
 import { ArrowRight, X, Calendar } from 'lucide-react'
 import { EventCard } from '@/components/ui'
 
-// Sample data - would come from API in production
-
-
-const upcomingEvents = [
-  {
-    title: '68th NSCC (Rifle)',
-    date: 'December 2025',
-    location: 'New Delhi',
-    status: 'upcoming' as const,
-    href: '/events/nscc-rifle-2025',
-  },
-  {
-    title: '68th NSCC (Pistol)',
-    date: 'January 2026',
-    location: 'Bhopal',
-    status: 'upcoming' as const,
-    href: '/events/nscc-pistol-2026',
-  },
-  {
-    title: 'Selection Trials - Asian Games',
-    date: 'February 2026',
-    location: 'New Delhi',
-    status: 'upcoming' as const,
-    href: '/events/asian-games-trials',
-  },
-]
-
 const galleryImages = [
   {
     src: '/committee.jpg',
@@ -71,10 +44,23 @@ type NewsItem = {
   featured_image_url?: string
 }
 
+type EventItem = {
+  id: number
+  title: string
+  slug: string
+  location: string
+  start_date: string
+  end_date: string
+  status: 'upcoming' | 'ongoing' | 'completed'
+  description?: string
+}
+
 const HomePage = () => {
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
   const [latestNews, setLatestNews] = useState<NewsItem[]>([])
   const [loadingNews, setLoadingNews] = useState(true)
+  const [upcomingEvents, setUpcomingEvents] = useState<EventItem[]>([])
+  const [loadingEvents, setLoadingEvents] = useState(true)
 
   useEffect(() => {
     const fetchLatestNews = async () => {
@@ -94,7 +80,32 @@ const HomePage = () => {
       }
     }
 
+    const fetchUpcomingEvents = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events`)
+        if (res.ok) {
+          const json = await res.json()
+          const data = json.data || json
+          if (Array.isArray(data)) {
+            // Filter for upcoming events and sort by start date
+            const upcoming = data
+              .filter((event: EventItem) => event.status === 'upcoming')
+              .sort((a: EventItem, b: EventItem) => 
+                new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
+              )
+              .slice(0, 3)
+            setUpcomingEvents(upcoming)
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch events:', error)
+      } finally {
+        setLoadingEvents(false)
+      }
+    }
+
     fetchLatestNews()
+    fetchUpcomingEvents()
   }, [])
 
   const formatDate = (dateString: string) => {
@@ -103,6 +114,16 @@ const HomePage = () => {
       month: 'short',
       day: 'numeric',
     })
+  }
+
+  const formatEventDate = (startDate: string, endDate: string) => {
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+    
+    if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
+      return start.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    }
+    return `${start.toLocaleDateString('en-US', { month: 'short' })} - ${end.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`
   }
 
   return (
@@ -232,11 +253,35 @@ const HomePage = () => {
               <ArrowRight className="w-4 h-4 ml-1" />
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {upcomingEvents.map((event) => (
-              <EventCard key={event.href} {...event} />
-            ))}
-          </div>
+          
+          {loadingEvents ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="card animate-pulse">
+                  <div className="h-6 bg-neutral-200 rounded w-3/4 mb-3"></div>
+                  <div className="h-4 bg-neutral-200 rounded w-1/2 mb-2"></div>
+                  <div className="h-4 bg-neutral-200 rounded w-2/3"></div>
+                </div>
+              ))}
+            </div>
+          ) : upcomingEvents.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {upcomingEvents.map((event) => (
+                <EventCard 
+                  key={event.id} 
+                  title={event.title}
+                  date={formatEventDate(event.start_date, event.end_date)}
+                  location={event.location}
+                  status={event.status}
+                  href={`/events/${event.slug || event.id}`}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-neutral-500">
+              <p>No upcoming events at the moment. Check back soon!</p>
+            </div>
+          )}
         </div>
       </section>
 
