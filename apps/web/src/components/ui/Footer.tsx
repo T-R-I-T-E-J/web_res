@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube } from 'lucide-react'
 
 const quickLinks = [
@@ -133,6 +134,20 @@ const Footer = () => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Sponsor Section */}
+      <div className="bg-white border-t border-neutral-200">
+        <div className="container-main py-6 flex flex-col items-center gap-3">
+          <p className="text-sm text-neutral-500 font-medium">Sponsored by</p>
+          <Image
+            src="/vsk-logo.jpeg"
+            alt="VSK - Sponsor"
+            width={120}
+            height={60}
+            className="object-contain"
+          />
         </div>
       </div>
 

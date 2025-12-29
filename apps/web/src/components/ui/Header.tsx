@@ -32,7 +32,7 @@ const navItems: NavItem[] = [
     ],
   },
   { label: 'Results', href: '/results' },
-  { label: 'Media', href: '/gallery' },
+  { label: 'Media', href: '/media' },
   { label: 'Criteria', href: '/downloads' },
   { label: 'Contact', href: '/contact' },
 ]

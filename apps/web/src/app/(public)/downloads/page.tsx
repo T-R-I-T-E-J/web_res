@@ -1,16 +1,25 @@
 import type { Metadata } from 'next'
-import { FileText, Download, BookOpen } from 'lucide-react'
+import { FileText, Download, BookOpen, Calendar, Trophy, ClipboardList } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Downloads',
-  description: 'Download official rules and guidelines for para shooting in India.',
+  title: 'Criteria',
+  description: 'Download official rules, guidelines, and selection policies for para shooting in India.',
 }
 
 const categories = [
   { label: 'Rules & Guidelines', icon: BookOpen, id: 'rules' },
+  { label: 'Selection Policies', icon: Trophy, id: 'selection' },
+  { label: 'Event Calendar', icon: Calendar, id: 'calendar' },
+  { label: 'Match Documents', icon: ClipboardList, id: 'match' },
 ]
 
 const rulesAndGuidelines = [
+  {
+    title: 'Para Shooting Criteria',
+    description: 'Official Para Shooting criteria and guidelines document',
+    fileType: 'PDF',
+    href: '/para-shooting-criteria.pdf',
+  },
   {
     title: 'WSPS Rulebook 2026',
     description: 'Official World Shooting Para Sport Rulebook - Final Version',
@@ -24,6 +33,45 @@ const rulesAndGuidelines = [
     fileType: 'PDF',
     size: 'External',
     href: 'https://www.paralympic.org/sites/default/files/2025-12/WSPS%20Rulebook%20Appendices%202026_vFinal.pdf',
+  },
+]
+
+const selectionPolicies = [
+  {
+    title: '2025 National Selection Policy',
+    description: 'National Selection Policy for Para Shooting - 2025',
+    fileType: 'PDF',
+    href: '/2025-national-selection-policy.pdf',
+  },
+  {
+    title: 'Selection Policy - Paris 2024 Paralympics',
+    description: 'Selection criteria for Paris France 2024 Paralympic Games',
+    fileType: 'PDF',
+    href: '/selection-policy-paris-2024.pdf',
+  },
+  {
+    title: 'Selection Policy - Tokyo 2020 Paralympics',
+    description: 'Selection criteria for Tokyo Japan 2020 Paralympic Games',
+    fileType: 'PDF',
+    href: '/selection-policy-tokyo-2020.pdf',
+  },
+]
+
+const eventCalendar = [
+  {
+    title: '2026-2027 Para Shooting Event Calendar',
+    description: 'Official event calendar for Para Shooting competitions 2026-2027',
+    fileType: 'PDF',
+    href: '/2026-2027-event-calendar.pdf',
+  },
+]
+
+const matchDocuments = [
+  {
+    title: 'Match Book - Zonal & National Championship 2022',
+    description: 'Match book for Zonal and National Para Shooting Championship 2022',
+    fileType: 'PDF',
+    href: '/match-book-2022.pdf',
   },
 ]
 
@@ -76,13 +124,25 @@ const DownloadCard = ({
 const DownloadsPage = () => {
   return (
     <>
+      {/* Hero Banner */}
+      <section className="gradient-hero py-16 md:py-20">
+        <div className="container-main text-center">
+          <h1 className="font-heading text-3xl md:text-4xl font-bold text-white mb-4">
+            Criteria & Documents
+          </h1>
+          <p className="text-white/90 max-w-2xl mx-auto">
+            Access official rules, selection policies, and important documents for Para Shooting in India
+          </p>
+        </div>
+      </section>
+
       {/* Breadcrumb */}
       <nav className="bg-neutral-100 py-3 text-sm" aria-label="Breadcrumb">
         <div className="container-main">
           <ol className="flex items-center gap-2">
             <li><a href="/" className="text-interactive hover:text-primary">Home</a></li>
             <li className="text-neutral-400">/</li>
-            <li className="text-neutral-600">Downloads</li>
+            <li className="text-neutral-600">Criteria</li>
           </ol>
         </div>
       </nav>
@@ -106,7 +166,7 @@ const DownloadsPage = () => {
       </section>
 
       {/* Rules & Guidelines Section */}
-      <section id="rules" className="section bg-neutral-50">
+      <section id="rules" className="section bg-white">
         <div className="container-main">
           <h2 className="section-title">Rules & Guidelines</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -117,6 +177,41 @@ const DownloadsPage = () => {
         </div>
       </section>
 
+      {/* Selection Policies Section */}
+      <section id="selection" className="section bg-neutral-50">
+        <div className="container-main">
+          <h2 className="section-title">Selection Policies</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {selectionPolicies.map((policy) => (
+              <DownloadCard key={policy.title} {...policy} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Event Calendar Section */}
+      <section id="calendar" className="section bg-white">
+        <div className="container-main">
+          <h2 className="section-title">Event Calendar</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {eventCalendar.map((item) => (
+              <DownloadCard key={item.title} {...item} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Match Documents Section */}
+      <section id="match" className="section bg-neutral-50">
+        <div className="container-main">
+          <h2 className="section-title">Match Documents</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {matchDocuments.map((doc) => (
+              <DownloadCard key={doc.title} {...doc} />
+            ))}
+          </div>
+        </div>
+      </section>
     </>
   )
 }
