@@ -10,14 +10,14 @@ export const multerConfig = {
   // Storage configuration
   storage: diskStorage({
     // Destination folder (relative to project root)
-    destination: (req, file, cb) => {
+    destination: (req: any, file: any, cb: any) => {
       // Store files outside web root for security
       const uploadPath = join(process.cwd(), 'uploads');
       cb(null, uploadPath);
     },
 
     // Filename configuration
-    filename: (req, file, cb) => {
+    filename: (req: any, file: any, cb: any) => {
       // Generate cryptographically secure random filename
       const randomName = crypto.randomBytes(16).toString('hex');
       const ext = extname(file.originalname).toLowerCase();
@@ -30,7 +30,7 @@ export const multerConfig = {
   }),
 
   // File filter (whitelist allowed types)
-  fileFilter: (req, file, cb) => {
+  fileFilter: (req: any, file: any, cb: any) => {
     // Allowed MIME types
     const allowedMimeTypes = [
       // Images
@@ -100,14 +100,14 @@ export const multerConfig = {
 export const profilePictureConfig = {
   storage: diskStorage({
     destination: join(process.cwd(), 'uploads', 'profiles'),
-    filename: (req, file, cb) => {
+    filename: (req: any, file: any, cb: any) => {
       const randomName = crypto.randomBytes(16).toString('hex');
       const ext = extname(file.originalname).toLowerCase();
       cb(null, `profile_${randomName}${ext}`);
     },
   }),
 
-  fileFilter: (req, file, cb) => {
+  fileFilter: (req: any, file: any, cb: any) => {
     // Only allow images for profile pictures
     const allowedMimeTypes = [
       'image/jpeg',
@@ -148,7 +148,7 @@ export const profilePictureConfig = {
 export const documentConfig = {
   storage: diskStorage({
     destination: join(process.cwd(), 'uploads', 'documents'),
-    filename: (req, file, cb) => {
+    filename: (req: any, file: any, cb: any) => {
       const randomName = crypto.randomBytes(16).toString('hex');
       const ext = extname(file.originalname).toLowerCase();
       const timestamp = Date.now();
@@ -156,7 +156,7 @@ export const documentConfig = {
     },
   }),
 
-  fileFilter: (req, file, cb) => {
+  fileFilter: (req: any, file: any, cb: any) => {
     // Only allow documents
     const allowedMimeTypes = [
       'application/pdf',

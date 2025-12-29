@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import clsx from 'clsx'
+import Cookies from 'js-cookie'
 import Image from 'next/image'
 import {
   Home, User, Trophy, Calendar, CreditCard, Settings, LogOut,
@@ -29,12 +30,18 @@ type SidebarProps = {
 
 const Sidebar = ({ items, user }: SidebarProps) => {
   const pathname = usePathname()
+  const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [expandedItems, setExpandedItems] = useState<string[]>([])
 
   const handleToggle = () => setCollapsed(!collapsed)
   const handleMobileToggle = () => setMobileOpen(!mobileOpen)
+
+  const handleLogout = () => {
+    Cookies.remove('auth_token')
+    router.push('/login')
+  }
 
   const toggleExpand = (label: string) => {
     if (collapsed) setCollapsed(false)
@@ -198,6 +205,7 @@ const Sidebar = ({ items, user }: SidebarProps) => {
               {!collapsed && <span className="font-medium">Settings</span>}
             </Link>
             <button
+              onClick={handleLogout}
               className="flex items-center gap-3 px-4 py-3 text-error hover:bg-error/10 rounded-card transition-colors w-full"
             >
               <LogOut className="w-5 h-5" />

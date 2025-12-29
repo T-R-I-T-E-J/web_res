@@ -96,7 +96,8 @@ export class User {
    */
   getDecryptedEmail(encryptionService: any): string {
     if (this.encryptedEmail) {
-      return encryptionService.decrypt(this.encryptedEmail);
+      const decrypted = encryptionService.decrypt(this.encryptedEmail);
+      if (decrypted) return decrypted;
     }
     return this.email; // Fallback to plain email during migration
   }
@@ -105,9 +106,10 @@ export class User {
    * Get decrypted phone
    * Note: Requires EncryptionService to be injected
    */
-  getDecryptedPhone(encryptionService: any): string {
+  getDecryptedPhone(encryptionService: any): string | undefined {
     if (this.encryptedPhone) {
-      return encryptionService.decrypt(this.encryptedPhone);
+      const decrypted = encryptionService.decrypt(this.encryptedPhone);
+      if (decrypted) return decrypted;
     }
     return this.phone; // Fallback to plain phone during migration
   }

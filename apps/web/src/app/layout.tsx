@@ -53,11 +53,15 @@ const RootLayout = ({ children }: RootLayoutProps) => {
     <html lang="en">
       <head>
         {/* CookieYes - GDPR/DPDP Consent Management */}
+        {/* TODO: Configure NEXT_PUBLIC_COOKIEYES_ID in production environment */}
+        {/* Uncomment and replace YOUR_COOKIEYES_ID with actual CookieYes account ID */}
+        {/* 
         <Script
           id="cookieyes"
-          src="https://cdn-cookieyes.com/client_data/YOUR_COOKIEYES_ID/script.js"
+          src={`https://cdn-cookieyes.com/client_data/${process.env.NEXT_PUBLIC_COOKIEYES_ID}/script.js`}
           strategy="beforeInteractive"
         />
+        */}
         
         {/* Security: Content Security Policy */}
         <meta

@@ -16,6 +16,7 @@ import { ResultsModule } from './results/results.module.js';
 import { NewsModule } from './news/news.module.js';
 import { UploadModule } from './upload/upload.module.js';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard.js';
+import { RolesGuard } from './auth/guards/roles.guard.js';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { AuditLog } from './common/entities/audit-log.entity.js';
 import { AuditService } from './common/services/audit.service.js';
@@ -39,18 +40,18 @@ import { getDatabaseConfig } from './config/database.config';
     ThrottlerModule.forRoot([
       {
         name: 'short',
-        ttl: 1000,    // 1 second
-        limit: 10,    // 10 requests per second (burst protection)
+        ttl: 1000, // 1 second
+        limit: 10, // 10 requests per second (burst protection)
       },
       {
         name: 'medium',
-        ttl: 60000,   // 1 minute
-        limit: 100,   // 100 requests per minute (standard protection)
+        ttl: 60000, // 1 minute
+        limit: 100, // 100 requests per minute (standard protection)
       },
       {
         name: 'long',
-        ttl: 900000,  // 15 minutes
-        limit: 1000,  // 1000 requests per 15 min (sustained load protection)
+        ttl: 900000, // 15 minutes
+        limit: 1000, // 1000 requests per 15 min (sustained load protection)
       },
     ]),
 
@@ -81,12 +82,21 @@ import { getDatabaseConfig } from './config/database.config';
     AppService,
     AuditService,
     EncryptionService,
-    PermissionsGuard,
     // Global JWT Guard - all routes require authentication by default
     // Use @Public() decorator to make routes public
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    // Global Roles Guard
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+    // Global Permissions Guard
+    {
+      provide: APP_GUARD,
+      useClass: PermissionsGuard,
     },
     // Global Rate Limiting
     {

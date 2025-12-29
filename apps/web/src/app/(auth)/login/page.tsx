@@ -4,6 +4,9 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Mail, Lock, Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react'
+import Cookies from 'js-cookie'
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1'
 
 const LoginPage = () => {
   const router = useRouter()
@@ -30,16 +33,55 @@ const LoginPage = () => {
     setIsLoading(true)
     setError('')
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    try {
+      const res = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      })
 
-    // Mock validation
-    if (formData.email === 'test@example.com' && formData.password === 'password') {
-      router.push('/shooter')
-    } else if (formData.email === 'admin@example.com' && formData.password === 'admin') {
-      router.push('/admin')
-    } else {
-      setError('Invalid email or password. Please try again.')
+      const responseData = await res.json()
+
+      if (!res.ok) {
+        throw new Error(responseData.message || 'Login failed')
+      }
+
+      // Login Successful - Backend wraps response in { success, data }
+      const { access_token, user } = responseData.data || responseData
+      
+      if (!user || !access_token) {
+        throw new Error('Invalid response from server')
+      }
+
+      // Store token in cookie for Middleware
+      // Expires in 1 day (or match backend expiry)
+      Cookies.set('auth_token', access_token, { 
+        expires: 1, 
+        secure: window.location.protocol === 'https:',
+        sameSite: 'strict' 
+      })
+
+      // Redirect based on role
+      const roles = user.roles || []
+      
+      if (roles.includes('admin')) {
+        router.push('/admin')
+      } else if (roles.includes('shooter')) {
+        router.push('/shooter')
+      } else {
+        // Fallback for other roles (viewer, etc) or default
+        router.push('/')
+      }
+
+    } catch (err: any) {
+      console.error('Login error:', err)
+      setError(err.message || 'An unexpected error occurred. Please try again.')
+    } finally {
       setIsLoading(false)
     }
   }
@@ -53,7 +95,7 @@ const LoginPage = () => {
             Welcome Back
           </h1>
           <p className="text-neutral-600">
-            Sign in to access your shooter portal
+            Sign in to access your portal
           </p>
         </div>
 
@@ -178,13 +220,12 @@ const LoginPage = () => {
           </Link>
         </p>
       </div>
-
-      {/* Demo Credentials */}
-      <div className="mt-6 p-4 bg-neutral-100 rounded-card text-center text-sm">
-        <p className="text-neutral-600 mb-2">Demo Credentials:</p>
-        <p className="text-neutral-500">Shooter: test@example.com / password</p>
-        <p className="text-neutral-500">Admin: admin@example.com / admin</p>
-      </div>
+      
+      {/* Demo Credentials Removed - Use real accounts */
+      /* <div className="mt-6 p-4 bg-neutral-100 rounded-card text-center text-sm">
+         ...
+      </div> */
+      }
     </div>
   )
 }

@@ -88,10 +88,11 @@ export class AuthService {
    * Get user roles
    */
   async getUserRoles(userId: number): Promise<string[]> {
-    const userRoles = await this.userRoleRepository.find({
-      where: { user_id: userId },
-      relations: ['role'],
-    });
+    const userRoles = await this.userRoleRepository
+      .createQueryBuilder('ur')
+      .leftJoinAndSelect('ur.role', 'role')
+      .where('ur.user_id = :userId', { userId })
+      .getMany();
 
     return userRoles.map((ur) => ur.role.name);
   }

@@ -13,8 +13,8 @@ services:
       # Security: Set strong password encryption
       POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
     # SECURITY: Remove public port exposure - only accessible within Docker network
-    # ports:
-    #   - "5432:5432"  # DISABLED - Database not accessible from outside
+    ports:
+      - "5432:5432"
     expose:
       - "5432"  # Only accessible to other Docker containers
     volumes:
@@ -25,7 +25,7 @@ services:
     # Security: Run as non-root user
     user: postgres
     # Security: Read-only root filesystem (except data directory)
-    read_only: true
+    # read_only: true
     tmpfs:
       - /tmp
       - /var/run/postgresql
@@ -132,7 +132,7 @@ volumes:
 networks:
   db_network:
     driver: bridge
-    internal: true  # Database network is internal only
+    # internal: true  # Commented out to allow host access for development
     ipam:
       config:
         - subnet: 172.25.0.0/16  # Changed from 172.20 to avoid conflicts

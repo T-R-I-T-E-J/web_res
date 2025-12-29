@@ -9,7 +9,7 @@ export class EncryptionService {
   private readonly algorithm = 'aes-256-gcm';
 
   constructor(private configService: ConfigService) {
-    this.encryptionKey = this.configService.get<string>('ENCRYPTION_KEY');
+    this.encryptionKey = this.configService.get<string>('ENCRYPTION_KEY') || '';
     if (!this.encryptionKey) {
       throw new Error(
         'ENCRYPTION_KEY must be set in environment variables for data encryption',
@@ -22,14 +22,14 @@ export class EncryptionService {
    * @param data - Plain text data to encrypt
    * @returns Encrypted string with IV and auth tag
    */
-  encrypt(data: string): string {
+  encrypt(data: string): string | null {
     if (!data) return null;
 
     try {
       // Use CryptoJS for simplicity
       const encrypted = CryptoJS.AES.encrypt(data, this.encryptionKey);
       return encrypted.toString();
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Encryption failed: ${error.message}`);
     }
   }
@@ -39,13 +39,13 @@ export class EncryptionService {
    * @param encryptedData - Encrypted string
    * @returns Decrypted plain text
    */
-  decrypt(encryptedData: string): string {
+  decrypt(encryptedData: string): string | null {
     if (!encryptedData) return null;
 
     try {
       const decrypted = CryptoJS.AES.decrypt(encryptedData, this.encryptionKey);
       return decrypted.toString(CryptoJS.enc.Utf8);
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Decryption failed: ${error.message}`);
     }
   }
@@ -56,7 +56,7 @@ export class EncryptionService {
    * @param data - Data to hash
    * @returns Hashed string (SHA-256)
    */
-  hash(data: string): string {
+  hash(data: string): string | null {
     if (!data) return null;
     return CryptoJS.SHA256(data).toString();
   }
@@ -87,7 +87,7 @@ export class EncryptionService {
    * @param obj - Object to encrypt
    * @returns Encrypted string
    */
-  encryptObject(obj: any): string {
+  encryptObject(obj: any): string | null {
     if (!obj) return null;
     const jsonString = JSON.stringify(obj);
     return this.encrypt(jsonString);
@@ -98,9 +98,10 @@ export class EncryptionService {
    * @param encryptedData - Encrypted string
    * @returns Decrypted object
    */
-  decryptObject<T>(encryptedData: string): T {
+  decryptObject<T>(encryptedData: string): T | null {
     if (!encryptedData) return null;
     const jsonString = this.decrypt(encryptedData);
+    if (!jsonString) return null;
     return JSON.parse(jsonString) as T;
   }
 
@@ -130,9 +131,7 @@ export class EncryptionService {
 
     const [localPart, domain] = email.split('@');
     const maskedLocal =
-      localPart.length > 3
-        ? `${localPart.substring(0, 3)}***`
-        : localPart;
+      localPart.length > 3 ? `${localPart.substring(0, 3)}***` : localPart;
 
     return `${maskedLocal}@${domain}`;
   }

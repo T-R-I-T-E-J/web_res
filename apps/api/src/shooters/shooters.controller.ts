@@ -5,15 +5,12 @@ import {
   Patch,
   Body,
   Param,
-  UseGuards,
 } from '@nestjs/common';
 import { ShootersService } from './shooters.service.js';
 import { CreateShooterProfileDto } from './dto/create-shooter-profile.dto.js';
 import { CreateShooterClassificationDto } from './dto/create-shooter-classification.dto.js';
 import { UpdateShooterClassificationDto } from './dto/update-shooter-classification.dto.js';
 import { Public } from '../auth/decorators/public.decorator.js';
-import { RolesGuard } from '../auth/guards/roles.guard.js';
-import { PermissionsGuard } from '../common/guards/permissions.guard.js';
 import { RequirePermissions } from '../common/decorators/permissions.decorator.js';
 import { AuditService } from '../common/services/audit.service.js';
 import { AuditAction } from '../common/entities/audit-log.entity.js';
@@ -60,7 +57,6 @@ export class ShootersController {
     return profile;
   }
 
-  @UseGuards(RolesGuard, PermissionsGuard)
   @RequirePermissions('users:verify')
   @Post(':id/verify')
   async verifyShooter(
@@ -85,7 +81,6 @@ export class ShootersController {
     return this.shootersService.getClassifications(+id);
   }
 
-  @UseGuards(RolesGuard, PermissionsGuard)
   @RequirePermissions('shooters:classify')
   @Post(':id/classifications')
   async addClassification(
@@ -109,7 +104,6 @@ export class ShootersController {
     return classification;
   }
 
-  @UseGuards(RolesGuard, PermissionsGuard)
   @RequirePermissions('shooters:classify')
   @Patch('classifications/:id')
   async updateClassification(

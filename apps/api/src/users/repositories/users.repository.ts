@@ -160,7 +160,7 @@ export class UsersRepository {
   /**
    * Get user count
    */
-  async count(filters?: Partial<User>): Promise<number> {
+  async count(filters?: FindOptionsWhere<User>): Promise<number> {
     return this.userRepository.count({
       where: { ...filters, deleted_at: IsNull() },
     });
