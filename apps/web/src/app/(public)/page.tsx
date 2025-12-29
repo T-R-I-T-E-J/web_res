@@ -1,35 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight, X } from 'lucide-react'
-import { NewsCard, EventCard } from '@/components/ui'
+import { ArrowRight, X, Calendar } from 'lucide-react'
+import { EventCard } from '@/components/ui'
 
 // Sample data - would come from API in production
-const latestNews = [
-  {
-    title: 'Para Shooting Election 2025',
-    excerpt: 'Important updates regarding the upcoming elections. Check the notification section for more details.',
-    category: 'Announcement',
-    date: 'Dec 20, 2025',
-    href: '/news/election-2025',
-  },
-  {
-    title: 'Shooting League of India',
-    excerpt: 'Registration for the new season is now open. Aspiring shooters are encouraged to apply early.',
-    category: 'Event',
-    date: 'Dec 18, 2025',
-    href: '/news/shooting-league',
-  },
-  {
-    title: 'National Championship 2025',
-    excerpt: 'Dates and venues for the 68th National Shooting Championship have been announced.',
-    category: 'Championship',
-    date: 'Dec 15, 2025',
-    href: '/news/nationals-2025',
-  },
-]
+
 
 const upcomingEvents = [
   {
@@ -83,8 +61,49 @@ type GalleryImage = {
   subtitle: string
 }
 
+type NewsItem = {
+  id: number
+  title: string
+  slug: string
+  excerpt: string
+  category: string
+  created_at: string
+  featured_image_url?: string
+}
+
 const HomePage = () => {
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
+  const [latestNews, setLatestNews] = useState<NewsItem[]>([])
+  const [loadingNews, setLoadingNews] = useState(true)
+
+  useEffect(() => {
+    const fetchLatestNews = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/news?status=published&limit=3`)
+        if (res.ok) {
+          const json = await res.json()
+          const data = json.data || json
+          if (Array.isArray(data)) {
+            setLatestNews(data.slice(0, 3))
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch news:', error)
+      } finally {
+        setLoadingNews(false)
+      }
+    }
+
+    fetchLatestNews()
+  }, [])
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    })
+  }
 
   return (
     <>
@@ -128,7 +147,7 @@ const HomePage = () => {
         </div>
       )}
 
-      {/* Latest News Section */}
+      {/* Latest News & Updates Section */}
       <section className="section bg-white">
         <div className="container-main">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
@@ -141,13 +160,64 @@ const HomePage = () => {
               <ArrowRight className="w-4 h-4 ml-1" />
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {latestNews.map((news) => (
-              <NewsCard key={news.href} {...news} />
-            ))}
-          </div>
+          
+          {loadingNews ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="card animate-pulse">
+                  <div className="bg-neutral-200 h-48 rounded-card mb-4"></div>
+                  <div className="h-4 bg-neutral-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-neutral-200 rounded w-1/2"></div>
+                </div>
+              ))}
+            </div>
+          ) : latestNews.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {latestNews.map((article) => (
+                <Link
+                  key={article.id}
+                  href={`/news/${article.slug || article.id}`}
+                  className="card group hover:border-primary transition-colors"
+                >
+                  <div className="relative aspect-[16/10] rounded-card overflow-hidden bg-neutral-100 mb-4">
+                    {article.featured_image_url ? (
+                      <img
+                        src={article.featured_image_url}
+                        alt={article.title}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
+                        <span className="text-4xl">📰</span>
+                      </div>
+                    )}
+                    <div className="absolute top-3 left-3">
+                      <span className="bg-accent text-white text-xs font-bold px-2 py-1 rounded-full">
+                        {article.category}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-neutral-400 mb-2">
+                    <Calendar className="w-3 h-3" />
+                    {formatDate(article.created_at)}
+                  </div>
+                  <h3 className="font-heading font-semibold text-lg text-neutral-700 group-hover:text-primary transition-colors mb-2 line-clamp-2">
+                    {article.title}
+                  </h3>
+                  <p className="text-sm text-neutral-600 line-clamp-3">
+                    {article.excerpt}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-neutral-500">
+              <p>No news articles available at the moment.</p>
+            </div>
+          )}
         </div>
       </section>
+
 
       {/* Upcoming Events Section */}
       <section className="section bg-neutral-50">
