@@ -140,10 +140,10 @@ const Footer = () => {
       {/* Sponsor Section */}
       <div className="bg-white border-t border-neutral-200">
         <div className="container-main py-6 flex flex-col items-center gap-3">
-          <p className="text-sm text-neutral-500 font-medium">Sponsored by</p>
+          <p className="text-sm text-neutral-500 font-medium">Supported by</p>
           <Image
-            src="/vsk-logo.jpeg"
-            alt="VSK - Sponsor"
+            src="/VSK_icon.jpg"
+            alt="VSK - Supported by"
             width={120}
             height={60}
             className="object-contain"
