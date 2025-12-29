@@ -1,5 +1,9 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
+import Image from 'next/image'
+import { ArrowRight, X } from 'lucide-react'
 import { NewsCard, EventCard } from '@/components/ui'
 
 // Sample data - would come from API in production
@@ -51,9 +55,79 @@ const upcomingEvents = [
   },
 ]
 
+const galleryImages = [
+  {
+    src: '/committee.jpg',
+    alt: 'Para Shooting Committee',
+    title: 'Para Shooting Committee',
+    subtitle: 'Leadership & Governance',
+  },
+  {
+    src: '/dronacharya-2021.jpg',
+    alt: 'Dronacharya Award 2021',
+    title: 'Dronacharya Award 2021',
+    subtitle: 'Excellence in Coaching',
+  },
+  {
+    src: '/president-of-india.jpg',
+    alt: "With Hon'ble President of India",
+    title: 'Presidential Recognition',
+    subtitle: "With Hon'ble President of India",
+  },
+]
+
+type GalleryImage = {
+  src: string
+  alt: string
+  title: string
+  subtitle: string
+}
+
 const HomePage = () => {
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
+
   return (
     <>
+      {/* Image Lightbox Modal */}
+      {selectedImage && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setSelectedImage(null)}
+        >
+          <button
+            onClick={() => setSelectedImage(null)}
+            className="absolute top-4 right-4 z-10 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+            aria-label="Close"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <div
+            className="relative max-w-5xl max-h-[90vh] w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {selectedImage.src.startsWith('http') ? (
+              <img
+                src={selectedImage.src.replace('sz=w1000', 'sz=w2000')}
+                alt={selectedImage.alt}
+                className="w-full h-auto max-h-[85vh] object-contain rounded-lg mx-auto"
+              />
+            ) : (
+              <Image
+                src={selectedImage.src}
+                alt={selectedImage.alt}
+                width={1200}
+                height={800}
+                className="w-full h-auto max-h-[85vh] object-contain rounded-lg"
+              />
+            )}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 rounded-b-lg">
+              <h3 className="font-heading font-bold text-white text-xl">{selectedImage.title}</h3>
+              <p className="text-white/80 text-sm mt-1">{selectedImage.subtitle}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Latest News Section */}
       <section className="section bg-white">
         <div className="container-main">
@@ -96,8 +170,43 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Featured Videos Section */}
+      {/* Highlights & Achievements Gallery */}
       <section className="section bg-white">
+        <div className="container-main">
+          <h2 className="section-title text-center mb-12">Highlights & Achievements</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {galleryImages.map((image) => (
+              <button
+                key={image.src}
+                onClick={() => setSelectedImage(image)}
+                className="group relative overflow-hidden rounded-card shadow-card cursor-pointer text-left"
+              >
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  width={600}
+                  height={400}
+                  className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-6">
+                  <div>
+                    <h3 className="font-heading font-bold text-white text-lg">{image.title}</h3>
+                    <p className="text-white/80 text-sm mt-1">{image.subtitle}</p>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors flex items-center justify-center">
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 text-primary font-semibold px-4 py-2 rounded-full text-sm">
+                    Click to view
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Videos Section */}
+      <section className="section bg-neutral-50">
         <div className="container-main">
           <h2 className="section-title text-center mb-12">Featured Videos</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -126,5 +235,3 @@ const HomePage = () => {
 }
 
 export default HomePage
-
-
