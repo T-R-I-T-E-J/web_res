@@ -54,16 +54,54 @@ const AboutPage = () => {
             <h2 className="section-title text-center">Introduction</h2>
             <div className="prose prose-lg text-neutral-600 space-y-6 text-center">
               <p>
-                The Para Shooting Committee of India (PSCI) is the national governing body 
-                for para shooting sports in India. Established in 1951, we have been at the 
-                forefront of promoting, developing, and managing competitive shooting for 
-                para-athletes across the nation.
+                Disabled at birth or rendered differently abled due to unforeseen accidents, our para shooters have never allowed circumstance to define their limits. Rather than seeking sympathy, they have emerged as powerful symbols of determination, self-belief, resilience, and an indomitable never-say-die spirit. Through grit and discipline, they continue to inspire the nation by transforming adversity into excellence.
               </p>
               <p>
-                As a member of World Shooting Para Sport (WSPS) and the Paralympic Committee 
-                of India, we organize national championships, selection trials, and training 
-                programs to identify and nurture shooting talent among athletes with disabilities.
+                The journey of Para Shooting in India truly began in 2015, making it a relatively young sport in terms of global presence and elite-level performance. Yet, in this short span, the progress has been extraordinary. Across two Paralympic Games—Tokyo and Paris—India's para shooters have secured an impressive total of nine medals: three Gold, two Silver, and four Bronze. These achievements stand as a testament to focused vision, structured development, and unwavering commitment.
               </p>
+              <p>
+                Para Shooting in India has witnessed exponential growth across every dimension. There has been a remarkable increase in the number of para shooters, international medals, and world records, alongside the development of world-class WSPS technical officials and certified medical classifiers. Indian para shooters have also consistently secured first positions at multiple World Cups, asserting their dominance on the global stage.
+              </p>
+              <p>
+                Today, India's para shooting ecosystem represents a true paradigm shift—rising from obscurity to global leadership. From having virtually no presence to standing at the very top of the world, this journey reflects not just sporting success, but the triumph of human spirit, vision, and purpose.
+              </p>
+              <div className="mt-8 text-right">
+                <p className="font-semibold text-primary">Jaiprakash Nautiyal</p>
+                <p className="text-sm text-neutral-500">Dronacharya Awardee</p>
+                <p className="text-sm text-neutral-500">Chairman, STC Para Shooting</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Embedded Document Section */}
+      <section className="section bg-neutral-50">
+        <div className="container-main">
+          <h2 className="section-title text-center">Para Shooting Criteria Document</h2>
+          <p className="text-neutral-600 text-center mb-8 max-w-2xl mx-auto">
+            View the official Para Shooting criteria and guidelines document below.
+          </p>
+          <div className="max-w-5xl mx-auto">
+            <div className="bg-white rounded-card shadow-card overflow-hidden border border-neutral-200">
+              <iframe
+                src="/para-shooting-criteria.pdf"
+                className="w-full h-[800px]"
+                title="Para Shooting Criteria Document"
+              />
+            </div>
+            <div className="mt-4 text-center">
+              <a
+                href="/para-shooting-criteria.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary inline-flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Download Full Document
+              </a>
             </div>
           </div>
         </div>
