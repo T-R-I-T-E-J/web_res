@@ -7,10 +7,6 @@ export class CreateEventDto {
   title: string;
 
   @IsString()
-  @IsNotEmpty()
-  slug: string;
-
-  @IsString()
   @IsOptional()
   description?: string;
 
