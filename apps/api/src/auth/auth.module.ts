@@ -18,13 +18,13 @@ import { UsersModule } from '../users/users.module.js';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: async (configService: ConfigService) => ({
         secret:
           configService.get<string>('config.jwt.secret') ||
           'default-secret-change-in-production',
         signOptions: {
           expiresIn:
-            configService.get<string | number>('config.jwt.expiresIn') || '1h',
+            (configService.get<string | number>('config.jwt.expiresIn') || '1h') as any,
         },
       }),
       inject: [ConfigService],
@@ -35,4 +35,4 @@ import { UsersModule } from '../users/users.module.js';
   providers: [AuthService, JwtStrategy, JwtAuthGuard, RolesGuard],
   exports: [AuthService, JwtAuthGuard, RolesGuard],
 })
-export class AuthModule {}
+export class AuthModule { }

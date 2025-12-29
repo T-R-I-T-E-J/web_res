@@ -1,0 +1,121 @@
+// This is your Prisma schema file for testing failure scenarios
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Test models for payment failure scenarios
+model Payment {
+  id                 String   @id @default(cuid())
+  razorpayOrderId    String   @unique
+  razorpayPaymentId  String?  @unique
+  amount             Int
+  currency           String   @default("INR")
+  status             String @default("PENDING") // PaymentStatus
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  
+  refunds            Refund[]
+  
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Refund {
+  id                String   @id @default(cuid())
+  paymentId         String
+  payment           Payment  @relation(fields: [paymentId], references: [id])
+  razorpayRefundId  String   @unique
+  amount            Int
+  status            String @default("PROCESSING") // RefundStatus
+  createdAt         DateTime @default(now())
+  processedAt       DateTime?
+  
+  @@index([status, createdAt])
+}
+
+// Test models for deadlock scenarios
+model Account {
+  id        String   @id @default(cuid())
+  balance   Int      @default(0)
+  version   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([id, version])
+}
+
+model Transaction {
+  id            String   @id @default(cuid())
+  fromAccountId String
+  toAccountId   String
+  amount        Int
+  status        String @default("PENDING") // TransactionStatus
+  createdAt     DateTime @default(now())
+  
+  @@index([status])
+}
+
+// Health check log
+model HealthCheck {
+  id        String   @id @default(cuid())
+  service   String
+  status    String
+  latencyMs Int?
+  message   String?
+  createdAt DateTime @default(now())
+  
+  @@index([service, createdAt])
+}
+
+// Audit logging models
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String?
+  action      String
+  tableName   String
+  recordId    String?
+  oldValues   String?  // JSON string
+  newValues   String?  // JSON string
+  ipAddress   String?
+  userAgent   String?
+  requestId   String?
+  createdAt   DateTime @default(now())
+  
+  @@index([userId])
+  @@index([tableName, recordId])
+  @@index([action])
+  @@index([createdAt])
+  @@index([requestId])
+}
+
+// User model for audit testing
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([email])
+}
+
+// Shooter model for audit testing
+model Shooter {
+  id              String   @id @default(cuid())
+  name            String
+  email           String   @unique
+  classification  String   @default("beginner")
+  totalScore      Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([email])
+  @@index([classification])
+}

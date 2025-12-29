@@ -1,4 +1,6 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
@@ -58,6 +60,23 @@ import { getDatabaseConfig } from './config/database.config';
     DisabilityCategoriesModule,
     VenuesModule,
     ShootersModule,
+    // Serve Static Files (Frontend)
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../../web/out'),
+      exclude: ['/api/(.*)'],
+    }),
+    // Serve Uploaded Results
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads', 'results'),
+      serveRoot: '/results',
+      serveStaticOptions: {
+        index: false, // Disable directory listing
+        setHeaders: (res) => {
+          res.setHeader('X-Content-Type-Options', 'nosniff');
+          res.setHeader('Cache-Control', 'public, max-age=3600');
+        },
+      },
+    }),
   ],
   controllers: [AppController],
   providers: [
