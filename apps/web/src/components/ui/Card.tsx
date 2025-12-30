@@ -23,7 +23,7 @@ export const FeaturedCard = ({ title, excerpt, date, href, imageUrl, category }:
             alt={title} 
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
           <div className="absolute bottom-0 left-0 p-6 md:p-8 w-full text-white">
             {category && (
               <span className="mb-3 inline-block rounded-md bg-blue-600 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
@@ -65,8 +65,9 @@ type NewsCardProps = {
 
 export const NewsCard = ({ title, excerpt, category, date, href, imageUrl }: NewsCardProps) => {
   return (
-    <Link href={href} className="group flex flex-col overflow-hidden rounded-xl bg-white shadow-md transition-all hover:-translate-y-1 hover:shadow-xl h-full border border-neutral-200 hover:border-blue-200">
-      <div className="relative h-48 w-full overflow-hidden bg-neutral-200">
+    <Link href={href} className="group flex overflow-hidden rounded-xl bg-white shadow-md transition-all hover:-translate-y-1 hover:shadow-xl border border-neutral-200 hover:border-blue-200">
+      {/* Image Section - Left Side */}
+      <div className="relative w-48 flex-shrink-0 overflow-hidden bg-neutral-200">
         {imageUrl ? (
           <img 
             src={imageUrl} 
@@ -80,24 +81,32 @@ export const NewsCard = ({ title, excerpt, category, date, href, imageUrl }: New
         )}
         {category && (
              <div className="absolute top-3 left-3">
-                <span className="rounded bg-white/90 backdrop-blur-sm px-2 py-1 text-xs font-bold uppercase tracking-wide text-blue-700 shadow-sm">
+                <span className="rounded bg-blue-600 backdrop-blur-sm px-2 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-sm">
                   {category}
                 </span>
              </div>
         )}
       </div>
-      <div className="flex flex-1 flex-col p-5">
-        <div className="mb-2 flex items-center text-xs font-medium text-neutral-500">
+
+      {/* Content Section - Right Side */}
+      <div className="flex flex-1 flex-col p-5 justify-between">
+        <div>
+          <h3 className="mb-2 text-lg font-bold leading-snug text-neutral-900 group-hover:text-blue-700 transition-colors line-clamp-2">
+            {title}
+          </h3>
+          {excerpt && <p className="mb-3 text-sm text-neutral-600 line-clamp-2 leading-relaxed">{excerpt}</p>}
+          <div className="flex items-center text-xs font-medium text-neutral-500">
            <Clock className="mr-1 h-3 w-3" />
            {date}
+          </div>
         </div>
-        <h3 className="mb-2 text-lg font-bold leading-snug text-neutral-900 group-hover:text-blue-700 transition-colors line-clamp-2">
-          {title}
-        </h3>
-        {excerpt && <p className="mb-4 flex-1 text-sm text-neutral-600 line-clamp-2 leading-relaxed">{excerpt}</p>}
-        <div className="mt-auto flex items-center justify-between border-t border-neutral-100 pt-4 text-sm font-medium text-blue-600">
-          <span>Read more</span>
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+        
+        {/* View Details Button */}
+        <div className="mt-4">
+          <div className="bg-blue-600 px-4 py-2.5 rounded-lg shadow-md flex items-center justify-between group-hover:bg-blue-700 group-hover:shadow-lg transition-all">
+             <span className="text-xs font-bold text-white uppercase tracking-wider">View Details</span>
+             <ArrowRight className="h-4 w-4 text-white transform group-hover:translate-x-1 transition-transform" />
+          </div>
         </div>
       </div>
     </Link>

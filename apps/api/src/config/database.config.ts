@@ -11,6 +11,15 @@ export const getDatabaseConfig = (
     throw new Error('Database configuration is missing');
   }
 
+  // Debug logging
+  console.log('Database Configuration:', {
+    host: dbConfig.host,
+    port: dbConfig.port,
+    username: dbConfig.username,
+    database: dbConfig.database,
+    passwordSet: !!dbConfig.password,
+  });
+
   return {
     type: 'postgres',
     host: dbConfig.host,
@@ -27,7 +36,7 @@ export const getDatabaseConfig = (
         : false,
     extra: {
       max: 20, // Maximum number of connections in the pool
-      connectionTimeoutMillis: 5000,
+      connectionTimeoutMillis: 30000, // Increased to 30 seconds for debugging
     },
   };
 };
