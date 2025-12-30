@@ -1,28 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import type { Metadata } from 'next'
+
 import { Mail, Phone, MapPin, Clock, Send, Facebook, Twitter, Instagram, Youtube } from 'lucide-react'
 
-const socialLinks = [
-  { label: 'Facebook', href: '#', icon: Facebook },
-  { label: 'Twitter', href: '#', icon: Twitter },
-  { label: 'Instagram', href: '#', icon: Instagram },
-  { label: 'YouTube', href: '#', icon: Youtube },
-]
+// const socialLinks = [
+//   { label: 'Facebook', href: '#', icon: Facebook },
+//   { label: 'Twitter', href: '#', icon: Twitter },
+//   { label: 'Instagram', href: '#', icon: Instagram },
+//   { label: 'YouTube', href: '#', icon: Youtube },
+// ]
 
-const officeHours = [
-  { day: 'Monday - Friday', hours: '9:00 AM - 5:30 PM' },
-  { day: 'Saturday', hours: '10:00 AM - 2:00 PM' },
-  { day: 'Sunday', hours: 'Closed' },
-]
 
-const departments = [
-  { name: 'General Enquiries', email: 'info@parashooting.org', phone: '+91-11-29964091' },
-  { name: 'Technical Department', email: 'technical@parashooting.org', phone: '+91-11-29964092' },
-  { name: 'Finance & Accounts', email: 'finance@parashooting.org', phone: '+91-11-29964093' },
-  { name: 'Events & Competitions', email: 'events@parashooting.org', phone: '+91-11-29964094' },
-]
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
@@ -57,7 +46,7 @@ const ContactPage = () => {
             Contact Us
           </h1>
           <p className="text-white/90 max-w-2xl mx-auto">
-            Get in touch with the Para Shooting Committee of India. We're here to help.
+            The STC Para Shooting office, part of the Paralympic Committee of India (PCI), handles administration, events, and selections for Indian para-shooters.
           </p>
         </div>
       </section>
@@ -89,11 +78,10 @@ const ContactPage = () => {
                     <MapPin className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-neutral-700 font-medium">Para Shooting House</p>
+                    <p className="text-neutral-700 font-medium">Jaisalmer House</p>
                     <p className="text-neutral-600 text-sm">
-                      51-B, Tughlakabad Institutional Area,<br />
-                      Near BSNL Office,<br />
-                      New Delhi - 110062
+                      26 Mansingh Road,<br />
+                      New Delhi - 110011
                     </p>
                   </div>
                 </div>
@@ -111,8 +99,8 @@ const ContactPage = () => {
                     </div>
                     <div>
                       <p className="text-sm text-neutral-500">Phone</p>
-                      <a href="tel:+911129964091" className="text-neutral-700 hover:text-interactive">
-                        +91-11-29964091/92/93
+                      <a href="tel:+911123075126" className="text-neutral-700 hover:text-interactive">
+                        +91-11-23075126
                       </a>
                     </div>
                   </div>
@@ -134,31 +122,14 @@ const ContactPage = () => {
               </div>
 
               {/* Office Hours */}
-              <div>
-                <h2 className="font-heading font-semibold text-lg text-primary mb-4">
-                  Office Hours
-                </h2>
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded-card flex items-center justify-center flex-shrink-0">
-                    <Clock className="w-5 h-5 text-primary" />
-                  </div>
-                  <div className="space-y-2">
-                    {officeHours.map((item) => (
-                      <div key={item.day} className="flex justify-between gap-8 text-sm">
-                        <span className="text-neutral-600">{item.day}</span>
-                        <span className="text-neutral-700 font-medium">{item.hours}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+
 
               {/* Social Links */}
               <div>
                 <h2 className="font-heading font-semibold text-lg text-primary mb-4">
                   Follow Us
                 </h2>
-                <div className="flex gap-3">
+                {/* <div className="flex gap-3">
                   {socialLinks.map((social) => (
                     <a
                       key={social.label}
@@ -171,7 +142,7 @@ const ContactPage = () => {
                       <social.icon className="w-5 h-5" />
                     </a>
                   ))}
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -317,41 +288,13 @@ const ContactPage = () => {
         </div>
       </section>
 
-      {/* Department Contacts */}
-      <section className="section bg-neutral-50">
-        <div className="container-main">
-          <h2 className="section-title">Department Contacts</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {departments.map((dept) => (
-              <div key={dept.name} className="card">
-                <h3 className="font-semibold text-primary mb-3">{dept.name}</h3>
-                <div className="space-y-2 text-sm">
-                  <a
-                    href={`mailto:${dept.email}`}
-                    className="flex items-center gap-2 text-neutral-600 hover:text-interactive"
-                  >
-                    <Mail className="w-4 h-4" />
-                    {dept.email}
-                  </a>
-                  <a
-                    href={`tel:${dept.phone}`}
-                    className="flex items-center gap-2 text-neutral-600 hover:text-interactive"
-                  >
-                    <Phone className="w-4 h-4" />
-                    {dept.phone}
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+
 
       {/* Map Section */}
       <section className="bg-white">
         <div className="h-96 bg-neutral-200 flex items-center justify-center">
           <div className="text-center">
-            <MapPin className="w-12 h-12 text-neutral-400 mx-auto mb-2" />
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-map-pin w-12 h-12 text-neutral-400 mx-auto mb-2"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
             <p className="text-neutral-500">Map placeholder - Google Maps integration</p>
           </div>
         </div>

@@ -135,7 +135,7 @@ export default function EditEventPage() {
         payload.circular_link = formData.circular_link.trim()
       }
 
-      console.log('Updating event payload:', payload)
+      // console.log('Updating event payload:', payload)
       
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/${eventId}`, {
         method: 'PATCH',

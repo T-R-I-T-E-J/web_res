@@ -181,7 +181,7 @@ const Header = () => {
           </Link>
           <div className="text-center pl-28 md:pl-0">
             <h1 className="font-heading text-2xl md:text-4xl font-bold text-primary tracking-tight leading-tight uppercase">
-              Para Shooting Committee of India
+              STC Para Shooting (PCI)
             </h1>
             <p className="text-neutral-500 font-medium tracking-[0.2em] uppercase mt-1 text-xs md:text-sm">
               Empowering para-athletes to achieve excellence

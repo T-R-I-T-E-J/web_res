@@ -9,7 +9,7 @@ const SearchBar = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // TODO: Implement search functionality
-    console.log('Search:', query)
+    // console.log('Search:', query)
   }
 
   return (

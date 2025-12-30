@@ -84,7 +84,7 @@ export default function CreateEventPage() {
         payload.circular_link = formData.circular_link.trim()
       }
 
-      console.log('Submitting event payload:', payload)
+      // console.log('Submitting event payload:', payload)
       
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events`, {
         method: 'POST',

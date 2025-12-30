@@ -19,12 +19,12 @@ const usefulLinks = [
   { label: 'Sports Authority of India', href: 'https://sportsauthorityofindia.nic.in' },
 ]
 
-const socialLinks = [
-  { label: 'Facebook', href: '#', icon: Facebook },
-  { label: 'Twitter', href: '#', icon: Twitter },
-  { label: 'Instagram', href: '#', icon: Instagram },
-  { label: 'YouTube', href: '#', icon: Youtube },
-]
+// const socialLinks = [
+//   { label: 'Facebook', href: '#', icon: Facebook },
+//   { label: 'Twitter', href: '#', icon: Twitter },
+//   { label: 'Instagram', href: '#', icon: Instagram },
+//   { label: 'YouTube', href: '#', icon: Youtube },
+// ]
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
@@ -37,14 +37,14 @@ const Footer = () => {
           {/* About Section */}
           <div>
             <h3 className="font-heading font-bold text-lg text-secondary mb-4">
-              About Para Shooting
+              About STC Para Shooting
             </h3>
             <p className="text-sm text-neutral-600 leading-relaxed mb-4">
-              The Para Shooting Committee of India was founded in 1951 with the view to promote and 
+              STC Para Shooting (PCI) was founded with the view to promote and 
               popularize shooting sports among para-athletes in India. We are committed to developing 
               world-class shooters.
             </p>
-            <div className="flex gap-3">
+            {/* <div className="flex gap-3">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
@@ -57,7 +57,7 @@ const Footer = () => {
                   <social.icon className="w-4 h-4" />
                 </a>
               ))}
-            </div>
+            </div> */}
           </div>
 
           {/* Quick Links */}
@@ -109,18 +109,18 @@ const Footer = () => {
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                 <p className="text-sm text-neutral-600">
-                  Para Shooting House,<br />
-                  51-B, Tughlakabad Institutional Area,<br />
-                  New Delhi - 110062
+                  Jaisalmer House,<br />
+                  26 Mansingh Road,<br />
+                  New Delhi - 110011
                 </p>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-primary flex-shrink-0" />
                 <a
-                  href="tel:+911129964091"
+                  href="tel:+911123075126"
                   className="text-sm text-neutral-600 hover:text-interactive transition-colors"
                 >
-                  +91-11-29964091/92/93
+                  +91-11-23075126
                 </a>
               </div>
               <div className="flex items-center gap-3">
@@ -142,10 +142,10 @@ const Footer = () => {
         <div className="container-main py-6 flex flex-col items-center gap-3">
           <p className="text-sm text-neutral-500 font-medium">Supported by</p>
           <Image
-            src="/VSK_icon.jpg"
+            src="/assets/images/vsk-logo.png"
             alt="VSK - Supported by"
-            width={120}
-            height={60}
+            width={84}
+            height={42}
             className="object-contain"
           />
         </div>
@@ -154,8 +154,8 @@ const Footer = () => {
       {/* Bottom Bar */}
       <div className="bg-secondary text-white">
         <div className="container-main py-4 flex flex-col md:flex-row justify-between items-center gap-2 text-sm">
-          <p>© {currentYear} Para Shooting Committee of India. All rights reserved.</p>
-          <p className="text-white/70">Sponsored by <span className="text-accent font-semibold">VSK</span></p>
+          <p>© {currentYear} STC Para Shooting (PCI). All rights reserved.</p>
+
           <div className="flex gap-4">
             <Link href="/privacy" className="hover:text-accent transition-colors">
               Privacy Policy

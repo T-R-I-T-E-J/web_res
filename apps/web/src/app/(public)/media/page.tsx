@@ -155,7 +155,8 @@ const GalleryPage = () => {
         </div>
       </section>
 
-      {/* Press Coverage */}
+      {/* Press Coverage - HIDDEN (Mock Data) */}
+      {/* 
       <section id="press" className="section bg-neutral-50">
         <div className="container-main">
           <h2 className="section-title">Press Coverage</h2>
@@ -181,6 +182,7 @@ const GalleryPage = () => {
           </div>
         </div>
       </section>
+      */}
     </>
   )
 }

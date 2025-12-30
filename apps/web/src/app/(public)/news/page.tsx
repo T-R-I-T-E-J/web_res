@@ -238,28 +238,7 @@ const NewsPage = async ({ searchParams }: { searchParams: { category?: string } 
          </div>
       </section>
 
-      {/* Newsletter Signup */}
-      <section className="section bg-primary text-white">
-        <div className="container-main text-center">
-          <h2 className="font-heading text-2xl md:text-3xl font-bold mb-4">Stay Updated</h2>
-          <p className="text-white/80 mb-8 max-w-xl mx-auto">
-            Subscribe to our newsletter to receive the latest news and updates directly in your inbox.
-          </p>
-          <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="flex-1 px-4 py-3 rounded-card text-neutral-700 focus:outline-none focus:ring-2 focus:ring-accent"
-            />
-            <button
-              type="submit"
-              className="bg-accent hover:bg-accent/90 text-white font-bold px-6 py-3 rounded-card transition-colors"
-            >
-              Subscribe
-            </button>
-          </form>
-        </div>
-      </section>
+
     </>
   )
 }

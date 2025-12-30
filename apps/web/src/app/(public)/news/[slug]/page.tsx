@@ -163,23 +163,29 @@ export default async function NewsArticlePage({ params }: { params: Params }) {
                     Share this article:
                   </span>
                   <div className="flex gap-2">
-                    {/* Placeholder links with # */}
+                    {/* Share Links */}
                     <a
-                      href="#"
+                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://parashootingindia.org/news/${slug}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="w-10 h-10 bg-[#1877f2] rounded-full flex items-center justify-center text-white hover:opacity-90 transition-opacity"
                       aria-label="Share on Facebook"
                     >
                       <Facebook className="w-5 h-5" />
                     </a>
                     <a
-                      href="#"
+                      href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(`https://parashootingindia.org/news/${slug}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="w-10 h-10 bg-[#1da1f2] rounded-full flex items-center justify-center text-white hover:opacity-90 transition-opacity"
                       aria-label="Share on Twitter"
                     >
                       <Twitter className="w-5 h-5" />
                     </a>
                     <a
-                      href="#"
+                      href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://parashootingindia.org/news/${slug}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="w-10 h-10 bg-[#0077b5] rounded-full flex items-center justify-center text-white hover:opacity-90 transition-opacity"
                       aria-label="Share on LinkedIn"
                     >

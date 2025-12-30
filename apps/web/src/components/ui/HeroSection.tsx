@@ -6,7 +6,7 @@ type HeroProps = {
 }
 
 const HeroSection = ({
-  title = 'Para Shooting Committee of India',
+  title = 'STC Para Shooting (PCI)',
   subtitle = 'Empowering para-athletes to achieve excellence in shooting sports',
 }: HeroProps) => {
   return (

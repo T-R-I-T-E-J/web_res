@@ -1,48 +1,42 @@
+import Image from 'next/image'
 import type { Metadata } from 'next'
-import { Users, History } from 'lucide-react'
+import { Users } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'About Us',
-  description: 'Learn about the Para Shooting Committee of India - our history, mission, and leadership.',
+  title: 'About STC Para Shooting',
+  description: 'Learn about STC Para Shooting (PCI) - our history, mission, and leadership.',
 }
 
 const committeeMembers = [
-  { name: 'Mr. Raninder Singh', position: 'President', since: '2008' },
-  { name: 'Mr. K. Sultan Singh', position: 'Senior Vice President', since: '2012' },
-  { name: 'Mr. Kalikesh Narayan Singh Deo', position: 'Vice President', since: '2014' },
-  { name: 'Mr. D.V. Seetharama Rao', position: 'Secretary General', since: '2010' },
-  { name: 'Mr. Rajiv Bhatia', position: 'Treasurer', since: '2016' },
+  { name: 'Dr. Deepa Malik', position: 'President, PCI', since: '2020' },
+  { name: 'Mr. Gursharan Singh', position: 'Secretary General, PCI', since: '2020' },
+  { name: 'Mr. Jaiprakash Nautiyal', position: 'Chairperson, STC Shooting', since: '2015' },
+  { name: 'Mr. Rahul Swami', position: 'Chief Administrator', since: '2021' },
 ]
 
-const achievements = [
-  { year: '2024', event: 'Paris Paralympics', medals: '4 Gold, 2 Silver, 3 Bronze' },
-  { year: '2023', event: 'World Championships', medals: '2 Gold, 4 Silver' },
-  { year: '2022', event: 'Asian Para Games', medals: '8 Gold, 5 Silver, 7 Bronze' },
-  { year: '2021', event: 'Tokyo Paralympics', medals: '2 Gold, 1 Silver, 2 Bronze' },
-]
 
 const AboutPage = () => {
   return (
     <>
       {/* Hero Banner */}
-      <section className="gradient-hero py-16 md:py-20">
+      <section className="gradient-hero py-20 md:py-24">
         <div className="container-main text-center">
-          <h1 className="font-heading text-3xl md:text-4xl font-bold text-white mb-4">
-            About Para Shooting India
+          <h1 className="font-heading text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">
+            About STC Para Shooting
           </h1>
-          <p className="text-white/90 max-w-2xl mx-auto">
-            Dedicated to promoting and developing para shooting sports across India since 1951
+          <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+            Leading the development of shooting sports for the differently-abled in India under the aegis of PCI
           </p>
         </div>
       </section>
 
       {/* Breadcrumb */}
-      <nav className="bg-neutral-100 py-3 text-sm" aria-label="Breadcrumb">
+      <nav className="bg-neutral-50 border-b border-neutral-200 py-4 text-sm" aria-label="Breadcrumb">
         <div className="container-main">
-          <ol className="flex items-center gap-2">
-            <li><a href="/" className="text-interactive hover:text-primary">Home</a></li>
-            <li className="text-neutral-400">/</li>
-            <li className="text-neutral-600">About Us</li>
+          <ol className="flex items-center gap-2 text-neutral-500">
+            <li><a href="/" className="hover:text-primary transition-colors">Home</a></li>
+            <li>/</li>
+            <li className="text-neutral-900 font-medium">About Us</li>
           </ol>
         </div>
       </nav>
@@ -50,25 +44,40 @@ const AboutPage = () => {
       {/* Introduction Section */}
       <section id="intro" className="section bg-white">
         <div className="container-main">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="section-title text-center">Introduction</h2>
-            <div className="prose prose-lg text-neutral-600 space-y-6 text-center">
+          <h2 className="section-title">Introduction</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+            <div className="prose prose-lg text-neutral-700 space-y-6 leading-relaxed">
               <p>
                 Disabled at birth or rendered differently abled due to unforeseen accidents, our para shooters have never allowed circumstance to define their limits. Rather than seeking sympathy, they have emerged as powerful symbols of determination, self-belief, resilience, and an indomitable never-say-die spirit. Through grit and discipline, they continue to inspire the nation by transforming adversity into excellence.
               </p>
               <p>
-                The journey of Para Shooting in India truly began in 2015, making it a relatively young sport in terms of global presence and elite-level performance. Yet, in this short span, the progress has been extraordinary. Across two Paralympic Games—Tokyo and Paris—India's para shooters have secured an impressive total of nine medals: three Gold, two Silver, and four Bronze. These achievements stand as a testament to focused vision, structured development, and unwavering commitment.
+                The journey of STC Para Shooting in India truly began in 2015, making it a relatively young sport in terms of global presence and elite-level performance. Yet, in this short span, the progress has been extraordinary. Across two Paralympic Games—Tokyo and Paris—India's para shooters have secured an impressive total of nine medals: three Gold, two Silver, and four Bronze. These achievements stand as a testament to focused vision, structured development, and unwavering commitment.
               </p>
               <p>
-                Para Shooting in India has witnessed exponential growth across every dimension. There has been a remarkable increase in the number of para shooters, international medals, and world records, alongside the development of world-class WSPS technical officials and certified medical classifiers. Indian para shooters have also consistently secured first positions at multiple World Cups, asserting their dominance on the global stage.
+                STC Para Shooting has witnessed exponential growth across every dimension. There has been a remarkable increase in the number of para shooters, international medals, and world records, alongside the development of world-class WSPS technical officials and certified medical classifiers. Indian para shooters have also consistently secured first positions at multiple World Cups, asserting their dominance on the global stage.
               </p>
               <p>
-                Today, India's para shooting ecosystem represents a true paradigm shift—rising from obscurity to global leadership. From having virtually no presence to standing at the very top of the world, this journey reflects not just sporting success, but the triumph of human spirit, vision, and purpose.
+                Today, India's STC Para Shooting ecosystem represents a true paradigm shift—rising from obscurity to global leadership. From having virtually no presence to standing at the very top of the world, this journey reflects not just sporting success, but the triumph of human spirit, vision, and purpose.
               </p>
-              <div className="mt-8 text-right">
-                <p className="font-semibold text-primary">Jaiprakash Nautiyal</p>
-                <p className="text-sm text-neutral-500">Dronacharya Awardee</p>
+              <div className="mt-10 pt-6 border-t border-neutral-100">
+                <p className="font-heading font-bold text-lg text-neutral-900">Jaiprakash Nautiyal</p>
+                <p className="text-sm font-medium text-neutral-600">Dronacharya Awardee</p>
                 <p className="text-sm text-neutral-500">Chairman, STC Para Shooting</p>
+              </div>
+            </div>
+            
+            {/* Right Column: Image */}
+            <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl border-4 border-white ring-1 ring-neutral-200 mt-4 lg:mt-0">
+              <Image 
+                src="/assets/images/president-award.jpg" 
+                alt="Jaiprakash Nautiyal receiving the Dronacharya Award from the President of India" 
+                fill 
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                priority
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-6">
+                <p className="text-white font-medium text-sm">Receiving the Dronacharya Award</p>
               </div>
             </div>
           </div>
@@ -76,25 +85,26 @@ const AboutPage = () => {
       </section>
 
       {/* History Section */}
-      <section id="history" className="section bg-white">
+      <section id="history" className="section bg-neutral-50">
         <div className="container-main">
-          <h2 className="section-title">Our History</h2>
-          <div className="max-w-3xl">
-            <div className="space-y-6 relative before:absolute before:left-4 before:top-2 before:bottom-2 before:w-0.5 before:bg-primary/20">
+          <h2 className="section-title">History of STC Para Shooting</h2>
+          <div className="max-w-3xl pt-2">
+            <div className="space-y-8 relative before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-0.5 before:bg-primary/20">
               {[
-                { year: '1951', event: 'Para Shooting Committee of India established' },
-                { year: '1972', event: 'First National Para Shooting Championship organized' },
-                { year: '1984', event: 'First participation in Paralympics (Seoul)' },
-                { year: '2000', event: 'First Paralympic medal in Shooting' },
-                { year: '2012', event: 'Established High-Performance Centre in New Delhi' },
-                { year: '2021', event: 'Historic performance at Tokyo Paralympics' },
+                { year: '2015', event: 'The journey of STC Para Shooting in India truly begins' },
+                { year: '2021', event: 'First Zonal Para Shooting Championship (February)' },
+                { year: '2021', event: 'First National Para Shooting Championship (March)' },
+                { year: '2021', event: 'Historic performance at Tokyo Paralympics (5 Medals)' },
+                { year: '2022', event: 'Best-ever World Championship performance (5 Medals)' },
                 { year: '2024', event: 'Record medal haul at Paris Paralympics' },
               ].map((item) => (
-                <div key={item.year} className="flex gap-4 pl-10 relative">
-                  <div className="absolute left-2 top-1 w-4 h-4 rounded-full bg-primary border-4 border-white" />
-                  <div>
-                    <div className="font-heading font-bold text-primary">{item.year}</div>
-                    <div className="text-neutral-600">{item.event}</div>
+                <div key={item.year + item.event} className="flex gap-6 pl-0 relative group">
+                  <div className="w-10 h-10 flex-shrink-0 bg-white border-4 border-primary rounded-full z-10 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-2 h-2 bg-primary rounded-full" />
+                  </div>
+                  <div className="pt-1">
+                    <div className="font-heading font-bold text-xl text-primary mb-1">{item.year}</div>
+                    <div className="text-lg text-neutral-700 leading-snug">{item.event}</div>
                   </div>
                 </div>
               ))}
@@ -107,55 +117,30 @@ const AboutPage = () => {
       <section id="committee" className="section bg-white">
         <div className="container-main">
           <h2 className="section-title">Executive Committee</h2>
-          <p className="text-neutral-600 mb-8 max-w-2xl">
+          <p className="text-neutral-600 text-lg mb-10 max-w-2xl leading-relaxed">
             Our leadership team is committed to advancing para shooting sports in India through 
-            strategic initiatives and athlete-centered programs.
+            strategic initiatives and athlete-centered programs under PCI.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {committeeMembers.map((member) => (
-              <div key={member.name} className="card text-center">
-                <div className="w-20 h-20 bg-neutral-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <Users className="w-10 h-10 text-neutral-400" />
+              <div key={member.name} className="card bg-white border border-neutral-100 shadow-sm hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 p-8 flex flex-col items-center text-center">
+                <div className="w-20 h-20 bg-primary/5 rounded-full mb-6 flex items-center justify-center text-primary">
+                  <Users className="w-8 h-8" strokeWidth={1.5} />
                 </div>
-                <h3 className="font-heading font-semibold text-lg text-primary">{member.name}</h3>
-                <p className="text-accent font-medium">{member.position}</p>
-                <p className="text-sm text-neutral-500">Since {member.since}</p>
+                <h3 className="font-heading font-bold text-xl text-neutral-900 mb-2">{member.name}</h3>
+                <p className="text-primary font-semibold mb-4">{member.position}</p>
+                <div className="mt-auto pt-4 border-t border-neutral-100 w-full">
+                   <p className="text-xs font-medium text-neutral-400 uppercase tracking-widest">Since {member.since}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Recent Achievements */}
-      <section className="section bg-neutral-50">
-        <div className="container-main">
-          <h2 className="section-title">Recent Achievements</h2>
-          <div className="overflow-x-auto">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Year</th>
-                  <th>Event</th>
-                  <th>Medals</th>
-                </tr>
-              </thead>
-              <tbody>
-                {achievements.map((item) => (
-                  <tr key={item.year + item.event}>
-                    <td className="font-data font-semibold">{item.year}</td>
-                    <td>{item.event}</td>
-                    <td className="text-success font-medium">{item.medals}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
 
     </>
   )
 }
 
 export default AboutPage
-
