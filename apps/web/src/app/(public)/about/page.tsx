@@ -18,17 +18,7 @@ const committeeMembers = [
 const AboutPage = () => {
   return (
     <>
-      {/* Hero Banner */}
-      <section className="gradient-hero py-20 md:py-24">
-        <div className="container-main text-center">
-          <h1 className="font-heading text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">
-            About STC Para Shooting
-          </h1>
-          <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-            Leading the development of shooting sports for the differently-abled in India under the aegis of PCI
-          </p>
-        </div>
-      </section>
+
 
       {/* Breadcrumb */}
       <nav className="bg-neutral-50 border-b border-neutral-200 py-4 text-sm" aria-label="Breadcrumb">

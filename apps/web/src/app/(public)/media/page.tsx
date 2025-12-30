@@ -17,14 +17,7 @@ const videos = [
 const GalleryPage = () => {
   return (
     <>
-      <section className="gradient-hero py-16 md:py-20 text-center text-white">
-        <div className="container-main">
-          <h1 className="font-heading text-3xl md:text-4xl font-bold mb-4">Media</h1>
-          <p className="opacity-90 max-w-2xl mx-auto">
-            Capturing the spirit of excellence and determination in para shooting.
-          </p>
-        </div>
-      </section>
+
 
       {/* 6th National Para Shooting Championship Gallery */}
       <section className="section bg-gradient-to-br from-primary via-primary to-secondary text-white">

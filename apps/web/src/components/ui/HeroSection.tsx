@@ -5,7 +5,7 @@ type HeroProps = {
   subtitle?: string
 }
 
-const HeroSection = ({
+export const HeroSection = ({
   title = 'STC Para Shooting (PCI)',
   subtitle = 'Empowering para-athletes to achieve excellence in shooting sports',
 }: HeroProps) => {
@@ -29,5 +29,5 @@ const HeroSection = ({
   )
 }
 
-export default HeroSection
+
 

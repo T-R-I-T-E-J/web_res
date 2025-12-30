@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight, X, Calendar } from 'lucide-react'
-import { EventCard } from '@/components/ui'
+import { EventCard, FeaturedCard, NewsCard } from '@/components/ui'
 
 const galleryImages = [
   {
@@ -168,6 +168,9 @@ const HomePage = () => {
         </div>
       )}
 
+
+
+
       {/* Latest News & Updates Section */}
       <section className="section bg-white">
         <div className="container-main">
@@ -175,61 +178,49 @@ const HomePage = () => {
             <h2 className="section-title">Latest News & Updates</h2>
             <Link
               href="/news"
-              className="inline-flex items-center text-sm font-semibold text-primary hover:text-accent transition-colors"
+              className="group inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
             >
               View All News
-              <ArrowRight className="w-4 h-4 ml-1" />
+              <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
           
           {loadingNews ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="card animate-pulse">
-                  <div className="bg-neutral-200 h-48 rounded-card mb-4"></div>
-                  <div className="h-4 bg-neutral-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-4 bg-neutral-200 rounded w-1/2"></div>
-                </div>
-              ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 h-[400px] bg-neutral-100 rounded-2xl animate-pulse"></div>
+              <div className="h-[400px] bg-neutral-100 rounded-2xl animate-pulse"></div>
             </div>
           ) : latestNews.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {latestNews.map((article) => (
-                <Link
-                  key={article.id}
-                  href={`/news/${article.slug || article.id}`}
-                  className="card group hover:border-primary transition-colors"
-                >
-                  <div className="relative aspect-[16/10] rounded-card overflow-hidden bg-neutral-100 mb-4">
-                    {article.featured_image_url ? (
-                      <img
-                        src={article.featured_image_url}
-                        alt={article.title}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
-                        <span className="text-4xl">📰</span>
-                      </div>
-                    )}
-                    <div className="absolute top-3 left-3">
-                      <span className="bg-accent text-white text-xs font-bold px-2 py-1 rounded-full">
-                        {article.category}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-neutral-400 mb-2">
-                    <Calendar className="w-3 h-3" />
-                    {formatDate(article.created_at)}
-                  </div>
-                  <h3 className="font-heading font-semibold text-lg text-neutral-700 group-hover:text-primary transition-colors mb-2 line-clamp-2">
-                    {article.title}
-                  </h3>
-                  <p className="text-sm text-neutral-600 line-clamp-3">
-                    {article.excerpt}
-                  </p>
-                </Link>
-              ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {/* Featured / First Item */}
+              <div className="lg:col-span-2">
+                 <FeaturedCard
+                    title={String(latestNews[0]?.title || '')}
+                    excerpt={String(latestNews[0]?.excerpt || '')}
+                    category={typeof latestNews[0]?.category === 'string' ? latestNews[0].category : 'News'}
+                    date={formatDate(latestNews[0]?.created_at || new Date().toISOString())}
+                    imageUrl={latestNews[0]?.featured_image_url || '/placeholder-news.jpg'} 
+                    href={`/news/${latestNews[0]?.slug || latestNews[0]?.id}`}
+                 />
+              </div>
+              {/* Other Items */}
+              <div className="flex flex-col gap-8">
+                 {latestNews.slice(1, 3).map((article) => (
+                    <NewsCard
+                      key={article.id}
+                      title={String(article.title || '')}
+                      category={typeof article.category === 'string' ? article.category : 'News'}
+                      date={formatDate(article.created_at || new Date().toISOString())}
+                      imageUrl={article.featured_image_url}
+                      href={`/news/${article.slug || article.id}`}
+                    />
+                 ))}
+                 {latestNews.length === 1 && (
+                     <div className="h-full flex items-center justify-center bg-neutral-50 rounded-xl border border-dashed border-neutral-200">
+                         <p className="text-neutral-500 font-medium">More updates coming soon</p>
+                     </div>
+                 )}
+              </div>
             </div>
           ) : (
             <div className="text-center py-12 text-neutral-500">
@@ -239,7 +230,6 @@ const HomePage = () => {
         </div>
       </section>
 
-
       {/* Upcoming Events Section */}
       <section className="section bg-neutral-50">
         <div className="container-main">
@@ -247,35 +237,36 @@ const HomePage = () => {
             <h2 className="section-title">Upcoming Events</h2>
             <Link
               href="/events"
-              className="inline-flex items-center text-sm font-semibold text-primary hover:text-accent transition-colors"
+              className="group inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
             >
               View Calendar
-              <ArrowRight className="w-4 h-4 ml-1" />
+              <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
           
           {loadingEvents ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="card animate-pulse">
-                  <div className="h-6 bg-neutral-200 rounded w-3/4 mb-3"></div>
-                  <div className="h-4 bg-neutral-200 rounded w-1/2 mb-2"></div>
-                  <div className="h-4 bg-neutral-200 rounded w-2/3"></div>
-                </div>
+                <div key={i} className="h-48 bg-neutral-100 rounded-xl animate-pulse"></div>
               ))}
             </div>
           ) : upcomingEvents.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {upcomingEvents.map((event) => (
-                <EventCard 
-                  key={event.id} 
-                  title={event.title}
-                  date={formatEventDate(event.start_date, event.end_date)}
-                  location={event.location}
-                  status={event.status}
-                  href={`/events/${event.slug || event.id}`}
-                />
-              ))}
+              {upcomingEvents.map((event) => {
+                 const startDate = new Date(event.start_date);
+                 return (
+                    <EventCard 
+                      key={event.id} 
+                      title={event.title}
+                      date={formatEventDate(event.start_date, event.end_date)}
+                      location={event.location}
+                      status={event.status}
+                      href={`/events/${event.slug || event.id}`}
+                      day={startDate.getDate().toString()}
+                      month={startDate.toLocaleString('default', { month: 'short' }).toUpperCase()}
+                    />
+                 )
+              })}
             </div>
           ) : (
             <div className="text-center py-12 text-neutral-500">
@@ -286,35 +277,21 @@ const HomePage = () => {
       </section>
 
       {/* Highlights & Achievements Gallery */}
-      <section className="section bg-white">
+       <section className="section bg-white">
         <div className="container-main">
-          <h2 className="section-title text-center mb-12">Highlights & Achievements</h2>
+          <div className="flex justify-between items-center mb-12">
+             <h2 className="section-title mb-0">Highlights & Achievements</h2>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {galleryImages.map((image) => (
-              <button
-                key={image.src}
-                onClick={() => setSelectedImage(image)}
-                className="group relative overflow-hidden rounded-card shadow-card cursor-pointer text-left"
-              >
-                <Image
-                  src={image.src}
-                  alt={image.alt}
-                  width={600}
-                  height={400}
-                  className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-6">
-                  <div>
-                    <h3 className="font-heading font-bold text-white text-lg">{image.title}</h3>
-                    <p className="text-white/80 text-sm mt-1">{image.subtitle}</p>
-                  </div>
-                </div>
-                <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors flex items-center justify-center">
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 text-primary font-semibold px-4 py-2 rounded-full text-sm">
-                    Click to view
-                  </span>
-                </div>
-              </button>
+            {galleryImages.map((image, idx) => (
+               <NewsCard
+                  key={idx}
+                  title={image.title}
+                  excerpt={image.subtitle}
+                  date="Featured" 
+                  imageUrl={image.src} 
+                  href="#"
+               />
             ))}
           </div>
         </div>

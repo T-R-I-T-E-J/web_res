@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Calendar, ArrowRight, Tag } from 'lucide-react'
+import { FeaturedCard, NewsCard } from '@/components/ui'
 
 export const metadata = {
   title: 'News & Updates',
@@ -78,15 +79,7 @@ const NewsPage = async ({ searchParams }: { searchParams: { category?: string } 
 
   return (
     <>
-      {/* Hero Section */}
-      <section className="gradient-hero py-16 md:py-20 text-center text-white">
-        <div className="container-main">
-          <h1 className="font-heading text-3xl md:text-4xl font-bold mb-4">News & Updates</h1>
-          <p className="opacity-90 max-w-2xl mx-auto">
-            Stay updated with the latest news, announcements, and achievements from Para Shooting India.
-          </p>
-        </div>
-      </section>
+
 
       {/* Breadcrumb */}
       <nav className="bg-neutral-100 py-3 text-sm" aria-label="Breadcrumb">
@@ -131,59 +124,41 @@ const NewsPage = async ({ searchParams }: { searchParams: { category?: string } 
                 <>
                 {/* Featured Section */}
                  <h2 className="section-title mb-8">Featured News</h2>
-                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
                    {/* Main Hero Article */}
                    <div className={sideArticles.length > 0 ? "lg:col-span-2" : "lg:col-span-3"}>
-                      <Link href={`/news/${heroArticle.slug || heroArticle.id}`} className="group block">
-                       <div className="relative aspect-[16/9] rounded-card overflow-hidden bg-neutral-200 mb-4">
-                         {heroArticle.featured_image_url ? (
-                            <img src={heroArticle.featured_image_url} alt={heroArticle.title} className="w-full h-full object-cover" />
-                         ) : (
-                             <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                               <span className="text-6xl">{getCategoryImage(heroArticle.category)}</span>
-                             </div>
-                         )}
-                         <div className="absolute top-4 left-4">
-                           <span className="bg-accent text-white text-xs font-bold px-3 py-1 rounded-full">
-                             {heroArticle.category}
-                           </span>
-                         </div>
-                       </div>
-                       <div className="flex items-center gap-3 text-sm text-neutral-500 mb-2">
-                         <span className="flex items-center gap-1">
-                           <Calendar className="w-4 h-4" />
-                           {formatDate(heroArticle.created_at)}
-                         </span>
-                       </div>
-                       <h3 className="font-heading font-bold text-2xl text-primary group-hover:text-interactive transition-colors mb-2">
-                         {heroArticle.title}
-                       </h3>
-                       <p className="text-neutral-600 line-clamp-3">{heroArticle.excerpt}</p>
-                     </Link>
+                      <FeaturedCard
+                        title={String(heroArticle.title || '')}
+                        excerpt={String(heroArticle.excerpt || '')}
+                        category={typeof heroArticle.category === 'string' ? heroArticle.category : 'NEWS'}
+                        date={formatDate(heroArticle.created_at)}
+                        imageUrl={heroArticle.featured_image_url || '/placeholder-news.jpg'}
+                        href={`/news/${heroArticle.slug || heroArticle.id}`}
+                      />
                    </div>
 
                    {/* Side Featured Articles */}
                    {sideArticles.length > 0 && (
-                       <div className="space-y-6">
+                       <div className="flex flex-col gap-6">
                          {sideArticles.map((article: any) => (
-                           <Link key={article.id} href={`/news/${article.slug || article.id}`} className="group block">
-                             <div className="flex gap-4">
-                               <div className="w-24 h-24 flex-shrink-0 rounded-card overflow-hidden bg-neutral-200">
-                                 {article.featured_image_url ? (
-                                    <img src={article.featured_image_url} alt={article.title} className="w-full h-full object-cover" />
-                                 ) : (
-                                    <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
-                                      <span className="text-2xl">{getCategoryImage(article.category)}</span>
-                                    </div>
-                                 )}
+                           <Link key={article.id} href={`/news/${article.slug || article.id}`} className="group relative flex flex-col gap-4 rounded-xl bg-white p-4 shadow-sm transition-all hover:shadow-md border border-neutral-100 h-full">
+                             <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-neutral-200">
+                               {article.featured_image_url ? (
+                                  <img src={article.featured_image_url} alt={article.title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                               ) : (
+                                  <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
+                                    <span className="text-2xl">{getCategoryImage(String(article.category))}</span>
+                                  </div>
+                               )}
+                             </div>
+                             <div className="flex flex-1 flex-col">
+                               <div className="flex items-center justify-between mb-2">
+                                   <span className="text-xs font-bold text-blue-600 px-2 py-0.5 rounded bg-blue-50">{String(article.category)}</span>
+                                   <span className="text-xs text-neutral-400">{formatDate(article.created_at)}</span>
                                </div>
-                               <div className="flex-1">
-                                 <span className="text-xs font-bold text-accent">{article.category}</span>
-                                 <h4 className="font-semibold text-neutral-700 group-hover:text-primary transition-colors line-clamp-2 mt-1">
-                                   {article.title}
-                                 </h4>
-                                 <span className="text-xs text-neutral-400 mt-1 block">{formatDate(article.created_at)}</span>
-                               </div>
+                               <h4 className="font-heading font-semibold text-neutral-800 group-hover:text-blue-700 transition-colors line-clamp-2 leading-tight">
+                                  {String(article.title)}
+                               </h4>
                              </div>
                            </Link>
                          ))}
@@ -195,40 +170,17 @@ const NewsPage = async ({ searchParams }: { searchParams: { category?: string } 
                  {gridArticles.length > 0 && (
                      <>
                         <h2 className="section-title mb-8">All News</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {gridArticles.map((article: any) => (
-                              <article key={article.id} className="card group hover:border-primary transition-colors">
-                                <div className="relative aspect-[16/10] rounded-card overflow-hidden bg-neutral-100 mb-4">
-                                  {article.featured_image_url ? (
-                                      <img src={article.featured_image_url} alt={article.title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
-                                  ) : (
-                                      <div className="w-full h-full bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center">
-                                        <span className="text-4xl">{getCategoryImage(article.category)}</span>
-                                      </div>
-                                  )}
-                                  <div className="absolute top-3 left-3">
-                                    <span className="bg-white/90 text-primary text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                                      <Tag className="w-3 h-3" />
-                                      {article.category}
-                                    </span>
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-2 text-xs text-neutral-400 mb-2">
-                                  <Calendar className="w-3 h-3" />
-                                  {formatDate(article.created_at)}
-                                </div>
-                                <h3 className="font-heading font-semibold text-lg text-neutral-700 group-hover:text-primary transition-colors mb-2 line-clamp-2">
-                                  {article.title}
-                                </h3>
-                                <p className="text-sm text-neutral-600 line-clamp-3 mb-4">{article.excerpt}</p>
-                                <Link
+                               <NewsCard
+                                  key={article.id}
+                                  title={String(article.title || '')}
+                                  excerpt={String(article.excerpt || '')}
+                                  category={typeof article.category === 'string' ? article.category : 'NEWS'}
+                                  date={formatDate(article.created_at)}
+                                  imageUrl={article.featured_image_url}
                                   href={`/news/${article.slug || article.id}`}
-                                  className="inline-flex items-center text-sm font-semibold text-primary hover:text-accent transition-colors"
-                                >
-                                  Read More
-                                  <ArrowRight className="w-4 h-4 ml-1" />
-                                </Link>
-                              </article>
+                               />
                             ))}
                         </div>
                      </>

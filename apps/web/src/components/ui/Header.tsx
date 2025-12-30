@@ -37,7 +37,7 @@ const navItems: NavItem[] = [
   { label: 'Contact', href: '/contact' },
 ]
 
-const Header = () => {
+export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
 
@@ -92,7 +92,7 @@ const Header = () => {
             <li className="ml-2">
               <Link
                 href="/login"
-                className="flex items-center gap-2 px-4 py-1.5 bg-accent text-white font-semibold text-xs rounded-card hover:bg-accent-dark transition-colors"
+                className="flex items-center gap-2 px-4 py-1.5 bg-white/10 text-white font-semibold text-xs rounded-card hover:bg-accent transition-colors"
               >
                 <LogIn className="w-3 h-3" />
                 LOGIN
@@ -167,7 +167,7 @@ const Header = () => {
       )}
 
       {/* Logo Section */}
-      <div className="bg-white py-8">
+      <div className="gradient-hero py-8 text-white">
         <div className="container-main relative flex items-center justify-center min-h-[160px]">
           <Link href="/" className="absolute left-0 top-1/2 -translate-y-1/2">
             <Image
@@ -175,15 +175,15 @@ const Header = () => {
               alt="Paralympic Committee India - Para Shooting"
               width={67}
               height={62}
-              className="object-contain"
+              className="object-contain brightness-0 invert"
               priority
             />
           </Link>
           <div className="text-center pl-28 md:pl-0">
-            <h1 className="font-heading text-2xl md:text-4xl font-bold text-primary tracking-tight leading-tight uppercase">
+            <h1 className="font-heading text-2xl md:text-4xl font-bold text-white tracking-tight leading-tight uppercase">
               STC Para Shooting (PCI)
             </h1>
-            <p className="text-neutral-500 font-medium tracking-[0.2em] uppercase mt-1 text-xs md:text-sm">
+            <p className="text-blue-100 font-medium tracking-[0.2em] uppercase mt-1 text-xs md:text-sm">
               Empowering para-athletes to achieve excellence
             </p>
           </div>
@@ -193,5 +193,5 @@ const Header = () => {
   )
 }
 
-export default Header
+
 

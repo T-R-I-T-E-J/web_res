@@ -77,8 +77,9 @@ export default async function NewsArticlePage({ params }: { params: Params }) {
     })
   }
 
-  // Handle content formatting (simple paragraph split)
-  const contentParagraphs = article.content ? article.content.split('\n').filter((p: string) => p.trim().length > 0) : []
+  // Check if content contains HTML tags
+  const isHtmlContent = article.content && (article.content.includes('<') || article.content.includes('>'))
+  const contentParagraphs = !isHtmlContent && article.content ? article.content.split('\n').filter((p: string) => p.trim().length > 0) : []
 
   return (
     <>
@@ -108,7 +109,7 @@ export default async function NewsArticlePage({ params }: { params: Params }) {
               {article.author && (
                   <>
                   <span>•</span>
-                  <span>By {article.author}</span>
+                  <span>By {typeof article.author === 'object' ? `${article.author.first_name || ''} ${article.author.last_name || ''}`.trim() : article.author}</span>
                   </>
               )}
             </div>
@@ -148,11 +149,15 @@ export default async function NewsArticlePage({ params }: { params: Params }) {
 
               {/* Article Body */}
               <div className="prose prose-lg max-w-none text-neutral-700">
-                {contentParagraphs.map((paragraph: string, index: number) => (
-                  <p key={index} className="mb-6 leading-relaxed">
-                    {paragraph}
-                  </p>
-                ))}
+                {isHtmlContent ? (
+                  <div dangerouslySetInnerHTML={{ __html: article.content }} />
+                ) : (
+                  contentParagraphs.map((paragraph: string, index: number) => (
+                    <p key={index} className="mb-6 leading-relaxed">
+                      {paragraph}
+                    </p>
+                  ))
+                )}
               </div>
 
               {/* Share Section */}

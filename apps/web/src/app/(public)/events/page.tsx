@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Calendar, MapPin, Loader2, AlertCircle, ExternalLink } from 'lucide-react'
+import { EventCard } from '@/components/ui'
 
 interface Event {
   id: number
@@ -17,21 +18,6 @@ interface Event {
   circular_link?: string
   is_featured: boolean
 }
-
-const shootingEvents = [
-  { code: 'R1', name: '10m Air Rifle Standing - SH1', classification: 'SH1' },
-  { code: 'R2', name: '10m Air Rifle Standing - SH2', classification: 'SH2' },
-  { code: 'R3', name: '10m Air Rifle Prone - SH1', classification: 'SH1' },
-  { code: 'R4', name: '10m Air Rifle Standing - SH2', classification: 'SH2' },
-  { code: 'R5', name: '10m Air Rifle Prone Mixed - SH2', classification: 'SH2' },
-  { code: 'R6', name: '50m Rifle Prone - SH1', classification: 'SH1' },
-  { code: 'R7', name: '50m Rifle 3 Positions - SH1', classification: 'SH1' },
-  { code: 'R8', name: '50m Rifle 3 Positions - SH2', classification: 'SH2' },
-  { code: 'P1', name: '10m Air Pistol - SH1', classification: 'SH1' },
-  { code: 'P2', name: '10m Air Pistol - SH1', classification: 'SH1' },
-  { code: 'P3', name: '25m Pistol - SH1', classification: 'SH1' },
-  { code: 'P4', name: '50m Pistol - SH1', classification: 'SH1' },
-]
 
 const EventsPage = () => {
   const [events, setEvents] = useState<Event[]>([])
@@ -97,17 +83,7 @@ const EventsPage = () => {
 
   return (
     <>
-      {/* Hero Banner */}
-      <section className="gradient-hero py-16 md:py-20">
-        <div className="container-main text-center">
-          <h1 className="font-heading text-3xl md:text-4xl font-bold text-white mb-4">
-            Championships & Events
-          </h1>
-          <p className="text-white/90 max-w-2xl mx-auto">
-            Explore upcoming competitions, view the event calendar, and access results from past championships
-          </p>
-        </div>
-      </section>
+
 
       {/* Breadcrumb */}
       <nav className="bg-neutral-100 py-3 text-sm" aria-label="Breadcrumb">
@@ -120,31 +96,6 @@ const EventsPage = () => {
         </div>
       </nav>
 
-      {/* Shooting Events Reference */}
-      <section id="events" className="section bg-white">
-        <div className="container-main">
-          <h2 className="section-title">Paralympic Shooting Events</h2>
-          <p className="text-neutral-600 mb-8 max-w-3xl">
-            Para shooting competitions follow World Shooting Para Sport (WSPS) classifications. 
-            Athletes compete based on their functional ability in SH1 (no arm impairment) and 
-            SH2 (arm/hand impairment requiring shooting stand).
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {shootingEvents.map((event) => (
-              <div key={event.code} className="card py-4 flex items-center gap-4">
-                <div className="w-12 h-12 bg-primary/10 rounded-card flex items-center justify-center flex-shrink-0">
-                  <span className="font-data font-bold text-primary">{event.code}</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-neutral-700 text-sm">{event.name}</div>
-                  <div className="text-xs text-neutral-500">Classification: {event.classification}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Upcoming Events */}
       <section className="section bg-neutral-50">
         <div className="container-main">
@@ -153,9 +104,10 @@ const EventsPage = () => {
           </div>
 
           {loading ? (
-            <div className="text-center py-12">
-              <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
-              <p className="text-neutral-600">Loading events...</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-48 bg-neutral-100 rounded-xl animate-pulse"></div>
+              ))}
             </div>
           ) : error ? (
             <div className="text-center py-12">
@@ -172,60 +124,22 @@ const EventsPage = () => {
               <p className="text-sm text-neutral-500">Check back soon for new competitions and championships</p>
             </div>
           ) : (
-            <div className="space-y-6">
-              {upcomingEvents.map((event) => (
-                <div key={event.id} className="card-hover">
-                  <div className="flex flex-col lg:flex-row lg:items-center gap-6">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className={getStatusBadge(event.status)}>
-                          {event.status.charAt(0).toUpperCase() + event.status.slice(1)}
-                        </span>
-                        {event.is_featured && (
-                          <span className="badge-accent">Featured</span>
-                        )}
-                      </div>
-                      <h3 className="font-heading text-xl font-semibold text-primary mb-3">
-                        {event.title}
-                      </h3>
-                      {event.description && (
-                        <p className="text-sm text-neutral-600 mb-3 line-clamp-2">
-                          {event.description}
-                        </p>
-                      )}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-neutral-600">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-neutral-400" />
-                          {formatDateRange(event.start_date, event.end_date)}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4 text-neutral-400" />
-                          {event.location}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-3 lg:flex-col">
-                      <Link
-                        href={`/events/${event.slug}`}
-                        className="btn-primary text-sm py-2"
-                      >
-                        View Details
-                      </Link>
-                      {event.registration_link && (
-                        <a
-                          href={event.registration_link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn-accent text-sm py-2 flex items-center justify-center gap-2"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          Register Now
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {upcomingEvents.map((event) => {
+                 const startDate = new Date(event.start_date);
+                 return (
+                    <EventCard 
+                      key={event.id} 
+                      title={String(event.title)}
+                      date={formatDateRange(event.start_date, event.end_date)}
+                      location={String(event.location)}
+                      status={event.status}
+                      href={`/events/${event.slug || event.id}`}
+                      day={startDate.getDate().toString()}
+                      month={startDate.toLocaleString('default', { month: 'short' }).toUpperCase()}
+                    />
+                 )
+              })}
             </div>
           )}
         </div>
@@ -254,11 +168,11 @@ const EventsPage = () => {
                     </span>
                   </div>
                   <h3 className="font-heading font-semibold text-lg text-primary mb-2">
-                    {event.title}
+                    {String(event.title)}
                   </h3>
                   <p className="text-sm text-neutral-600 mb-3">
                     <MapPin className="w-4 h-4 inline mr-1" />
-                    {event.location}
+                    {String(event.location)}
                   </p>
                   <Link
                     href={`/events/${event.slug}`}

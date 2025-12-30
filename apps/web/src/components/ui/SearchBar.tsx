@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Search } from 'lucide-react'
 
-const SearchBar = () => {
+export const SearchBar = () => {
   const [query, setQuery] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -39,5 +39,5 @@ const SearchBar = () => {
   )
 }
 
-export default SearchBar
+
 
