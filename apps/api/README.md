@@ -57,6 +57,25 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Static File Serving
+
+The API serves static files for:
+1.  **Frontend Application**: Served from `apps/web/out` (Client App).
+2.  **Result Files**: Uploaded PDFs are served from `apps/api/uploads/results` at the `/results` endpoint.
+
+### Configuration
+- **Endpoint**: `/results`
+- **Source**: `uploads/results/`
+- **Security**: 
+  - Directory listing is **disabled**. 
+  - `X-Content-Type-Options: nosniff` header is set.
+
+### Verification
+To verify file serving:
+1.  Ensure a file exists at `apps/api/uploads/results/test.pdf`.
+2.  Start the API (`npm run start`).
+3.  Access `http://localhost:8080/api/v1/results/test.pdf` (or `http://localhost:8080/results/test.pdf` depending on global prefix).
+
 ## Deployment
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.

@@ -17,6 +17,7 @@ import {
 } from './interfaces/jwt-payload.interface.js';
 import { UserRole } from './entities/user-role.entity.js';
 import { Role } from './entities/role.entity.js';
+import type { StringValue } from 'ms';
 
 @Injectable()
 export class AuthService {
@@ -28,7 +29,7 @@ export class AuthService {
     private readonly userRoleRepository: Repository<UserRole>,
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
-  ) {}
+  ) { }
 
   /**
    * Register a new user
@@ -158,9 +159,8 @@ export class AuthService {
     };
 
     const accessToken = this.jwtService.sign(payload, {
-      expiresIn:
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-        (this.configService.get('config.jwt.expiresIn') as any) || '1h',
+      expiresIn: (this.configService.get<string>('config.jwt.expiresIn') ||
+        '1h') as StringValue,
     });
 
     return {

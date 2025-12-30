@@ -65,6 +65,7 @@ The project is currently in the **Migration Phase**.
 
 - **Legacy/Static Code**: Located in `apps/web/public`. This contains the initial HTML/CSS implementation of the new Design System.
 - **Governance**: Strict rules for database and UI implementation are defined in the `rules/` directory.
+- **Recent Fixes**: See [ISSUES_SOLVED_README.md](./ISSUES_SOLVED_README.md) for details on the Static File 404 fix and documentation cleanup.
 
 ## 📚 Documentation
 

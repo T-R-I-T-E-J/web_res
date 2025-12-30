@@ -11,6 +11,7 @@ import { RolesGuard } from './guards/roles.guard.js';
 import { Role } from './entities/role.entity.js';
 import { UserRole } from './entities/user-role.entity.js';
 import { UsersModule } from '../users/users.module.js';
+import type { StringValue } from 'ms';
 
 @Module({
   imports: [
@@ -39,4 +40,4 @@ import { UsersModule } from '../users/users.module.js';
   providers: [AuthService, JwtStrategy, JwtAuthGuard, RolesGuard],
   exports: [AuthService, JwtAuthGuard, RolesGuard],
 })
-export class AuthModule {}
+export class AuthModule { }

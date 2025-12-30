@@ -1,4 +1,6 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_GUARD } from '@nestjs/core';
@@ -28,6 +30,7 @@ import { Role } from './auth/entities/role.entity.js';
 import { UserRole } from './auth/entities/user-role.entity.js';
 import configuration from './config/configuration';
 import { getDatabaseConfig } from './config/database.config';
+import { envValidationSchema } from './config/env.validation';
 
 @Module({
   imports: [
@@ -36,6 +39,7 @@ import { getDatabaseConfig } from './config/database.config';
       isGlobal: true,
       load: [configuration],
       envFilePath: '.env',
+      validationSchema: envValidationSchema,
     }),
 
     // Rate Limiting - Multi-tier strategy for 40k peak users
@@ -80,6 +84,24 @@ import { getDatabaseConfig } from './config/database.config';
     UploadModule,
     EventsModule,
     MediaModule,
+
+    // Serve Static Files (Frontend)
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../../web/out'),
+      exclude: ['/api/(.*)'],
+    }),
+    // Serve Uploaded Results
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads', 'results'),
+      serveRoot: '/results',
+      serveStaticOptions: {
+        index: false, // Disable directory listing
+        setHeaders: (res) => {
+          res.setHeader('X-Content-Type-Options', 'nosniff');
+          res.setHeader('Cache-Control', 'public, max-age=3600');
+        },
+      },
+    }),
   ],
   controllers: [AppController],
   providers: [

@@ -35,7 +35,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message:
         typeof message === 'string'
           ? message
-          : (message as any).message || message,
+          : typeof message === 'object' && message !== null && 'message' in message
+            ? String((message as { message: unknown }).message)
+            : 'Unknown error',
     };
 
     // Log the error
