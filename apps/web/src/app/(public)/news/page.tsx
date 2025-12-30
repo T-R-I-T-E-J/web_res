@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { Calendar, ArrowRight, Tag } from 'lucide-react'
 import { FeaturedCard, NewsCard } from '@/components/ui'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata = {
   title: 'News & Updates',
   description: 'Latest news, announcements, and updates from Para Shooting Committee of India.',

@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Calendar, ArrowLeft, Share2, Facebook, Twitter, Linkedin } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 async function getArticle(slug: string) {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/news/${slug}`, {
