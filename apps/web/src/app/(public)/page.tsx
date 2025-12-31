@@ -199,7 +199,7 @@ const HomePage = () => {
                     excerpt={String(latestNews[0]?.excerpt || '')}
                     category={typeof latestNews[0]?.category === 'string' ? latestNews[0].category : 'News'}
                     date={formatDate(latestNews[0]?.created_at || new Date().toISOString())}
-                    imageUrl={latestNews[0]?.featured_image_url || '/placeholder-news.jpg'} 
+                    imageUrl={latestNews[0]?.featured_image_url || '/news-hero-placeholder.png'} 
                     href={`/news/${latestNews[0]?.slug || latestNews[0]?.id}`}
                  />
               </div>

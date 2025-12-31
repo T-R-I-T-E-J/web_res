@@ -134,7 +134,14 @@ export async function getFailedLoginAttempts(sinceMinutes = 60, threshold = 5) {
     for (const log of logs) {
         if (!log.ipAddress) continue;
 
-        const details = log.newValues ? JSON.parse(log.newValues) : {};
+        let details: any = {};
+        if (log.newValues) {
+            try {
+                details = JSON.parse(log.newValues);
+            } catch (e) {
+                // Ignore parsing errors for audit logs
+            }
+        }
         if (details.success === false) {
             const existing = ipCounts.get(log.ipAddress);
             if (existing) {

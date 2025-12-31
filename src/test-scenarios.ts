@@ -4,16 +4,16 @@
  */
 
 import { PrismaClient } from '@prisma/client';
-import { testCircuitBreaker } from '../src/app/circuit-breaker';
-import { simulateDeadlock } from '../src/db/deadlock-test';
+import { testCircuitBreaker } from './app/circuit-breaker';
+import { simulateDeadlock } from './db/deadlock-test';
 import {
     testDoubleChargePrevention,
     createTestRefunds,
     retryPendingRefunds
-} from '../src/payment/double-charge-test';
-import { testHealthChecks } from '../src/monitoring/health-checks';
-import { CircuitBreaker } from '../src/app/circuit-breaker';
-import { withDeadlockRetry } from '../src/db/deadlock-test';
+} from './payment/double-charge-test';
+import { testHealthChecks } from './monitoring/health-checks';
+import { CircuitBreaker } from './app/circuit-breaker';
+import { withDeadlockRetry } from './db/deadlock-test';
 
 const prisma = new PrismaClient();
 
@@ -154,6 +154,21 @@ async function main() {
     } catch (error) {
         console.error('\n❌ Scenario test failed:', error);
     } finally {
+        console.log('\n🧹 Cleaning up database tables...');
+        try {
+            // Delete in correct order to match Foreign Key constraints
+            // Refund depends on Payment, so delete Refund first
+            await prisma.refund.deleteMany();
+            await prisma.payment.deleteMany();
+            await prisma.transaction.deleteMany();
+            await prisma.healthCheck.deleteMany();
+             // Clean other independent tables
+            await prisma.auditLog.deleteMany();
+            console.log('   Cleanup complete.');
+        } catch (cleanupError: any) {
+            console.error('   Cleanup failed:', cleanupError.message);
+        }
+
         await prisma.$disconnect();
     }
 }

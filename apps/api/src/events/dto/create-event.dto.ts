@@ -6,6 +6,7 @@ import {
   IsEnum,
   IsBoolean,
   IsUrl,
+  IsArray,
 } from 'class-validator';
 import { EventStatus } from '../entities/event.entity';
 
@@ -45,4 +46,9 @@ export class CreateEventDto {
   @IsBoolean()
   @IsOptional()
   is_featured?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  image_urls?: string[];
 }

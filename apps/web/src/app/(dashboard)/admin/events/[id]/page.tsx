@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { DashboardHeader } from '@/components/dashboard'
-import { ArrowLeft, Loader2, Save } from 'lucide-react'
+import { ArrowLeft, Loader2, Save, Plus, X } from 'lucide-react'
 import Cookies from 'js-cookie'
 
 export default function EditEventPage() {
@@ -23,6 +23,7 @@ export default function EditEventPage() {
     status: 'upcoming',
     registration_link: '',
     circular_link: '',
+    image_urls: [''] as string[],
     is_featured: false
   })
 
@@ -58,6 +59,7 @@ export default function EditEventPage() {
           status: event.status || 'upcoming',
           registration_link: event.registration_link || '',
           circular_link: event.circular_link || '',
+          image_urls: Array.isArray(event.image_urls) && event.image_urls.length > 0 ? event.image_urls : [''],
           is_featured: event.is_featured || false
         })
       } else {
@@ -83,6 +85,23 @@ export default function EditEventPage() {
       ...prev,
       [name]: val,
     }))
+  }
+
+  const handleImageUrlChange = (index: number, value: string) => {
+    const newImageUrls = [...formData.image_urls]
+    newImageUrls[index] = value
+    setFormData((prev) => ({ ...prev, image_urls: newImageUrls }))
+  }
+
+  const addImageUrl = () => {
+    setFormData((prev) => ({ ...prev, image_urls: [...prev.image_urls, ''] }))
+  }
+
+  const removeImageUrl = (index: number) => {
+    if (formData.image_urls.length > 1) {
+      const newImageUrls = formData.image_urls.filter((_, i) => i !== index)
+      setFormData((prev) => ({ ...prev, image_urls: newImageUrls }))
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -133,6 +152,9 @@ export default function EditEventPage() {
       }
       if (formData.circular_link && formData.circular_link.trim()) {
         payload.circular_link = formData.circular_link.trim()
+      }
+      if (formData.image_urls && formData.image_urls.length > 0) {
+        payload.image_urls = formData.image_urls.filter((url) => url.trim() !== '')
       }
 
       // console.log('Updating event payload:', payload)
@@ -286,6 +308,44 @@ export default function EditEventPage() {
                   className="input w-full"
                   placeholder="https://example.com/circular.pdf"
                 />
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-medium text-neutral-700">Image URLs</label>
+                <div className="space-y-3">
+                  {formData.image_urls.map((url, index) => (
+                    <div key={index} className="flex gap-2">
+                      <input
+                        type="url"
+                        value={url}
+                        onChange={(e) => handleImageUrlChange(index, e.target.value)}
+                        className="input w-full"
+                        placeholder={`Image URL ${index + 1} (e.g., https://example.com/image.jpg)`}
+                      />
+                      {formData.image_urls.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeImageUrl(index)}
+                          className="btn-secondary px-3"
+                          title="Remove URL"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={addImageUrl}
+                    className="btn-secondary flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Another Image URL
+                  </button>
+                </div>
+                <p className="text-xs text-neutral-500 mt-1">
+                  Add multiple image URLs. The first image will be used as the featured image.
+                </p>
               </div>
             </div>
 

@@ -7,7 +7,8 @@ import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube } from 'luci
 const quickLinks = [
   { label: 'About Us', href: '/about' },
   { label: 'Championships', href: '/events' },
-  { label: 'Criteria', href: '/downloads' },
+  { label: 'Policies', href: '/policies' },
+  { label: 'Classification', href: '/classification' },
   { label: 'Contact', href: '/contact' },
   { label: 'Accessibility', href: '/accessibility' },
 ]
@@ -40,7 +41,7 @@ export const Footer = () => {
               About STC Para Shooting
             </h3>
             <p className="text-sm text-neutral-600 leading-relaxed mb-4">
-              STC Para Shooting (PCI) was founded with the view to promote and 
+              STC Para Shooting (Paralympic Committee of India) was founded with the view to promote and 
               popularize shooting sports among para-athletes in India. We are committed to developing 
               world-class shooters.
             </p>
@@ -154,7 +155,7 @@ export const Footer = () => {
       {/* Bottom Bar */}
       <div className="bg-secondary text-white">
         <div className="container-main py-4 flex flex-col md:flex-row justify-between items-center gap-2 text-sm">
-          <p>© {currentYear} STC Para Shooting (PCI). All rights reserved.</p>
+          <p>© {currentYear} STC Para Shooting (Paralympic Committee of India). All rights reserved.</p>
 
           <div className="flex gap-4">
             <Link href="/privacy" className="hover:text-accent transition-colors">

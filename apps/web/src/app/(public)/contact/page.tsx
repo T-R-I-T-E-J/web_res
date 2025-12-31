@@ -46,7 +46,7 @@ const ContactPage = () => {
             Contact Us
           </h1>
           <p className="text-white/90 max-w-2xl mx-auto">
-            The STC Para Shooting office, part of the Paralympic Committee of India (PCI), handles administration, events, and selections for Indian para-shooters.
+            The STC Para Shooting office, part of the Paralympic Committee of India, handles administration, events, and selections for Indian para-shooters.
           </p>
         </div>
       </section>

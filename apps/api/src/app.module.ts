@@ -19,6 +19,7 @@ import { NewsModule } from './news/news.module.js';
 import { UploadModule } from './upload/upload.module.js';
 import { EventsModule } from './events/events.module.js';
 import { MediaModule } from './media/media.module.js';
+import { DownloadsModule } from './downloads/downloads.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from './auth/guards/roles.guard.js';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
@@ -84,11 +85,24 @@ import { envValidationSchema } from './config/env.validation';
     UploadModule,
     EventsModule,
     MediaModule,
+    DownloadsModule,
 
     // Serve Static Files (Frontend)
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '../../web/out'),
       exclude: ['/api/(.*)'],
+    }),
+    // Serve General Uploads (Documents, Profiles, etc.)
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+      serveStaticOptions: {
+        index: false,
+        setHeaders: (res) => {
+          res.setHeader('X-Content-Type-Options', 'nosniff');
+          res.setHeader('Cache-Control', 'public, max-age=3600');
+        },
+      },
     }),
     // Serve Uploaded Results
     ServeStaticModule.forRoot({

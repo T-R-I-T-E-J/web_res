@@ -44,7 +44,8 @@ const adminNavItems = [
     href: '/admin/content',
     icon: FileText,
     subItems: [
-      { label: 'Circulars/Downloads', href: '/admin/downloads' },
+      { label: 'Policies', href: '/admin/policies' },
+      { label: 'Classification', href: '/admin/classification' },
       { label: 'News & Updates', href: '/admin/news' },
       { label: 'Gallery', href: '/admin/gallery' },
     ]

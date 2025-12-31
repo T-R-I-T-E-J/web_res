@@ -1,8 +1,9 @@
+
 import type { Metadata } from 'next'
 import { FileText, Download, BookOpen, Calendar, Trophy, ClipboardList } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Criteria',
+  title: 'Policies',
   description: 'Download official rules, guidelines, and selection policies for para shooting in India.',
 }
 
@@ -13,67 +14,41 @@ const categories = [
   { label: 'Match Documents', icon: ClipboardList, id: 'match' },
 ]
 
-const rulesAndGuidelines = [
-  {
-    title: 'Para Shooting Criteria',
-    description: 'Official Para Shooting criteria and guidelines document',
-    fileType: 'PDF',
-    href: '/para-shooting-criteria.pdf',
-  },
-  {
-    title: 'WSPS Rulebook 2026',
-    description: 'Official World Shooting Para Sport Rulebook - Final Version',
-    fileType: 'PDF',
-    size: 'External',
-    href: 'https://www.paralympic.org/sites/default/files/2025-12/WSPS%20Rulebook%202026_vFinal_0.pdf',
-  },
-  {
-    title: 'WSPS Rulebook Appendices 2026',
-    description: 'Appendices to the Official WSPS Rulebook 2026',
-    fileType: 'PDF',
-    size: 'External',
-    href: 'https://www.paralympic.org/sites/default/files/2025-12/WSPS%20Rulebook%20Appendices%202026_vFinal.pdf',
-  },
-]
+interface DownloadItem {
+  id: string
+  title: string
+  description: string
+  fileType: string
+  size?: string
+  href: string
+  category: string
+  createdAt?: string
+  date?: string // Some items might have explicit date if we added that field, but for now createdAt
+}
 
-const selectionPolicies = [
-  {
-    title: '2025 National Selection Policy',
-    description: 'National Selection Policy for Para Shooting - 2025',
-    fileType: 'PDF',
-    href: '/2025-national-selection-policy.pdf',
-  },
-  {
-    title: 'Selection Policy - Paris 2024 Paralympics',
-    description: 'Selection criteria for Paris France 2024 Paralympic Games',
-    fileType: 'PDF',
-    href: '/selection-policy-paris-2024.pdf',
-  },
-  {
-    title: 'Selection Policy - Tokyo 2020 Paralympics',
-    description: 'Selection criteria for Tokyo Japan 2020 Paralympic Games',
-    fileType: 'PDF',
-    href: '/selection-policy-tokyo-2020.pdf',
-  },
-]
+async function getDownloads(): Promise<DownloadItem[]> {
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+    console.log(`Fetching downloads from: ${apiUrl}/downloads`);
+    
+    const res = await fetch(`${apiUrl}/downloads`, {
+      cache: 'no-store',
+    })
+    
+    if (!res.ok) {
+       console.error('Failed to fetch downloads:', res.status, await res.text())
+       return []
+    }
 
-const eventCalendar = [
-  {
-    title: '2026-2027 Para Shooting Event Calendar',
-    description: 'Official event calendar for Para Shooting competitions 2026-2027',
-    fileType: 'PDF',
-    href: '/2026-2027-event-calendar.pdf',
-  },
-]
-
-const matchDocuments = [
-  {
-    title: 'Match Book - Zonal & National Championship 2022',
-    description: 'Match book for Zonal and National Para Shooting Championship 2022',
-    fileType: 'PDF',
-    href: '/match-book-2022.pdf',
-  },
-]
+    const json = await res.json()
+    // Handle potential response wrapping (Standard NestJS interceptors might wrap in { data: ... })
+    const data = Array.isArray(json) ? json : (json.data || [])
+    return Array.isArray(data) ? data : []
+  } catch (error) {
+    console.error('Error fetching downloads:', error)
+    return []
+  }
+}
 
 const DownloadCard = ({
   title,
@@ -103,7 +78,7 @@ const DownloadCard = ({
         <div className="flex items-center gap-3 mt-2 text-xs text-neutral-400">
           <span className="uppercase font-medium">{fileType}</span>
           {size && <span>• {size}</span>}
-          {date && <span>• {date}</span>}
+          {date && <span>• {new Date(date).toLocaleDateString()}</span>}
         </div>
       </div>
     </div>
@@ -115,13 +90,20 @@ const DownloadCard = ({
         rel="noopener noreferrer"
       >
         <Download className="w-4 h-4" />
-        Download {fileType}
+        {fileType === 'Link' ? 'Open Link' : `Download ${fileType}`}
       </a>
     </div>
   </div>
 )
 
-const DownloadsPage = () => {
+const DownloadsPage = async () => {
+  const downloads = await getDownloads();
+  
+  const rules = downloads.filter(d => d.category === 'rules');
+  const selection = downloads.filter(d => d.category === 'selection');
+  const calendarItems = downloads.filter(d => d.category === 'calendar');
+  const match = downloads.filter(d => d.category === 'match');
+
   return (
     <>
 
@@ -132,7 +114,7 @@ const DownloadsPage = () => {
           <ol className="flex items-center gap-2">
             <li><a href="/" className="text-interactive hover:text-primary">Home</a></li>
             <li className="text-neutral-400">/</li>
-            <li className="text-neutral-600">Criteria</li>
+            <li className="text-neutral-600">Policies</li>
           </ol>
         </div>
       </nav>
@@ -160,9 +142,15 @@ const DownloadsPage = () => {
         <div className="container-main">
           <h2 className="section-title">Rules & Guidelines</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {rulesAndGuidelines.map((rule) => (
-              <DownloadCard key={rule.title} {...rule} />
-            ))}
+            {rules.length > 0 ? rules.map((rule) => (
+              <DownloadCard 
+                key={rule.id} 
+                {...rule} 
+                date={rule.createdAt} 
+              />
+            )) : (
+              <p className="text-neutral-500">No documents found.</p>
+            )}
           </div>
         </div>
       </section>
@@ -172,9 +160,15 @@ const DownloadsPage = () => {
         <div className="container-main">
           <h2 className="section-title">Selection Policies</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {selectionPolicies.map((policy) => (
-              <DownloadCard key={policy.title} {...policy} />
-            ))}
+            {selection.length > 0 ? selection.map((policy) => (
+              <DownloadCard 
+                key={policy.id} 
+                {...policy} 
+                date={policy.createdAt}
+              />
+            )) : (
+              <p className="text-neutral-500">No documents found.</p>
+            )}
           </div>
         </div>
       </section>
@@ -184,9 +178,15 @@ const DownloadsPage = () => {
         <div className="container-main">
           <h2 className="section-title">Event Calendar</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {eventCalendar.map((item) => (
-              <DownloadCard key={item.title} {...item} />
-            ))}
+            {calendarItems.length > 0 ? calendarItems.map((item) => (
+              <DownloadCard 
+                key={item.id} 
+                {...item} 
+                date={item.createdAt}
+              />
+            )) : (
+              <p className="text-neutral-500">No documents found.</p>
+            )}
           </div>
         </div>
       </section>
@@ -196,9 +196,15 @@ const DownloadsPage = () => {
         <div className="container-main">
           <h2 className="section-title">Match Documents</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {matchDocuments.map((doc) => (
-              <DownloadCard key={doc.title} {...doc} />
-            ))}
+            {match.length > 0 ? match.map((doc) => (
+              <DownloadCard 
+                key={doc.id} 
+                {...doc} 
+                date={doc.createdAt}
+              />
+            )) : (
+              <p className="text-neutral-500">No documents found.</p>
+            )}
           </div>
         </div>
       </section>

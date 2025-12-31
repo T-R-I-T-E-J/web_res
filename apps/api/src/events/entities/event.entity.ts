@@ -50,6 +50,9 @@ export class Event {
   @Column({ type: 'varchar', length: 500, nullable: true })
   circular_link?: string;
 
+  @Column({ type: 'jsonb', default: [] })
+  image_urls: string[];
+
   @Column({ type: 'boolean', default: false })
   is_featured: boolean;
 

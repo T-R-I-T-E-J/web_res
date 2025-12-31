@@ -16,97 +16,118 @@ type FeaturedCardProps = {
 
 export const FeaturedCard = ({ title, excerpt, date, href, imageUrl, category }: FeaturedCardProps) => {
   return (
-    <Link href={href} className="group relative block w-full overflow-hidden rounded-2xl bg-white shadow-lg h-full transition-all hover:shadow-xl">
-      <div className="relative h-64 md:h-full min-h-[300px] w-full overflow-hidden">
-         <img 
-            src={imageUrl} 
-            alt={title} 
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
-          <div className="absolute bottom-0 left-0 p-6 md:p-8 w-full text-white">
-            {category && (
-              <span className="mb-3 inline-block rounded-md bg-blue-600 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
-                {category}
-              </span>
-            )}
-            <h3 className="mb-3 text-2xl md:text-3xl font-bold leading-tight drop-shadow-sm group-hover:text-blue-200 transition-colors">
-              {title}
-            </h3>
+    <Link href={href} className="group relative block w-full overflow-hidden rounded-2xl bg-white shadow-card transition-all hover:shadow-card-hover border border-neutral-200 h-full">
+      <div className="flex flex-col md:flex-row h-full">
+         {/* Image Section */}
+         <div className="relative h-64 md:h-auto md:w-[55%] overflow-hidden">
+             <img 
+                src={imageUrl} 
+                alt={title} 
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent md:hidden" />
+              {category && (
+                <div className="absolute top-4 left-4">
+                  <span className="inline-block rounded-md bg-white/90 backdrop-blur-sm px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary shadow-sm border border-neutral-100">
+                    {category}
+                  </span>
+                </div>
+              )}
+         </div>
+
+         {/* Content Section */}
+         <div className="flex flex-col justify-center p-6 md:p-8 md:w-[45%] bg-white relative">
+            {/* Category for desktop - optional position */}
+            <div className="mb-4">
+               {category && (
+                 <span className="text-xs font-bold text-interactive uppercase tracking-wider mb-2 block md:inline-block">
+                    {category}
+                 </span>
+               )}
+               <h3 className="text-2xl md:text-3xl font-bold leading-tight text-neutral-900 group-hover:text-primary transition-colors">
+                  {title}
+               </h3>
+            </div>
+            
             {excerpt && (
-              <p className="mb-4 max-w-xl text-neutral-200 line-clamp-2 md:line-clamp-3">
+              <p className="mb-6 text-neutral-600 line-clamp-3 leading-relaxed">
                 {excerpt}
               </p>
             )}
-            <div className="flex items-center gap-4 text-sm font-medium text-neutral-300">
-               <span className="flex items-center gap-1.5">
+
+            <div className="mt-auto pt-4 flex items-center justify-between border-t border-neutral-100">
+               <span className="flex items-center gap-1.5 text-sm font-medium text-neutral-500">
                   <Clock className="h-4 w-4" />
                   {date}
                </span>
-               <span className="flex items-center gap-1.5 text-white/90 group-hover:text-white group-hover:translate-x-1 transition-all">
-                  Read Article <ArrowRight className="h-4 w-4" />
-               </span>
+               <div className="bg-secondary text-white px-5 py-2 rounded-lg text-sm font-bold shadow-md group-hover:bg-primary transition-colors flex items-center gap-2">
+                 View Details
+               </div>
             </div>
-          </div>
+         </div>
       </div>
     </Link>
   )
 }
 
-// News Card (Image-forward, minimal)
+// News Card (Vertical Grid Style)
 type NewsCardProps = {
   title: string
   excerpt?: string
   category?: string
-  date: string
+  date?: string
   href: string
   imageUrl?: string
 }
 
 export const NewsCard = ({ title, excerpt, category, date, href, imageUrl }: NewsCardProps) => {
   return (
-    <Link href={href} className="group flex overflow-hidden rounded-xl bg-white shadow-md transition-all hover:-translate-y-1 hover:shadow-xl border border-neutral-200 hover:border-blue-200">
-      {/* Image Section - Left Side */}
-      <div className="relative w-48 flex-shrink-0 overflow-hidden bg-neutral-200">
+    <Link href={href} className="group flex flex-col overflow-hidden rounded-xl bg-white shadow-card transition-all hover:-translate-y-1 hover:shadow-card-hover border border-neutral-200 h-full">
+      {/* Image Section - Top */}
+      <div className="relative aspect-video w-full overflow-hidden bg-neutral-100">
         {imageUrl ? (
           <img 
             src={imageUrl} 
             alt={title} 
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-neutral-100 text-neutral-400">
-            <span className="text-sm font-medium">No Image</span>
+          <div className="flex h-full w-full items-center justify-center text-neutral-300">
+             <span className="text-4xl">📰</span>
           </div>
         )}
         {category && (
-             <div className="absolute top-3 left-3">
-                <span className="rounded bg-blue-600 backdrop-blur-sm px-2 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-sm">
+             <div className="absolute bottom-3 left-3">
+                <span className="rounded bg-white/95 backdrop-blur-sm px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-primary shadow-sm">
                   {category}
                 </span>
              </div>
         )}
       </div>
 
-      {/* Content Section - Right Side */}
-      <div className="flex flex-1 flex-col p-5 justify-between">
-        <div>
-          <h3 className="mb-2 text-lg font-bold leading-snug text-neutral-900 group-hover:text-blue-700 transition-colors line-clamp-2">
-            {title}
-          </h3>
-          {excerpt && <p className="mb-3 text-sm text-neutral-600 line-clamp-2 leading-relaxed">{excerpt}</p>}
-          <div className="flex items-center text-xs font-medium text-neutral-500">
-           <Clock className="mr-1 h-3 w-3" />
-           {date}
-          </div>
-        </div>
+      {/* Content Section - Bottom */}
+      <div className="flex flex-1 flex-col p-5">
+        <h3 className="mb-3 text-lg font-bold leading-snug text-neutral-900 group-hover:text-interactive transition-colors line-clamp-2">
+          {title}
+        </h3>
         
-        {/* View Details Button */}
-        <div className="mt-4">
-          <div className="bg-blue-600 px-4 py-2.5 rounded-lg shadow-md flex items-center justify-between group-hover:bg-blue-700 group-hover:shadow-lg transition-all">
-             <span className="text-xs font-bold text-white uppercase tracking-wider">View Details</span>
-             <ArrowRight className="h-4 w-4 text-white transform group-hover:translate-x-1 transition-transform" />
-          </div>
+        {excerpt && (
+          <p className="mb-4 text-sm text-neutral-600 line-clamp-2 leading-relaxed flex-1">
+             {excerpt}
+          </p>
+        )}
+        
+        <div className="mt-auto flex items-center justify-between pt-4 border-t border-neutral-50">
+           {date ? (
+            <span className="text-xs font-medium text-neutral-400">
+               {date}
+            </span>
+           ) : (
+             <span /> // Spacer
+           )}
+           <span className="flex items-center justify-center w-8 h-8 rounded-full bg-neutral-50 text-neutral-400 group-hover:bg-primary group-hover:text-white transition-all">
+             <ArrowRight className="h-4 w-4" />
+           </span>
         </div>
       </div>
     </Link>
@@ -136,7 +157,7 @@ export const EventCard = ({ title, date, location, status, href, day, month }: E
       <div className="flex flex-1 flex-col p-5">
         <div className="flex gap-4">
             {/* Date Badge */}
-            <div className="flex h-16 w-16 flex-shrink-0 flex-col items-center justify-center rounded-lg bg-[#001f5c] text-white shadow-md group-hover:bg-[#001233] transition-colors">
+            <div className="flex h-16 w-16 flex-shrink-0 flex-col items-center justify-center rounded-lg bg-secondary text-white shadow-md group-hover:bg-primary transition-colors">
                 <span className="text-xs font-medium uppercase tracking-wider opacity-90">{displayMonth}</span>
                 <span className="text-2xl font-bold leading-none">{displayDay}</span>
             </div>

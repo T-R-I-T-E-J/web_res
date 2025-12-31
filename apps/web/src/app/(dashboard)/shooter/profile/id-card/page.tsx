@@ -42,7 +42,7 @@ const ShooterIDCardPage = () => {
                   </div>
                   <div>
                     <h3 className="font-heading font-bold text-xs leading-tight">NATIONAL PARA<br />SHOOTING FEDERATION</h3>
-                    <p className="text-[10px] opacity-80">MEMBER OF WSPS / PCI</p>
+                    <p className="text-[10px] opacity-80">MEMBER OF WSPS / Paralympic Committee of India</p>
                   </div>
                 </div>
                 <div className="text-right">

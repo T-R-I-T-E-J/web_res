@@ -134,7 +134,7 @@ const NewsPage = async ({ searchParams }: { searchParams: { category?: string } 
                         excerpt={String(heroArticle.excerpt || '')}
                         category={typeof heroArticle.category === 'string' ? heroArticle.category : 'NEWS'}
                         date={formatDate(heroArticle.created_at)}
-                        imageUrl={heroArticle.featured_image_url || '/placeholder-news.jpg'}
+                        imageUrl={heroArticle.featured_image_url || '/news-hero-placeholder.png'}
                         href={`/news/${heroArticle.slug || heroArticle.id}`}
                       />
                    </div>

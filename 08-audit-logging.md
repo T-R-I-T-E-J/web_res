@@ -31,13 +31,13 @@ The audit logging system provides a comprehensive trail of all data changes and 
 
 ### Audit Purposes
 
-| Purpose | Description |
-|---------|-------------|
+| Purpose        | Description                                        |
+| -------------- | -------------------------------------------------- |
 | **Compliance** | Meet regulatory requirements (IT Act, Sports Code) |
-| **Security** | Detect unauthorized access and data breaches |
-| **Debugging** | Track down data corruption issues |
-| **Analytics** | Understand user behavior patterns |
-| **Legal** | Provide evidence for disputes |
+| **Security**   | Detect unauthorized access and data breaches       |
+| **Debugging**  | Track down data corruption issues                  |
+| **Analytics**  | Understand user behavior patterns                  |
+| **Legal**      | Provide evidence for disputes                      |
 
 ---
 
@@ -45,33 +45,33 @@ The audit logging system provides a comprehensive trail of all data changes and 
 
 ### Data Change Events
 
-| Table | Events to Log | Sensitivity | Volume |
-|-------|---------------|-------------|--------|
-| `users` | CREATE, UPDATE, DELETE | High | Low (daily) |
-| `shooters` | CREATE, UPDATE, DELETE | High | Medium (weekly) |
-| `shooter_classifications` | CREATE, UPDATE | High | Low (monthly) |
-| `scores` | CREATE, UPDATE, DELETE | Critical | **High (competition days)** |
-| `rankings` | CREATE, UPDATE | Medium | Medium (weekly) |
-| `payments` | CREATE, UPDATE | Critical | Medium (daily) |
-| `refunds` | CREATE, UPDATE | Critical | Low (as needed) |
-| `memberships` | CREATE, UPDATE | High | Low (monthly) |
-| `competition_entries` | CREATE, UPDATE, DELETE | Medium | **High (registration spikes)** |
-| `news_articles` | CREATE, UPDATE, DELETE | Low | Low (weekly) |
+| Table                     | Events to Log          | Sensitivity | Volume                         |
+| ------------------------- | ---------------------- | ----------- | ------------------------------ |
+| `users`                   | CREATE, UPDATE, DELETE | High        | Low (daily)                    |
+| `shooters`                | CREATE, UPDATE, DELETE | High        | Medium (weekly)                |
+| `shooter_classifications` | CREATE, UPDATE         | High        | Low (monthly)                  |
+| `scores`                  | CREATE, UPDATE, DELETE | Critical    | **High (competition days)**    |
+| `rankings`                | CREATE, UPDATE         | Medium      | Medium (weekly)                |
+| `payments`                | CREATE, UPDATE         | Critical    | Medium (daily)                 |
+| `refunds`                 | CREATE, UPDATE         | Critical    | Low (as needed)                |
+| `memberships`             | CREATE, UPDATE         | High        | Low (monthly)                  |
+| `competition_entries`     | CREATE, UPDATE, DELETE | Medium      | **High (registration spikes)** |
+| `news_articles`           | CREATE, UPDATE, DELETE | Low         | Low (weekly)                   |
 
 > [!TIP]
 > Focus on high-volume tables (scores, competition_entries) when optimizing for performance during peak periods.
 
 ### User Action Events
 
-| Action | When | Data Captured | Frequency |
-|--------|------|---------------|-----------|
-| `LOGIN` | User authenticates | IP, user agent, success/failure | High |
-| `LOGOUT` | User logs out | Session duration | High |
-| `PASSWORD_CHANGE` | Password updated | Old hash (masked), timestamp | Low |
-| `ROLE_CHANGE` | Role assigned/removed | Old roles, new roles, admin | Low |
-| `EXPORT` | Data exported | Export type, filters, record count | Medium |
-| `BULK_UPDATE` | Mass data changes | Affected records, change summary | Low |
-| `FAILED_LOGIN` | Authentication failed | IP, attempted user, timestamp | Variable |
+| Action            | When                  | Data Captured                      | Frequency |
+| ----------------- | --------------------- | ---------------------------------- | --------- |
+| `LOGIN`           | User authenticates    | IP, user agent, success/failure    | High      |
+| `LOGOUT`          | User logs out         | Session duration                   | High      |
+| `PASSWORD_CHANGE` | Password updated      | Old hash (masked), timestamp       | Low       |
+| `ROLE_CHANGE`     | Role assigned/removed | Old roles, new roles, admin        | Low       |
+| `EXPORT`          | Data exported         | Export type, filters, record count | Medium    |
+| `BULK_UPDATE`     | Mass data changes     | Affected records, change summary   | Low       |
+| `FAILED_LOGIN`    | Authentication failed | IP, attempted user, timestamp      | Variable  |
 
 ### Events NOT to Log
 
@@ -87,19 +87,19 @@ The audit logging system provides a comprehensive trail of all data changes and 
 
 ### Table: `audit_logs`
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | bigint | Primary key |
-| `user_id` | bigint | Acting user (null for system) |
-| `action` | varchar(50) | Action type |
-| `table_name` | varchar(100) | Affected table |
-| `record_id` | bigint | Affected record ID |
-| `old_values` | jsonb | Previous values (for UPDATE/DELETE) |
-| `new_values` | jsonb | New values (for CREATE/UPDATE) |
-| `ip_address` | inet | Client IP address |
-| `user_agent` | text | Browser/client info |
-| `request_id` | uuid | Request correlation ID |
-| `created_at` | timestamptz | Event timestamp |
+| Column       | Type         | Description                         |
+| ------------ | ------------ | ----------------------------------- |
+| `id`         | bigint       | Primary key                         |
+| `user_id`    | bigint       | Acting user (null for system)       |
+| `action`     | varchar(50)  | Action type                         |
+| `table_name` | varchar(100) | Affected table                      |
+| `record_id`  | bigint       | Affected record ID                  |
+| `old_values` | jsonb        | Previous values (for UPDATE/DELETE) |
+| `new_values` | jsonb        | New values (for CREATE/UPDATE)      |
+| `ip_address` | inet         | Client IP address                   |
+| `user_agent` | text         | Browser/client info                 |
+| `request_id` | uuid         | Request correlation ID              |
+| `created_at` | timestamptz  | Event timestamp                     |
 
 ### Indexes (Performance-Optimized)
 
@@ -116,12 +116,13 @@ create index idx_audit_logs_user_created on audit_logs(user_id, created_at desc)
 create index idx_audit_logs_table_created on audit_logs(table_name, created_at desc);
 
 -- Partial indexes for security monitoring (optional but recommended)
-create index idx_audit_logs_failed_logins 
-  on audit_logs(created_at desc) 
+create index idx_audit_logs_failed_logins
+  on audit_logs(created_at desc)
   where action = 'LOGIN' and new_values->>'success' = 'false';
 ```
 
 **Index Performance (Validated)**:
+
 - User activity query: **< 10ms**
 - Record history query: **< 5ms**
 - Failed login detection: **< 50ms**
@@ -145,17 +146,17 @@ begin
     audit_user_id := nullif(current_setting('app.current_user_id', true), '')::bigint;
     audit_ip := nullif(current_setting('app.client_ip', true), '')::inet;
     audit_request_id := nullif(current_setting('app.request_id', true), '')::uuid;
-    
+
     if (tg_op = 'DELETE') then
         insert into audit_logs (
-            user_id, action, table_name, record_id, 
+            user_id, action, table_name, record_id,
             old_values, ip_address, request_id
         ) values (
             audit_user_id, 'DELETE', tg_table_name, old.id,
             to_jsonb(old), audit_ip, audit_request_id
         );
         return old;
-        
+
     elsif (tg_op = 'UPDATE') then
         -- Only log if values actually changed
         if to_jsonb(old) is distinct from to_jsonb(new) then
@@ -168,7 +169,7 @@ begin
             );
         end if;
         return new;
-        
+
     elsif (tg_op = 'INSERT') then
         insert into audit_logs (
             user_id, action, table_name, record_id,
@@ -179,7 +180,7 @@ begin
         );
         return new;
     end if;
-    
+
     return null;
 end;
 $$ language plpgsql;
@@ -187,13 +188,13 @@ $$ language plpgsql;
 -- Apply to tables
 create trigger audit_users after insert or update or delete on users
     for each row execute function audit_log_trigger();
-    
+
 create trigger audit_shooters after insert or update or delete on shooters
     for each row execute function audit_log_trigger();
-    
+
 create trigger audit_scores after insert or update or delete on scores
     for each row execute function audit_log_trigger();
-    
+
 create trigger audit_payments after insert or update or delete on payments
     for each row execute function audit_log_trigger();
 ```
@@ -205,18 +206,22 @@ create trigger audit_payments after insert or update or delete on payments
  * Middleware to set audit context
  * Sets session variables for database triggers
  */
-function auditContextMiddleware(req: Request, res: Response, next: NextFunction) {
+function auditContextMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   const requestId = uuidv4();
   req.requestId = requestId;
-  
+
   // Set PostgreSQL session variables for triggers
   // These are transaction-scoped and automatically cleaned up
   await prisma.$executeRaw`
-    SELECT set_config('app.current_user_id', ${String(req.user?.id || '')}, true),
-           set_config('app.client_ip', ${req.ip || ''}, true),
+    SELECT set_config('app.current_user_id', ${String(req.user?.id || "")}, true),
+           set_config('app.client_ip', ${req.ip || ""}, true),
            set_config('app.request_id', ${requestId}, true);
   `;
-  
+
   next();
 }
 ```
@@ -226,7 +231,7 @@ function auditContextMiddleware(req: Request, res: Response, next: NextFunction)
 ```typescript
 /**
  * Log audit event manually (for actions without database changes)
- * 
+ *
  * Performance: < 50ms per event (validated)
  * Supports batching for high-volume scenarios
  */
@@ -235,7 +240,7 @@ async function logAuditEvent(event: AuditEvent) {
     data: {
       userId: event.userId,
       action: event.action,
-      tableName: event.tableName || 'N/A',
+      tableName: event.tableName || "N/A",
       recordId: event.recordId,
       newValues: event.details,
       ipAddress: event.ipAddress,
@@ -248,14 +253,14 @@ async function logAuditEvent(event: AuditEvent) {
 // Example: Log login event
 await logAuditEvent({
   userId: user.id,
-  action: 'LOGIN',
-  details: { 
-    method: 'password', 
+  action: "LOGIN",
+  details: {
+    method: "password",
     success: true,
     mfa: user.mfaEnabled,
   },
   ipAddress: req.ip,
-  userAgent: req.headers['user-agent'],
+  userAgent: req.headers["user-agent"],
   requestId: req.requestId,
 });
 ```
@@ -269,12 +274,12 @@ await logAuditEvent({
 /**
  * Batch audit logging for performance
  * Use during high-volume operations (competition registrations, score submissions)
- * 
+ *
  * Performance: ~2.3s for 100 events (23ms per event)
  */
 async function logAuditEventsBatch(events: AuditEvent[]) {
   await prisma.auditLog.createMany({
-    data: events.map(event => ({
+    data: events.map((event) => ({
       userId: event.userId,
       action: event.action,
       tableName: event.tableName,
@@ -290,9 +295,9 @@ async function logAuditEventsBatch(events: AuditEvent[]) {
 }
 
 // Example: Log 50 score submissions
-const scoreEvents = scores.map(score => ({
-  action: 'CREATE',
-  tableName: 'scores',
+const scoreEvents = scores.map((score) => ({
+  action: "CREATE",
+  tableName: "scores",
   recordId: score.id,
   userId: score.shooterId,
   newValues: { totalScore: score.total, round: score.round },
@@ -309,10 +314,10 @@ await logAuditEventsBatch(scoreEvents);
 
 ### Data Subject Rights
 
-| Right | Implementation |
-|-------|----------------|
-| **Right to Access** | Export all audit logs for a user |
-| **Right to Erasure** | Anonymize user reference in logs |
+| Right                    | Implementation                    |
+| ------------------------ | --------------------------------- |
+| **Right to Access**      | Export all audit logs for a user  |
+| **Right to Erasure**     | Anonymize user reference in logs  |
 | **Right to Portability** | Export in machine-readable format |
 
 ### PII Handling in Logs
@@ -321,35 +326,41 @@ await logAuditEventsBatch(scoreEvents);
 /**
  * Sanitize sensitive fields before logging
  * Automatically applied to all audit events
- * 
+ *
  * Tested with: passwords, tokens, emails, phones, credit cards
  */
 function sanitizeForAudit(data: Record<string, any>): Record<string, any> {
   const sensitiveFields = [
-    'password', 'passwordHash', 'token', 'secret',
-    'creditCard', 'bankAccount', 'aadhaar', 'pan'
+    "password",
+    "passwordHash",
+    "token",
+    "secret",
+    "creditCard",
+    "bankAccount",
+    "aadhaar",
+    "pan",
   ];
-  
+
   const sanitized = { ...data };
-  
+
   // Redact sensitive fields
   for (const field of sensitiveFields) {
     if (field in sanitized) {
-      sanitized[field] = '[REDACTED]';
+      sanitized[field] = "[REDACTED]";
     }
   }
-  
+
   // Mask email partially (us***@example.com)
   if (sanitized.email) {
-    const [local, domain] = sanitized.email.split('@');
+    const [local, domain] = sanitized.email.split("@");
     sanitized.email = `${local.slice(0, 2)}***@${domain}`;
   }
-  
+
   // Mask phone (keep last 4 digits)
   if (sanitized.phone) {
-    sanitized.phone = sanitized.phone.replace(/\d(?=\d{4})/g, '*');
+    sanitized.phone = sanitized.phone.replace(/\d(?=\d{4})/g, "*");
   }
-  
+
   return sanitized;
 }
 ```
@@ -376,7 +387,7 @@ order by created_at desc;
 ```sql
 -- Anonymize user in audit logs (Right to Erasure)
 update audit_logs
-set 
+set
     ip_address = null,
     user_agent = null,
     old_values = old_values - 'email' - 'phone' - 'firstName' - 'lastName',
@@ -394,7 +405,7 @@ where user_id = $1;
 
 ```sql
 -- Who modified this score and when?
-select 
+select
     al.created_at,
     al.action,
     u.email as modified_by,
@@ -412,7 +423,7 @@ order by al.created_at desc;
 
 ```sql
 -- All actions by a user in the last 24 hours
-select 
+select
     created_at,
     action,
     table_name,
@@ -428,7 +439,7 @@ order by created_at desc;
 
 ```sql
 -- Failed login attempts from suspicious IPs
-select 
+select
     ip_address,
     count(*) as attempts,
     min(created_at) as first_attempt,
@@ -446,7 +457,7 @@ order by attempts desc;
 
 ```sql
 -- Daily change summary by table
-select 
+select
     date(created_at) as date,
     table_name,
     action,
@@ -463,13 +474,13 @@ order by date desc, table_name, action;
 
 ### Retention Periods
 
-| Log Type | Retention | Reason |
-|----------|-----------|--------|
-| Financial (payments, refunds) | 7 years | Tax compliance |
-| Score modifications | 10 years | Sports records |
-| User authentication | 2 years | Security audit |
-| General data changes | 2 years | Standard retention |
-| System events | 90 days | Operational needs |
+| Log Type                      | Retention | Reason             |
+| ----------------------------- | --------- | ------------------ |
+| Financial (payments, refunds) | 7 years   | Tax compliance     |
+| Score modifications           | 10 years  | Sports records     |
+| User authentication           | 2 years   | Security audit     |
+| General data changes          | 2 years   | Standard retention |
+| System events                 | 90 days   | Operational needs  |
 
 ### Archival Strategy
 
@@ -502,27 +513,30 @@ vacuum analyze audit_logs;
 async function archiveOldAuditLogs() {
   const cutoffDate = new Date();
   cutoffDate.setFullYear(cutoffDate.getFullYear() - 2);
-  
+
   // Archive to cold storage (S3, etc.)
   const oldLogs = await prisma.auditLog.findMany({
     where: {
       createdAt: { lt: cutoffDate },
-      tableName: { notIn: ['payments', 'refunds', 'scores'] },
+      tableName: { notIn: ["payments", "refunds", "scores"] },
     },
   });
-  
+
   // Export to S3
-  await exportToS3(oldLogs, `audit-archive/${format(cutoffDate, 'yyyy-MM')}.json`);
-  
+  await exportToS3(
+    oldLogs,
+    `audit-archive/${format(cutoffDate, "yyyy-MM")}.json`
+  );
+
   // Delete from database
   await prisma.auditLog.deleteMany({
     where: {
       createdAt: { lt: cutoffDate },
-      tableName: { notIn: ['payments', 'refunds', 'scores'] },
+      tableName: { notIn: ["payments", "refunds", "scores"] },
     },
   });
-  
-  logger.info('Archived audit logs', { count: oldLogs.length });
+
+  logger.info("Archived audit logs", { count: oldLogs.length });
 }
 ```
 
@@ -535,13 +549,13 @@ async function archiveOldAuditLogs() {
 
 ### Traffic Patterns Validated
 
-| Pattern | Events/Second | Duration | Performance | Status |
-|---------|---------------|----------|-------------|--------|
-| **Off-Season (Low)** | 1-5 | Sustained | < 50ms per event | ✅ Excellent |
-| **Competition Registration** | 100+ | Spike (5-10 min) | < 10s for 100 events | ✅ Excellent |
-| **Score Submission** | 50-100 | Burst (1-2 min) | < 15s for 150 events | ✅ Excellent |
-| **Daily Operations** | 10-20 | Variable | Adaptive | ✅ Excellent |
-| **Sustained Load** | 10 | Hours | Consistent | ✅ Excellent |
+| Pattern                      | Events/Second | Duration         | Performance          | Status       |
+| ---------------------------- | ------------- | ---------------- | -------------------- | ------------ |
+| **Off-Season (Low)**         | 1-5           | Sustained        | < 50ms per event     | ✅ Excellent |
+| **Competition Registration** | 100+          | Spike (5-10 min) | < 10s for 100 events | ✅ Excellent |
+| **Score Submission**         | 50-100        | Burst (1-2 min)  | < 15s for 150 events | ✅ Excellent |
+| **Daily Operations**         | 10-20         | Variable         | Adaptive             | ✅ Excellent |
+| **Sustained Load**           | 10            | Hours            | Consistent           | ✅ Excellent |
 
 ### Performance Benchmarks (Test-Validated)
 
@@ -563,38 +577,40 @@ Large Payload:    < 500ms (up to 50KB JSON)
 class AuditLogger {
   private eventQueue: AuditEvent[] = [];
   private lastFlush = Date.now();
-  
+
   // Configuration adapts to traffic
   private config = {
     lowTraffic: {
-      batchSize: 1,      // Real-time logging
-      maxWaitMs: 0,      // No batching
+      batchSize: 1, // Real-time logging
+      maxWaitMs: 0, // No batching
     },
     highTraffic: {
-      batchSize: 100,    // Batch 100 events
-      maxWaitMs: 1000,   // Flush every 1 second
+      batchSize: 100, // Batch 100 events
+      maxWaitMs: 1000, // Flush every 1 second
     },
   };
-  
+
   async log(event: AuditEvent) {
     this.eventQueue.push(event);
-    
+
     // Auto-flush on batch size or time
     const isLowTraffic = this.eventQueue.length < 10;
-    const config = isLowTraffic ? this.config.lowTraffic : this.config.highTraffic;
-    
-    const shouldFlush = 
+    const config = isLowTraffic
+      ? this.config.lowTraffic
+      : this.config.highTraffic;
+
+    const shouldFlush =
       this.eventQueue.length >= config.batchSize ||
-      (Date.now() - this.lastFlush) > config.maxWaitMs;
-    
+      Date.now() - this.lastFlush > config.maxWaitMs;
+
     if (shouldFlush) {
       await this.flush();
     }
   }
-  
+
   private async flush() {
     if (this.eventQueue.length === 0) return;
-    
+
     const batch = this.eventQueue.splice(0, this.config.highTraffic.batchSize);
     await logAuditEventsBatch(batch);
     this.lastFlush = Date.now();
@@ -616,43 +632,43 @@ class AuditLogger {
 const AUDIT_CONFIG = {
   development: {
     enabled: true,
-    batchSize: 1,        // Real-time for debugging
+    batchSize: 1, // Real-time for debugging
     flushInterval: 0,
-    logLevel: 'debug',
+    logLevel: "debug",
   },
-  
+
   staging: {
     enabled: true,
     batchSize: 10,
-    flushInterval: 5000,  // 5 seconds
-    logLevel: 'info',
+    flushInterval: 5000, // 5 seconds
+    logLevel: "info",
   },
-  
+
   production: {
     enabled: true,
-    
+
     // Off-season (low traffic)
     lowTraffic: {
       batchSize: 10,
       flushInterval: 5000,
       expectedEventsPerSecond: 1,
     },
-    
+
     // Competition period (high traffic)
     highTraffic: {
       batchSize: 100,
-      flushInterval: 1000,   // 1 second
+      flushInterval: 1000, // 1 second
       expectedEventsPerSecond: 100,
     },
-    
+
     // Performance targets (all validated ✅)
     performanceTargets: {
-      singleEvent: 50,      // ms
-      batchOf100: 10000,    // ms
-      queryLatency: 100,    // ms
+      singleEvent: 50, // ms
+      batchOf100: 10000, // ms
+      queryLatency: 100, // ms
     },
-    
-    logLevel: 'warn',
+
+    logLevel: "warn",
   },
 };
 ```
@@ -667,7 +683,7 @@ const AUDIT_CONFIG = {
 -- Table partitioning for large audit logs (>10M records)
 create table audit_logs_2025_01 partition of audit_logs
   for values from ('2025-01-01') to ('2025-02-01');
-  
+
 create table audit_logs_2025_02 partition of audit_logs
   for values from ('2025-02-01') to ('2025-03-01');
 
@@ -682,13 +698,13 @@ select create_parent('public.audit_logs', 'created_at', 'partman', 'monthly');
 
 ### Metrics to Track
 
-| Metric | Normal | Warning | Critical | Action |
-|--------|--------|---------|----------|--------|
-| Events/minute | 10-20 | > 100 | > 200 | Check for unusual activity |
-| Audit lag (write delay) | < 100ms | > 500ms | > 2s | Scale database |
-| Failed writes | 0% | > 0.1% | > 1% | Check database health |
-| Query latency | < 100ms | > 500ms | > 2s | Optimize indexes |
-| Table size | Varies | > 80% max | > 95% max | Archive old logs |
+| Metric                  | Normal  | Warning   | Critical  | Action                     |
+| ----------------------- | ------- | --------- | --------- | -------------------------- |
+| Events/minute           | 10-20   | > 100     | > 200     | Check for unusual activity |
+| Audit lag (write delay) | < 100ms | > 500ms   | > 2s      | Scale database             |
+| Failed writes           | 0%      | > 0.1%    | > 1%      | Check database health      |
+| Query latency           | < 100ms | > 500ms   | > 2s      | Optimize indexes           |
+| Table size              | Varies  | > 80% max | > 95% max | Archive old logs           |
 
 ### Alert Configurations
 
@@ -700,12 +716,14 @@ select create_parent('public.audit_logs', 'created_at', 'partman', 'monthly');
 
 // 1. Low Traffic Alert (system may be down)
 if (eventsLastHour < 1) {
-  await sendAlert('CRITICAL: No audit events in last hour - system may be down');
+  await sendAlert(
+    "CRITICAL: No audit events in last hour - system may be down"
+  );
 }
 
 // 2. High Traffic Alert (unusual activity)
 if (eventsLastMinute > 200) {
-  await sendAlert('WARNING: Unusually high audit activity', {
+  await sendAlert("WARNING: Unusually high audit activity", {
     rate: eventsLastMinute,
     threshold: 200,
   });
@@ -714,15 +732,15 @@ if (eventsLastMinute > 200) {
 // 3. Failed Login Spike (potential attack)
 const failedLogins = await getFailedLoginAttempts(5, 10);
 if (failedLogins.length > 0) {
-  await sendAlert('SECURITY: Brute force attack detected', {
-    ips: failedLogins.map(f => f.ipAddress),
-    attempts: failedLogins.map(f => f.count),
+  await sendAlert("SECURITY: Brute force attack detected", {
+    ips: failedLogins.map((f) => f.ipAddress),
+    attempts: failedLogins.map((f) => f.count),
   });
 }
 
 // 4. Performance Degradation
 if (avgWriteLatency > 500) {
-  await sendAlert('WARNING: Audit write latency high', {
+  await sendAlert("WARNING: Audit write latency high", {
     latency: avgWriteLatency,
     threshold: 500,
   });
@@ -730,7 +748,7 @@ if (avgWriteLatency > 500) {
 
 // 5. Storage Alert
 if (auditTableSize > maxTableSize * 0.8) {
-  await sendAlert('WARNING: Audit logs table reaching capacity', {
+  await sendAlert("WARNING: Audit logs table reaching capacity", {
     size: auditTableSize,
     capacity: maxTableSize,
   });
@@ -745,7 +763,7 @@ if (auditTableSize > maxTableSize * 0.8) {
  */
 async function monitorTrafficPatterns() {
   const lastHourStats = await prisma.auditLog.groupBy({
-    by: ['action'],
+    by: ["action"],
     where: {
       createdAt: {
         gte: new Date(Date.now() - 3600000), // Last hour
@@ -753,24 +771,24 @@ async function monitorTrafficPatterns() {
     },
     _count: true,
   });
-  
+
   const metrics = {
     timestamp: new Date(),
     eventsPerHour: lastHourStats.reduce((sum, s) => sum + s._count, 0),
     breakdown: lastHourStats,
     trafficLevel: determineTrafficLevel(eventsPerHour),
   };
-  
+
   // Log for analysis
-  await prometheus.gauge('audit_events_per_hour').set(metrics.eventsPerHour);
-  await prometheus.gauge('audit_traffic_level').set(metrics.trafficLevel);
+  await prometheus.gauge("audit_events_per_hour").set(metrics.eventsPerHour);
+  await prometheus.gauge("audit_traffic_level").set(metrics.trafficLevel);
 }
 
 function determineTrafficLevel(eventsPerHour: number): string {
-  if (eventsPerHour < 100) return 'low';
-  if (eventsPerHour < 1000) return 'normal';
-  if (eventsPerHour < 5000) return 'high';
-  return 'critical';
+  if (eventsPerHour < 100) return "low";
+  if (eventsPerHour < 1000) return "normal";
+  if (eventsPerHour < 5000) return "high";
+  return "critical";
 }
 ```
 
@@ -783,32 +801,38 @@ function determineTrafficLevel(eventsPerHour: number): string {
 Test individual audit functions in isolation:
 
 ```typescript
-describe('Audit Logging', () => {
-  it('should log CREATE events', async () => {
-    const user = await createUser({ email: 'test@example.com' });
-    
+describe("Audit Logging", () => {
+  it("should log CREATE events", async () => {
+    const user = await createUser({ email: "test@example.com" });
+
     await logAuditEvent({
-      action: 'CREATE',
-      tableName: 'users',
+      action: "CREATE",
+      tableName: "users",
       recordId: user.id,
       newValues: { email: user.email },
       context: { userId: user.id },
     });
-    
-    const logs = await getRecordAuditHistory('users', user.id);
+
+    const logs = await getRecordAuditHistory("users", user.id);
     expect(logs).toHaveLength(1);
-    expect(logs[0].action).toBe('CREATE');
-  });
-  
-  it('should sanitize sensitive data', () => {
-    const data = { email: 'user@example.com', password: 'secret123' };
-    const sanitized = sanitizeForAudit(data);
-    
-    expect(sanitized.password).toBe('[REDACTED]');
-    expect(sanitized.email).toMatch(/^us\*\*\*@example\.com$/);
+    expect(logs[0].action).toBe("CREATE");
   });
 });
 ```
+
+});
+
+it('should sanitize sensitive data', () => {
+const data = { email: 'user@example.com', password: 'secret123' };
+const sanitized = sanitizeForAudit(data);
+
+    expect(sanitized.password).toBe('[REDACTED]');
+    expect(sanitized.email).toMatch(/^us\*\*\*@example\.com$/);
+
+});
+});
+
+````
 
 ### Integration Tests
 
@@ -828,15 +852,15 @@ describe('Traffic Scenarios', () => {
         })
       );
     }
-    
+
     const start = Date.now();
     await Promise.all(registrations);
     const duration = Date.now() - start;
-    
+
     expect(duration).toBeLessThan(10000); // < 10 seconds
   });
 });
-```
+````
 
 ### Load Testing
 
@@ -844,19 +868,19 @@ Use k6 or similar tools:
 
 ```javascript
 // k6 load test for audit endpoints
-import http from 'k6/http';
+import http from "k6/http";
 
 export const options = {
   stages: [
-    { duration: '1m', target: 10 },   // Normal traffic
-    { duration: '2m', target: 100 },  // Spike to 100
-    { duration: '1m', target: 10 },   // Back to normal
+    { duration: "1m", target: 10 }, // Normal traffic
+    { duration: "2m", target: 100 }, // Spike to 100
+    { duration: "1m", target: 10 }, // Back to normal
   ],
 };
 
 export default function () {
-  http.post('http://api.example.com/audit', {
-    action: 'LOGIN',
+  http.post("http://api.example.com/audit", {
+    action: "LOGIN",
     userId: `user-${Math.random()}`,
   });
 }
@@ -876,11 +900,11 @@ export default function () {
  * Use request ID for idempotency
  */
 await logAuditEvent({
-  action: 'WEBHOOK',
-  tableName: 'payments',
+  action: "WEBHOOK",
+  tableName: "payments",
   recordId: paymentId,
   requestId: webhookRequestId, // Same for retries
-  context: { userId: 'system' },
+  context: { userId: "system" },
 });
 
 // Query by request ID to detect duplicates
@@ -889,7 +913,7 @@ const existingLogs = await prisma.auditLog.findMany({
 });
 
 if (existingLogs.length > 1) {
-  logger.warn('Duplicate webhook detected', { requestId: webhookRequestId });
+  logger.warn("Duplicate webhook detected", { requestId: webhookRequestId });
 }
 ```
 

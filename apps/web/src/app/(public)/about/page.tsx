@@ -4,12 +4,12 @@ import { Users } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'About STC Para Shooting',
-  description: 'Learn about STC Para Shooting (PCI) - our history, mission, and leadership.',
+  description: 'Learn about STC Para Shooting (Paralympic Committee of India) - our history, mission, and leadership.',
 }
 
 const committeeMembers = [
-  { name: 'Dr. Deepa Malik', position: 'President, PCI', since: '2020' },
-  { name: 'Mr. Gursharan Singh', position: 'Secretary General, PCI', since: '2020' },
+  { name: 'Dr. Deepa Malik', position: 'President, Paralympic Committee of India', since: '2020' },
+  { name: 'Mr. Gursharan Singh', position: 'Secretary General, Paralympic Committee of India', since: '2020' },
   { name: 'Mr. Jaiprakash Nautiyal', position: 'Chairperson, STC Shooting', since: '2015' },
   { name: 'Mr. Rahul Swami', position: 'Chief Administrator', since: '2021' },
 ]
@@ -109,7 +109,7 @@ const AboutPage = () => {
           <h2 className="section-title">Executive Committee</h2>
           <p className="text-neutral-600 text-lg mb-10 max-w-2xl leading-relaxed">
             Our leadership team is committed to advancing para shooting sports in India through 
-            strategic initiatives and athlete-centered programs under PCI.
+            strategic initiatives and athlete-centered programs under Paralympic Committee of India.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {committeeMembers.map((member) => (

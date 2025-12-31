@@ -138,15 +138,34 @@ export default async function NewsArticlePage({ params }: { params: Params }) {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              {/* Featured Image */}
-              <div className="aspect-[16/9] rounded-card overflow-hidden bg-neutral-100 mb-8">
-                 {article.featured_image_url ? (
+              {/* Featured Image(s) */}
+              <div className="space-y-4 mb-8">
+                {/* Display all images from image_urls array */}
+                {article.image_urls && Array.isArray(article.image_urls) && article.image_urls.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-4">
+                    {article.image_urls.map((imageUrl: string, index: number) => (
+                      <div key={index} className="aspect-[16/9] rounded-card overflow-hidden bg-neutral-100">
+                        <img 
+                          src={imageUrl} 
+                          alt={`${article.title} - Image ${index + 1}`} 
+                          className="w-full h-full object-cover" 
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : article.featured_image_url ? (
+                  // Fallback to featured_image_url for backward compatibility
+                  <div className="aspect-[16/9] rounded-card overflow-hidden bg-neutral-100">
                     <img src={article.featured_image_url} alt={article.title} className="w-full h-full object-cover" />
-                 ) : (
+                  </div>
+                ) : (
+                  // No images available
+                  <div className="aspect-[16/9] rounded-card overflow-hidden bg-neutral-100">
                     <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
                       <span className="text-8xl">📰</span>
                     </div>
-                 )}
+                  </div>
+                )}
               </div>
 
               {/* Article Body */}
@@ -241,8 +260,8 @@ export default async function NewsArticlePage({ params }: { params: Params }) {
                     </Link>
                   </li>
                   <li>
-                    <Link href="/downloads" className="text-neutral-600 hover:text-primary transition-colors text-sm">
-                      → Criteria & Documents
+                    <Link href="/policies" className="text-neutral-600 hover:text-primary transition-colors text-sm">
+                      → Policies & Documents
                     </Link>
                   </li>
                   <li>

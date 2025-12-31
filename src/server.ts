@@ -79,10 +79,24 @@ app.get('/', (req: Request, res: Response) => {
 
 // Start server
 if (require.main === module) {
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
         console.log(`🚀 Failure handling test server running on port ${PORT}`);
         console.log(`   Health check: http://localhost:${PORT}/health`);
     });
+
+    // Graceful shutdown
+    const shutdown = async () => {
+        console.log('SIGTERM/SIGINT received. Shutting down...');
+        server.close(() => {
+            console.log('HTTP server closed');
+        });
+        await prisma.$disconnect();
+        console.log('Prisma client disconnected');
+        process.exit(0);
+    };
+
+    process.on('SIGTERM', shutdown);
+    process.on('SIGINT', shutdown);
 }
 
 export { app, prisma };

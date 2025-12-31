@@ -4,7 +4,6 @@ import {
   IsOptional,
   IsBoolean,
   IsArray,
-  IsUrl,
 } from 'class-validator';
 import { NewsCategory, NewsStatus } from '../entities/news.entity';
 
@@ -24,7 +23,12 @@ export class CreateNewsDto {
 
   @IsOptional()
   @IsString()
-  featured_image_url?: string; // IsUrl check might fail if it's a relative path or s3 key, keeping it flex or use specific validator if needed. Assuming full URL or relative path string.
+  featured_image_url?: string; // DEPRECATED: Use image_urls instead
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  image_urls?: string[];
 
   @IsOptional()
   @IsArray()

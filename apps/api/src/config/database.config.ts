@@ -1,6 +1,7 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { DatabaseConfig } from './config.interface';
+import { Logger } from '@nestjs/common';
 
 export const getDatabaseConfig = (
   configService: ConfigService,
@@ -11,14 +12,20 @@ export const getDatabaseConfig = (
     throw new Error('Database configuration is missing');
   }
 
-  // Debug logging
-  console.log('Database Configuration:', {
-    host: dbConfig.host,
-    port: dbConfig.port,
-    username: dbConfig.username,
-    database: dbConfig.database,
-    passwordSet: !!dbConfig.password,
-  });
+  // Conditional Debug logging
+
+  const logger = new Logger('DatabaseConfig');
+  if (process.env.NODE_ENV === 'production') {
+    logger.debug('Database configuration hidden for security');
+  } else if (process.env.DEBUG === 'true') {
+    logger.debug({
+      host: dbConfig.host,
+      port: dbConfig.port,
+      username: dbConfig.username,
+      database: dbConfig.database,
+      passwordSet: !!dbConfig.password,
+    });
+  }
 
   return {
     type: 'postgres',

@@ -10,7 +10,7 @@ const leadershipData = {
   officeBearers: [
     { name: 'Mr. Raninder Singh', position: 'President', role: 'Strategic direction and overall governance of para shooting in India.' },
     { name: 'Mr. K. Sultan Singh', position: 'Senior Vice President', role: 'Support to President and management of national championships.' },
-    { name: 'Mr. D.V. Seetharama Rao', position: 'Secretary General', role: 'Administrative head and primary contact for WSPS and PCI.' },
+    { name: 'Mr. D.V. Seetharama Rao', position: 'Secretary General', role: 'Administrative head and primary contact for WSPS and Paralympic Committee of India.' },
     { name: 'Mr. Rajiv Bhatia', position: 'Treasurer', role: 'Financial management, budgeting, and audit compliance.' },
   ],
   executiveCommittee: [

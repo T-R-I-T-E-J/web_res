@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { DashboardHeader } from '@/components/dashboard'
-import { ArrowLeft, Loader2, Save } from 'lucide-react'
+import { ArrowLeft, Loader2, Save, Plus, X } from 'lucide-react'
 import Cookies from 'js-cookie'
 
 export default function EditNewsPage({ params }: { params: { id: string } }) {
@@ -18,6 +18,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
     category: 'NEWS',
     status: 'draft',
     featured_image_url: '',
+    image_urls: [''] as string[],
     tags: '',
     is_featured: false,
     is_pinned: false
@@ -44,6 +45,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
             category: data.category || 'NEWS',
             status: data.status || 'draft',
             featured_image_url: data.featured_image_url || '',
+            image_urls: Array.isArray(data.image_urls) && data.image_urls.length > 0 ? data.image_urls : [''],
             tags: Array.isArray(data.tags) ? data.tags.join(', ') : '',
             is_featured: data.is_featured || false,
             is_pinned: data.is_pinned || false,
@@ -76,6 +78,23 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
     }))
   }
 
+  const handleImageUrlChange = (index: number, value: string) => {
+    const newImageUrls = [...formData.image_urls]
+    newImageUrls[index] = value
+    setFormData((prev) => ({ ...prev, image_urls: newImageUrls }))
+  }
+
+  const addImageUrl = () => {
+    setFormData((prev) => ({ ...prev, image_urls: [...prev.image_urls, ''] }))
+  }
+
+  const removeImageUrl = (index: number) => {
+    if (formData.image_urls.length > 1) {
+      const newImageUrls = formData.image_urls.filter((_, i) => i !== index)
+      setFormData((prev) => ({ ...prev, image_urls: newImageUrls }))
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -85,6 +104,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
       const payload = {
         ...formData,
         tags: formData.tags.split(',').map((t) => t.trim()).filter(Boolean),
+        image_urls: formData.image_urls.filter((url) => url.trim() !== ''),
       }
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/news/${params.id}`, {
@@ -187,16 +207,42 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
                 />
               </div>
               
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-neutral-700">Featured Image URL</label>
-                <input
-                  type="url"
-                  name="featured_image_url"
-                  value={formData.featured_image_url}
-                  onChange={handleChange}
-                  className="input w-full"
-                  placeholder="https://example.com/image.jpg"
-                />
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-medium text-neutral-700">Image URLs</label>
+                <div className="space-y-3">
+                  {formData.image_urls.map((url, index) => (
+                    <div key={index} className="flex gap-2">
+                      <input
+                        type="url"
+                        value={url}
+                        onChange={(e) => handleImageUrlChange(index, e.target.value)}
+                        className="input w-full"
+                        placeholder={`Image URL ${index + 1} (e.g., https://example.com/image.jpg)`}
+                      />
+                      {formData.image_urls.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeImageUrl(index)}
+                          className="btn-secondary px-3"
+                          title="Remove URL"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={addImageUrl}
+                    className="btn-secondary flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Another Image URL
+                  </button>
+                </div>
+                <p className="text-xs text-neutral-500 mt-1">
+                  Add multiple image URLs. The first image will be used as the featured image.
+                </p>
               </div>
 
                <div className="space-y-2">

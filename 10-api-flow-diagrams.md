@@ -8,6 +8,7 @@
 ## Table of Contents
 
 ### Original Flows
+
 1. [User Registration Flow](#user-registration-flow)
 2. [Shooter Profile Creation](#shooter-profile-creation)
 3. [Competition Registration Flow](#competition-registration-flow)
@@ -18,6 +19,7 @@
 8. [Ranking Calculation Flow](#ranking-calculation-flow)
 
 ### New Features (v2.0)
+
 9. [Waitlist Management Flow](#waitlist-management-flow) **[NEW]**
 10. [Live Leaderboard Update Flow](#live-leaderboard-update-flow) **[NEW]**
 11. [Score Dispute Workflow](#score-dispute-workflow) **[NEW]**
@@ -27,6 +29,7 @@
 15. [Payment Retry Flow](#payment-retry-flow) **[NEW]**
 
 ### Reference
+
 16. [Quick Reference](#quick-reference)
 17. [Performance Metrics](#performance-metrics) **[NEW]**
 18. [Production Deployment](#production-deployment) **[NEW]**
@@ -230,7 +233,7 @@ COMMIT;
 │  │     (status = 'PROMOTED')             │                              │
 │  │                                       │                              │
 │  │  7. DELETE FROM waitlist              │                              │
-│  │     WHERE id = $promo ted_id          │                              │
+│  │     WHERE id = $promoted_id           │                              │
 │  │                                       │                              │
 │  │  8. SET payment_deadline =            │                              │
 │  │     NOW() + INTERVAL '24 hours'       │                              │
@@ -467,11 +470,11 @@ Initial:               After Score (652.1):
 
 ### Escalation Timeline
 
-| Level | Reviewer | Response Time | Authority |
-|-------|----------|---------------|-----------|
-| 1 | Range Officer | 30 minutes | Can approve/reject minor disputes |
-| 2 | Technical Delegate | 2 hours | Can approve/reject with evidence |
-| 3 | Jury of Appeal | 24 hours | **Final decision** |
+| Level | Reviewer           | Response Time | Authority                         |
+| ----- | ------------------ | ------------- | --------------------------------- |
+| 1     | Range Officer      | 30 minutes    | Can approve/reject minor disputes |
+| 2     | Technical Delegate | 2 hours       | Can approve/reject with evidence  |
+| 3     | Jury of Appeal     | 24 hours      | **Final decision**                |
 
 ---
 
@@ -577,12 +580,12 @@ Initial:               After Score (652.1):
 
 ### Team Categories
 
-| Category | Size | Scoring Method |
-|----------|------|----------------|
-| Rifle Teams | 3 shooters | Sum of all scores |
-| Pistol Teams | 3 shooters | Sum of all scores |
-| Mixed Teams | 2 rifle + 1 pistol | Weighted average |
-| Junior Teams | 4 shooters | Best 3 scores |
+| Category     | Size               | Scoring Method    |
+| ------------ | ------------------ | ----------------- |
+| Rifle Teams  | 3 shooters         | Sum of all scores |
+| Pistol Teams | 3 shooters         | Sum of all scores |
+| Mixed Teams  | 2 rifle + 1 pistol | Weighted average  |
+| Junior Teams | 4 shooters         | Best 3 scores     |
 
 ---
 
@@ -696,11 +699,11 @@ Initial:               After Score (652.1):
 
 ### Violation Severity Levels
 
-| Severity | Examples | Penalty |
-|----------|----------|---------|
-| **Critical** | Illegal equipment, doping | Immediate DQ |
-| **Major** | Timing violation, conduct | Score invalid |
-| **Minor** | Clothing irregularity | Warning + time penalty |
+| Severity     | Examples                  | Penalty                |
+| ------------ | ------------------------- | ---------------------- |
+| **Critical** | Illegal equipment, doping | Immediate DQ           |
+| **Major**    | Timing violation, conduct | Score invalid          |
+| **Minor**    | Clothing irregularity     | Warning + time penalty |
 
 ---
 
@@ -815,11 +818,11 @@ Initial:               After Score (652.1):
 
 ### Sharing Rules
 
-| Tie Position | Medals Awarded | Next Rank |
-|--------------|----------------|-----------|
-| 2 tied for 1st | 2× GOLD, 1× BRONZE | Skip 2nd |
-| 2 tied for 2nd | 1× GOLD, 2× SILVER | Skip 3rd |
-| 3 tied for 1st | 3× GOLD | Skip 2nd, 3rd |
+| Tie Position   | Medals Awarded     | Next Rank     |
+| -------------- | ------------------ | ------------- |
+| 2 tied for 1st | 2× GOLD, 1× BRONZE | Skip 2nd      |
+| 2 tied for 2nd | 1× GOLD, 2× SILVER | Skip 3rd      |
+| 3 tied for 1st | 3× GOLD            | Skip 2nd, 3rd |
 
 ---
 
@@ -971,70 +974,73 @@ Success rate: 66% recovery (2/3 attempts failed but recovered)
 
 ### Flow Performance Summary
 
-| Flow | Concurrent  Load | Performance | Status |
-|------|------------------|-------------|--------|
-| User Registration | 10 users | Fast | ✅ |
-| Competition Registration | 1000 shooters | < 5 min | ✅ |
-| Waitlist Promotion | Auto | < 1 sec | ✅ |
-| Score Submission | 200 concurrent | ~2 sec total | ✅ |
-| Live Leaderboard | Real-time | < 1 sec update | ✅ |
-| Score Dispute | Multi-level | 30min - 24hr | ✅ |
-| Team Registration | 10 teams | Fast | ✅ |
-| Auto-DQ Checks | Per shooter | < 5 sec | ✅ |
-| Medal Allocation | Auto | < 1 sec | ✅ |
-| Payment Processing | 500 concurrent | ~2 sec total | ✅ |
-| Payment Retry | 3 attempts | 3sec backoff | ✅ |
+| Flow                     | Concurrent Load | Performance    | Status |
+| ------------------------ | --------------- | -------------- | ------ |
+| User Registration        | 10 users        | Fast           | ✅     |
+| Competition Registration | 1000 shooters   | < 5 min        | ✅     |
+| Waitlist Promotion       | Auto            | < 1 sec        | ✅     |
+| Score Submission         | 200 concurrent  | ~2 sec total   | ✅     |
+| Live Leaderboard         | Real-time       | < 1 sec update | ✅     |
+| Score Dispute            | Multi-level     | 30min - 24hr   | ✅     |
+| Team Registration        | 10 teams        | Fast           | ✅     |
+| Auto-DQ Checks           | Per shooter     | < 5 sec        | ✅     |
+| Medal Allocation         | Auto            | < 1 sec        | ✅     |
+| Payment Processing       | 500 concurrent  | ~2 sec total   | ✅     |
+| Payment Retry            | 3 attempts      | 3sec backoff   | ✅     |
 
 ### Stress Test Results
 
-| Test | Scenario | Result |
-|------|----------|--------|
+| Test               | Scenario           | Result  |
+| ------------------ | ------------------ | ------- |
 | Registration Spike | 1000 shooters/5min | ✅ Pass |
-| Score Burst | 200 concurrent | ✅ Pass |
-| Payment Surge | 500 concurrent | ✅ Pass |
+| Score Burst        | 200 concurrent     | ✅ Pass |
+| Payment Surge      | 500 concurrent     | ✅ Pass |
 
 ---
 
 ## Production Deployment
 
 ### Phase 1: Core Flows (Week 1)
+
 ✅ User Registration  
 ✅ Shooter Profile  
 ✅ Competition Registration (with row locking)  
 ✅ Score Submission  
-✅ Payment Processing  
+✅ Payment Processing
 
 ### Phase 2: Enhanced Features (Week 2)
+
 ✅ Waitlist Management  
 ✅ Live Leaderboard  
 ✅ Payment Retry Logic  
-✅ Medal Allocation  
+✅ Medal Allocation
 
 ### Phase 3: Advanced Features (Week 3)
+
 ✅ Score Dispute Workflow  
 ✅ Team Registration  
-✅ Auto-Disqualification Checks  
+✅ Auto-Disqualification Checks
 
 ### Monitoring Setup
 
 ```typescript
 // Key metrics to monitor
 const metrics = {
-  registrationRate: '# registrations/minute',
-  waitlistLength: 'current waitlist size',
-  leaderboardUpdates: 'updates/second',
-  disputesOpen: 'active dispute count',
-  disqualifications: 'DQ count per event',
-  paymentRetries: 'retry count/success rate',
-  medalAllocations: 'medals awarded',
+  registrationRate: "# registrations/minute",
+  waitlistLength: "current waitlist size",
+  leaderboardUpdates: "updates/second",
+  disputesOpen: "active dispute count",
+  disqualifications: "DQ count per event",
+  paymentRetries: "retry count/success rate",
+  medalAllocations: "medals awarded",
 };
 
 // Alerts
 alerts = {
-  highRegistrationRate: '> 100/min',
-  longWaitlist: '> 50 shooters',
-  disputeBacklog: '> 10 pending',
-  paymentFailures: '> 5% failure rate',
+  highRegistrationRate: "> 100/min",
+  longWaitlist: "> 50 shooters",
+  disputeBacklog: "> 10 pending",
+  paymentFailures: "> 5% failure rate",
 };
 ```
 
@@ -1044,32 +1050,32 @@ alerts = {
 
 ### API Endpoints Summary (Updated)
 
-| Flow | Method | Endpoint | Auth | NEW |
-|------|--------|----------|------|-----|
-| Register | POST | `/api/auth/register` | None | |
-| Create Shooter | POST | `/api/shooters` | User | |
-| Register Competition | POST | `/api/competitions/:id/register` | Shooter | |
-| **Join Waitlist** | POST | `/api/competitions/:id/waitlist` | Shooter | ✅ |
-| Submit Score | POST | `/api/scores` | Official | |
-| **Dispute Score** | POST | `/api/scores/:id/dispute` | Shooter | ✅ |
-| **Register Team** | POST | `/api/teams/register` | Lead | ✅ |
-| Create Payment | POST | `/api/payments` | User | |
-| Process Refund | POST | `/api/admin/payments/:id/refund` | Admin | |
-| Update Classification | POST | `/api/admin/shooters/:id/classification` | Classifier | |
-| **Get Leaderboard** | GET | `/api/leaderboard/live/:eventId` | Public | ✅ |
-| **Check Equipment** | POST | `/api/equipment/validate` | Official | ✅ |
-| **Allocate Medals** | POST | `/api/admin/medals/allocate/:eventId` | Admin | ✅ |
+| Flow                  | Method | Endpoint                                 | Auth       | NEW |
+| --------------------- | ------ | ---------------------------------------- | ---------- | --- |
+| Register              | POST   | `/api/auth/register`                     | None       |     |
+| Create Shooter        | POST   | `/api/shooters`                          | User       |     |
+| Register Competition  | POST   | `/api/competitions/:id/register`         | Shooter    |     |
+| **Join Waitlist**     | POST   | `/api/competitions/:id/waitlist`         | Shooter    | ✅  |
+| Submit Score          | POST   | `/api/scores`                            | Official   |     |
+| **Dispute Score**     | POST   | `/api/scores/:id/dispute`                | Shooter    | ✅  |
+| **Register Team**     | POST   | `/api/teams/register`                    | Lead       | ✅  |
+| Create Payment        | POST   | `/api/payments`                          | User       |     |
+| Process Refund        | POST   | `/api/admin/payments/:id/refund`         | Admin      |     |
+| Update Classification | POST   | `/api/admin/shooters/:id/classification` | Classifier |     |
+| **Get Leaderboard**   | GET    | `/api/leaderboard/live/:eventId`         | Public     | ✅  |
+| **Check Equipment**   | POST   | `/api/equipment/validate`                | Official   | ✅  |
+| **Allocate Medals**   | POST   | `/api/admin/medals/allocate/:eventId`    | Admin      | ✅  |
 
 ### Transaction Isolation Levels
 
-| Flow | Isolation Level | Reason |
-|------|----------------|---------|
-| User Registration | READ COMMITTED | Low contention |
+| Flow                         | Isolation Level     | Reason                   |
+| ---------------------------- | ------------------- | ------------------------ |
+| User Registration            | READ COMMITTED      | Low contention           |
 | **Competition Registration** | **REPEATABLE READ** | Prevent capacity overrun |
-| Score Submission | REPEATABLE READ | Prevent phantom reads |
-| Payment Processing | SERIALIZABLE | Money operations |
-| **Waitlist Promotion** | **SERIALIZABLE** | Critical ordering |
-| **Medal Allocation** | **SERIALIZABLE** | Final results |
+| Score Submission             | REPEATABLE READ     | Prevent phantom reads    |
+| Payment Processing           | SERIALIZABLE        | Money operations         |
+| **Waitlist Promotion**       | **SERIALIZABLE**    | Critical ordering        |
+| **Medal Allocation**         | **SERIALIZABLE**    | Final results            |
 
 ---
 

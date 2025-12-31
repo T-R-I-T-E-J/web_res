@@ -54,7 +54,7 @@ const ImportPermitPage = () => {
             <div>
               <h4 className="font-bold text-primary mb-1">Mandatory Requirement</h4>
               <p className="text-sm text-neutral-600">
-                All import permit applications require a valid <strong>NRAI Shooter ID Card</strong> and a <strong>Recommendation Letter</strong> from the Paralympic Committee of India (PCI).
+                All import permit applications require a valid <strong>NRAI Shooter ID Card</strong> and a <strong>Recommendation Letter</strong> from the Paralympic Committee of India.
               </p>
             </div>
           </div>

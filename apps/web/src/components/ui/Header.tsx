@@ -33,7 +33,8 @@ const navItems: NavItem[] = [
   },
   { label: 'Results', href: '/results' },
   { label: 'Media', href: '/media' },
-  { label: 'Criteria', href: '/downloads' },
+  { label: 'Policies', href: '/policies' },
+  { label: 'Classification', href: '/classification' },
   { label: 'Contact', href: '/contact' },
 ]
 
@@ -171,17 +172,18 @@ export const Header = () => {
         <div className="container-main relative flex items-center justify-center min-h-[160px]">
           <Link href="/" className="absolute left-0 top-1/2 -translate-y-1/2">
             <Image
-              src="/logo.png"
+              src="/pci-logo-test-1.png"
               alt="Paralympic Committee India - Para Shooting"
               width={67}
               height={62}
-              className="object-contain brightness-0 invert"
+              className="object-contain"
               priority
             />
           </Link>
           <div className="text-center pl-28 md:pl-0">
             <h1 className="font-heading text-2xl md:text-4xl font-bold text-white tracking-tight leading-tight uppercase">
-              STC Para Shooting (PCI)
+              STC Para Shooting<br />
+              Paralympic Committee of India
             </h1>
             <p className="text-blue-100 font-medium tracking-[0.2em] uppercase mt-1 text-xs md:text-sm">
               Empowering para-athletes to achieve excellence

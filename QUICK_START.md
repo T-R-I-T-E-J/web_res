@@ -11,7 +11,7 @@
 ### 1. Install Dependencies
 
 ```bash
-cd C:\Users\starl\.gemini\antigravity\scratch\failure-handling-tests
+cd .
 npm install
 ```
 
