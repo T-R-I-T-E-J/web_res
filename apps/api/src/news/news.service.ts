@@ -39,10 +39,11 @@ export class NewsService {
     const query = this.newsRepository
       .createQueryBuilder('news')
       .leftJoinAndSelect('news.author', 'author')
+      .where('news.deleted_at IS NULL')
       .orderBy('news.created_at', 'DESC');
 
     if (status) {
-      query.where('news.status = :status', { status });
+      query.andWhere('news.status = :status', { status });
     }
 
     return query.getMany();
@@ -98,6 +99,14 @@ export class NewsService {
   async remove(id: number): Promise<void> {
     const result = await this.newsRepository.softDelete(id);
     if (result.affected === 0) {
+      // Check if it exists but is already deleted
+      const exists = await this.newsRepository.findOne({
+        where: { id },
+        withDeleted: true,
+      });
+      if (exists && exists.deleted_at) {
+        return; // Already deleted, consider success
+      }
       throw new NotFoundException(`News article with ID ${id} not found`);
     }
   }
