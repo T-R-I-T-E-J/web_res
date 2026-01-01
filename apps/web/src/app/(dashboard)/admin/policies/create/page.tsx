@@ -66,58 +66,49 @@ export default function CreatePolicyPage() {
     return ext === 'DOCX' || ext === 'DOC' ? 'DOC' : ext
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+  const uploadDocument = async (token: string, apiUrl: string) => {
+    if (!file) return null;
+    
+    const uploadFormData = new FormData()
+    uploadFormData.append('document', file)
 
-    try {
-      const token = Cookies.get('auth_token')
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
-      let finalHref = formData.href
+    const uploadRes = await fetch(`${apiUrl}/upload/document`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: uploadFormData
+    })
 
-      // 1. Upload File if selected
-      if (uploadType === 'file' && file) {
-        const uploadFormData = new FormData()
-        uploadFormData.append('document', file)
+    if (!uploadRes.ok) {
+      throw new Error('File upload failed');
+    }
 
-        const uploadRes = await fetch(`${apiUrl}/upload/document`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
-          body: uploadFormData
-        })
+    const uploadJson = await uploadRes.json();
+    
+    // Defensive validation of response shape
+    if (typeof uploadJson !== 'object' || !uploadJson) {
+       throw new Error('Invalid response from upload server');
+    }
 
-        if (!uploadRes.ok) {
-          throw new Error('File upload failed');
-        }
+    // Check for direct URL or nested file object
+    let filename: string | undefined;
 
-        const uploadJson = await uploadRes.json();
-        
-        // Defensive validation of response shape
-        if (typeof uploadJson !== 'object' || !uploadJson) {
-           throw new Error('Invalid response from upload server');
-        }
+    if (uploadJson.data?.file?.filename) {
+      filename = uploadJson.data.file.filename;
+    } else if (uploadJson.file?.filename) {
+      filename = uploadJson.file.filename;
+    }
 
-        // Check for direct URL or nested file object
-        // The API returns data wrapped in a 'data' object due to TransformInterceptor
-        let filename: string | undefined;
+    if (!filename) {
+       console.error('Unexpected upload response:', uploadJson);
+       throw new Error('Upload successful but filename missing in response');
+    }
 
-        if (uploadJson.data && uploadJson.data.file && uploadJson.data.file.filename) {
-          filename = uploadJson.data.file.filename;
-        } else if (uploadJson.file && uploadJson.file.filename) {
-          filename = uploadJson.file.filename;
-        }
+    return `/uploads/documents/${filename}`;
+  }
 
-        if (!filename) {
-           console.error('Unexpected upload response:', uploadJson);
-           throw new Error('Upload successful but filename missing in response');
-        }
-
-        finalHref = `/uploads/documents/${filename}`;
-      }
-
-      // 2. Create Download Entry
+  const createDownloadEntry = async (finalHref: string, token: string, apiUrl: string) => {
       const payload = {
         ...formData,
         href: finalHref,
@@ -140,6 +131,28 @@ export default function CreatePolicyPage() {
         const error = await res.text()
         alert(`Failed to create: ${error}`)
       }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+
+    try {
+      const token = Cookies.get('auth_token')
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
+      
+      if (!token) throw new Error('Authentication token missing');
+
+      let finalHref = formData.href
+
+      // 1. Upload File if selected
+      if (uploadType === 'file' && file) {
+        const uploadedPath = await uploadDocument(token, apiUrl);
+        if (uploadedPath) finalHref = uploadedPath;
+      }
+
+      // 2. Create Download Entry
+      await createDownloadEntry(finalHref, token, apiUrl);
 
     } catch (error) {
       console.error('Error creating document:', error)

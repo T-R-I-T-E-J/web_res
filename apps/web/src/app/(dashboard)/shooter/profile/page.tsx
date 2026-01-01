@@ -3,9 +3,9 @@
 import { useState } from 'react'
 import { DashboardHeader } from '@/components/dashboard'
 import { 
-  User, Mail, Phone, MapPin, Calendar, Shield, Save, 
-  Camera, AlertCircle, CheckCircle, CreditCard, 
-  FileText, Briefcase, Globe, Info
+  User, MapPin, Camera, Shield, Save, 
+  CheckCircle,
+  Briefcase, Globe, Info, FileText
 } from 'lucide-react'
 import clsx from 'clsx'
 
@@ -25,11 +25,340 @@ const classifications = [
   { code: 'VI3', description: 'Visual impairment class 3 (Least severe)' },
 ]
 
+interface ShooterProfileData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  dateOfBirth: string;
+  gender: string;
+  bloodGroup: string;
+  nationality: string;
+  guardianName: string;
+  guardianRelation: string;
+  guardianPhone: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  district: string;
+  passportNumber: string;
+  passportExpiry: string;
+  placeOfIssue: string;
+  classification: string;
+  psciId: string;
+  membership: string;
+  memberSince: string;
+}
+
+interface TabProps {
+  formData: ShooterProfileData;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
+  isEditing: boolean;
+}
+
+const PersonalTab = ({ formData, handleChange, isEditing }: TabProps) => (
+  <div className="space-y-6">
+    <h3 className="font-heading font-semibold text-lg text-primary flex items-center gap-2">
+      <User className="w-5 h-5" />
+      Personal Information
+    </h3>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div>
+        <label className="label">First Name</label>
+        <input
+          type="text"
+          name="firstName"
+          value={formData.firstName}
+          onChange={handleChange}
+          disabled={!isEditing}
+          className={clsx('input', !isEditing && 'bg-neutral-50')}
+        />
+      </div>
+      <div>
+        <label className="label">Last Name</label>
+        <input
+          type="text"
+          name="lastName"
+          value={formData.lastName}
+          onChange={handleChange}
+          disabled={!isEditing}
+          className={clsx('input', !isEditing && 'bg-neutral-50')}
+        />
+      </div>
+      <div>
+        <label className="label">Date of Birth</label>
+        <input
+          type="date"
+          name="dateOfBirth"
+          value={formData.dateOfBirth}
+          onChange={handleChange}
+          disabled={!isEditing}
+          className={clsx('input', !isEditing && 'bg-neutral-50')}
+        />
+      </div>
+      <div>
+        <label className="label">Gender</label>
+        <select
+          name="gender"
+          value={formData.gender}
+          onChange={handleChange}
+          disabled={!isEditing}
+          className={clsx('input', !isEditing && 'bg-neutral-50')}
+        >
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div>
+        <label className="label">Blood Group</label>
+        <input
+          type="text"
+          name="bloodGroup"
+          value={formData.bloodGroup}
+          onChange={handleChange}
+          disabled={!isEditing}
+          className={clsx('input', !isEditing && 'bg-neutral-50')}
+        />
+      </div>
+      <div>
+        <label className="label">Nationality</label>
+        <input
+          type="text"
+          name="nationality"
+          value={formData.nationality}
+          onChange={handleChange}
+          disabled={!isEditing}
+          className={clsx('input', !isEditing && 'bg-neutral-50')}
+        />
+      </div>
+      <div className="lg:col-span-2">
+        <label className="label">Email Address</label>
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          disabled={!isEditing}
+          className={clsx('input', !isEditing && 'bg-neutral-50')}
+        />
+      </div>
+      <div>
+        <label className="label">Phone Number</label>
+        <input
+          type="tel"
+          name="phone"
+          value={formData.phone}
+          onChange={handleChange}
+          disabled={!isEditing}
+          className={clsx('input', !isEditing && 'bg-neutral-50')}
+        />
+      </div>
+    </div>
+  </div>
+)
+
+const GuardianTab = ({ formData, handleChange, isEditing }: TabProps) => (
+  <div className="space-y-6">
+    <h3 className="font-heading font-semibold text-lg text-primary flex items-center gap-2">
+      <Briefcase className="w-5 h-5" />
+      Parent/Guardian Details
+    </h3>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label className="label">Guardian Name</label>
+        <input
+          type="text"
+          name="guardianName"
+          value={formData.guardianName}
+          onChange={handleChange}
+          disabled={!isEditing}
+          className={clsx('input', !isEditing && 'bg-neutral-50')}
+        />
+      </div>
+      <div>
+        <label className="label">Relationship</label>
+        <select
+          name="guardianRelation"
+          value={formData.guardianRelation}
+          onChange={handleChange}
+          disabled={!isEditing}
+          className={clsx('input', !isEditing && 'bg-neutral-50')}
+        >
+          <option value="Father">Father</option>
+          <option value="Mother">Mother</option>
+          <option value="Spouse">Spouse</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div>
+        <label className="label">Guardian Phone</label>
+        <input
+          type="tel"
+          name="guardianPhone"
+          value={formData.guardianPhone}
+          onChange={handleChange}
+          disabled={!isEditing}
+          className={clsx('input', !isEditing && 'bg-neutral-50')}
+        />
+      </div>
+    </div>
+  </div>
+)
+
+const AddressTab = ({ formData, handleChange, isEditing }: TabProps) => (
+  <div className="space-y-6">
+    <h3 className="font-heading font-semibold text-lg text-primary flex items-center gap-2">
+      <MapPin className="w-5 h-5" />
+      Address Details
+    </h3>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="md:col-span-2 lg:col-span-3">
+        <label className="label">Communication Address</label>
+        <textarea
+          name="address"
+          value={formData.address}
+          onChange={handleChange}
+          disabled={!isEditing}
+          rows={3}
+          className={clsx('input', !isEditing && 'bg-neutral-50')}
+        />
+      </div>
+      <div>
+        <label className="label">City</label>
+        <input
+          type="text"
+          name="city"
+          value={formData.city}
+          onChange={handleChange}
+          disabled={!isEditing}
+          className={clsx('input', !isEditing && 'bg-neutral-50')}
+        />
+      </div>
+      <div>
+        <label className="label">District</label>
+        <input
+          type="text"
+          name="district"
+          value={formData.district}
+          onChange={handleChange}
+          disabled={!isEditing}
+          className={clsx('input', !isEditing && 'bg-neutral-50')}
+        />
+      </div>
+      <div>
+        <label className="label">State</label>
+        <input
+          type="text"
+          name="state"
+          value={formData.state}
+          onChange={handleChange}
+          disabled={!isEditing}
+          className={clsx('input', !isEditing && 'bg-neutral-50')}
+        />
+      </div>
+      <div>
+        <label className="label">Pincode</label>
+        <input
+          type="text"
+          name="pincode"
+          value={formData.pincode}
+          onChange={handleChange}
+          disabled={!isEditing}
+          className={clsx('input', !isEditing && 'bg-neutral-50')}
+        />
+      </div>
+    </div>
+  </div>
+)
+
+const PassportTab = ({ formData, handleChange, isEditing }: TabProps) => (
+  <div className="space-y-6">
+    <h3 className="font-heading font-semibold text-lg text-primary flex items-center gap-2">
+      <Globe className="w-5 h-5" />
+      Passport Information
+    </h3>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div>
+        <label className="label">Passport Number</label>
+        <input
+          type="text"
+          name="passportNumber"
+          value={formData.passportNumber}
+          onChange={handleChange}
+          disabled={!isEditing}
+          className={clsx('input font-data', !isEditing && 'bg-neutral-50')}
+        />
+      </div>
+      <div>
+        <label className="label">Date of Expiry</label>
+        <input
+          type="date"
+          name="passportExpiry"
+          value={formData.passportExpiry}
+          onChange={handleChange}
+          disabled={!isEditing}
+          className={clsx('input', !isEditing && 'bg-neutral-50')}
+        />
+      </div>
+      <div>
+        <label className="label">Place of Issue</label>
+        <input
+          type="text"
+          name="placeOfIssue"
+          value={formData.placeOfIssue}
+          onChange={handleChange}
+          disabled={!isEditing}
+          className={clsx('input', !isEditing && 'bg-neutral-50')}
+        />
+      </div>
+    </div>
+    <div className="bg-neutral-50 p-4 rounded-card border border-neutral-200">
+      <p className="text-sm text-neutral-600 flex items-center gap-2">
+        <Info className="w-4 h-4 text-primary" />
+        Passport details are mandatory for participation in international competitions.
+      </p>
+    </div>
+  </div>
+)
+
+const MediaTab = () => (
+    <div className="space-y-8">
+    <h3 className="font-heading font-semibold text-lg text-primary flex items-center gap-2">
+        <Camera className="w-5 h-5" />
+        Photo & Signature
+    </h3>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="space-y-4">
+        <label className="label">Profile Photo</label>
+        <div className="border-2 border-dashed border-neutral-200 rounded-card p-8 text-center bg-neutral-50">
+            <div className="w-32 h-40 bg-neutral-200 mx-auto mb-4 flex items-center justify-center">
+            <User className="w-16 h-16 text-neutral-400" />
+            </div>
+            <button className="btn-outline text-sm">Upload Photo</button>
+            <p className="text-xs text-neutral-500 mt-2">Max 2MB, JPG/PNG only</p>
+        </div>
+        </div>
+        <div className="space-y-4">
+        <label className="label">Specimen Signature</label>
+        <div className="border-2 border-dashed border-neutral-200 rounded-card p-8 text-center bg-neutral-50">
+            <div className="w-48 h-24 bg-neutral-200 mx-auto mb-4 flex items-center justify-center">
+            <FileText className="w-10 h-10 text-neutral-400" />
+            </div>
+            <button className="btn-outline text-sm">Upload Signature</button>
+            <p className="text-xs text-neutral-500 mt-2">Max 1MB, JPG/PNG only</p>
+        </div>
+        </div>
+    </div>
+    </div>
+)
+
 const ShooterProfilePage = () => {
   const [activeTab, setActiveTab] = useState('personal')
   const [isEditing, setIsEditing] = useState(false)
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ShooterProfileData>({
     // Personal
     firstName: 'Avani',
     lastName: 'Lekhara',
@@ -70,6 +399,23 @@ const ShooterProfilePage = () => {
 
   const handleSave = () => {
     setIsEditing(false)
+  }
+
+  const renderTabContent = () => {
+      switch (activeTab) {
+          case 'personal':
+              return <PersonalTab formData={formData} handleChange={handleChange} isEditing={isEditing} />;
+          case 'guardian':
+              return <GuardianTab formData={formData} handleChange={handleChange} isEditing={isEditing} />;
+          case 'address':
+            return <AddressTab formData={formData} handleChange={handleChange} isEditing={isEditing} />;
+          case 'passport':
+            return <PassportTab formData={formData} handleChange={handleChange} isEditing={isEditing} />;
+          case 'media':
+            return <MediaTab />;
+          default:
+              return null;
+      }
   }
 
   return (
@@ -147,302 +493,7 @@ const ShooterProfilePage = () => {
 
         {/* Tab Content */}
         <div className="card">
-          {activeTab === 'personal' && (
-            <div className="space-y-6">
-              <h3 className="font-heading font-semibold text-lg text-primary flex items-center gap-2">
-                <User className="w-5 h-5" />
-                Personal Information
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div>
-                  <label className="label">First Name</label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className={clsx('input', !isEditing && 'bg-neutral-50')}
-                  />
-                </div>
-                <div>
-                  <label className="label">Last Name</label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className={clsx('input', !isEditing && 'bg-neutral-50')}
-                  />
-                </div>
-                <div>
-                  <label className="label">Date of Birth</label>
-                  <input
-                    type="date"
-                    name="dateOfBirth"
-                    value={formData.dateOfBirth}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className={clsx('input', !isEditing && 'bg-neutral-50')}
-                  />
-                </div>
-                <div>
-                  <label className="label">Gender</label>
-                  <select
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className={clsx('input', !isEditing && 'bg-neutral-50')}
-                  >
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="label">Blood Group</label>
-                  <input
-                    type="text"
-                    name="bloodGroup"
-                    value={formData.bloodGroup}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className={clsx('input', !isEditing && 'bg-neutral-50')}
-                  />
-                </div>
-                <div>
-                  <label className="label">Nationality</label>
-                  <input
-                    type="text"
-                    name="nationality"
-                    value={formData.nationality}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className={clsx('input', !isEditing && 'bg-neutral-50')}
-                  />
-                </div>
-                <div className="lg:col-span-2">
-                  <label className="label">Email Address</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className={clsx('input', !isEditing && 'bg-neutral-50')}
-                  />
-                </div>
-                <div>
-                  <label className="label">Phone Number</label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className={clsx('input', !isEditing && 'bg-neutral-50')}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'guardian' && (
-            <div className="space-y-6">
-              <h3 className="font-heading font-semibold text-lg text-primary flex items-center gap-2">
-                <Briefcase className="w-5 h-5" />
-                Parent/Guardian Details
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="label">Guardian Name</label>
-                  <input
-                    type="text"
-                    name="guardianName"
-                    value={formData.guardianName}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className={clsx('input', !isEditing && 'bg-neutral-50')}
-                  />
-                </div>
-                <div>
-                  <label className="label">Relationship</label>
-                  <select
-                    name="guardianRelation"
-                    value={formData.guardianRelation}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className={clsx('input', !isEditing && 'bg-neutral-50')}
-                  >
-                    <option value="Father">Father</option>
-                    <option value="Mother">Mother</option>
-                    <option value="Spouse">Spouse</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="label">Guardian Phone</label>
-                  <input
-                    type="tel"
-                    name="guardianPhone"
-                    value={formData.guardianPhone}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className={clsx('input', !isEditing && 'bg-neutral-50')}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'address' && (
-            <div className="space-y-6">
-              <h3 className="font-heading font-semibold text-lg text-primary flex items-center gap-2">
-                <MapPin className="w-5 h-5" />
-                Address Details
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="md:col-span-2 lg:col-span-3">
-                  <label className="label">Communication Address</label>
-                  <textarea
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    rows={3}
-                    className={clsx('input', !isEditing && 'bg-neutral-50')}
-                  />
-                </div>
-                <div>
-                  <label className="label">City</label>
-                  <input
-                    type="text"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className={clsx('input', !isEditing && 'bg-neutral-50')}
-                  />
-                </div>
-                <div>
-                  <label className="label">District</label>
-                  <input
-                    type="text"
-                    name="district"
-                    value={formData.district}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className={clsx('input', !isEditing && 'bg-neutral-50')}
-                  />
-                </div>
-                <div>
-                  <label className="label">State</label>
-                  <input
-                    type="text"
-                    name="state"
-                    value={formData.state}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className={clsx('input', !isEditing && 'bg-neutral-50')}
-                  />
-                </div>
-                <div>
-                  <label className="label">Pincode</label>
-                  <input
-                    type="text"
-                    name="pincode"
-                    value={formData.pincode}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className={clsx('input', !isEditing && 'bg-neutral-50')}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'passport' && (
-            <div className="space-y-6">
-              <h3 className="font-heading font-semibold text-lg text-primary flex items-center gap-2">
-                <Globe className="w-5 h-5" />
-                Passport Information
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div>
-                  <label className="label">Passport Number</label>
-                  <input
-                    type="text"
-                    name="passportNumber"
-                    value={formData.passportNumber}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className={clsx('input font-data', !isEditing && 'bg-neutral-50')}
-                  />
-                </div>
-                <div>
-                  <label className="label">Date of Expiry</label>
-                  <input
-                    type="date"
-                    name="passportExpiry"
-                    value={formData.passportExpiry}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className={clsx('input', !isEditing && 'bg-neutral-50')}
-                  />
-                </div>
-                <div>
-                  <label className="label">Place of Issue</label>
-                  <input
-                    type="text"
-                    name="placeOfIssue"
-                    value={formData.placeOfIssue}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className={clsx('input', !isEditing && 'bg-neutral-50')}
-                  />
-                </div>
-              </div>
-              <div className="bg-neutral-50 p-4 rounded-card border border-neutral-200">
-                <p className="text-sm text-neutral-600 flex items-center gap-2">
-                  <Info className="w-4 h-4 text-primary" />
-                  Passport details are mandatory for participation in international competitions.
-                </p>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'media' && (
-            <div className="space-y-8">
-              <h3 className="font-heading font-semibold text-lg text-primary flex items-center gap-2">
-                <Camera className="w-5 h-5" />
-                Photo & Signature
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                <div className="space-y-4">
-                  <label className="label">Profile Photo</label>
-                  <div className="border-2 border-dashed border-neutral-200 rounded-card p-8 text-center bg-neutral-50">
-                    <div className="w-32 h-40 bg-neutral-200 mx-auto mb-4 flex items-center justify-center">
-                      <User className="w-16 h-16 text-neutral-400" />
-                    </div>
-                    <button className="btn-outline text-sm">Upload Photo</button>
-                    <p className="text-xs text-neutral-500 mt-2">Max 2MB, JPG/PNG only</p>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <label className="label">Specimen Signature</label>
-                  <div className="border-2 border-dashed border-neutral-200 rounded-card p-8 text-center bg-neutral-50">
-                    <div className="w-48 h-24 bg-neutral-200 mx-auto mb-4 flex items-center justify-center">
-                      <FileText className="w-10 h-10 text-neutral-400" />
-                    </div>
-                    <button className="btn-outline text-sm">Upload Signature</button>
-                    <p className="text-xs text-neutral-500 mt-2">Max 1MB, JPG/PNG only</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+          {renderTabContent()}
         </div>
 
         {/* Classification Summary Card */}
@@ -471,3 +522,4 @@ const ShooterProfilePage = () => {
 }
 
 export default ShooterProfilePage
+
