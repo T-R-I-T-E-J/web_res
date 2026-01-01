@@ -29,117 +29,17 @@ async function migrateUsers() {
     await client.connect();
     console.log('✅ Connected to database\n');
 
-    // Get all users with unencrypted data
-    const result = await client.query(`
-      SELECT id, email, phone 
-      FROM users 
-      WHERE encrypted_email IS NULL 
-         OR encrypted_phone IS NULL
-      ORDER BY id
-    `);
-
-    const users = result.rows;
-    console.log(`Found ${users.length} users to encrypt\n`);
-
+    const users = await getUnencryptedUsers(client);
     if (users.length === 0) {
       console.log('✅ No users need encryption. Migration complete!\n');
       return;
     }
 
-    let successCount = 0;
-    let errorCount = 0;
+    const { successCount, errorCount } = await processUsers(client, users);
 
-    // Encrypt each user's data
-    for (const user of users) {
-      try {
-        const updates = [];
-        const values = [];
-        let paramIndex = 1;
-
-        // Encrypt email if exists and not already encrypted
-        if (user.email && !user.encrypted_email) {
-          const encryptedEmail = CryptoJS.AES.encrypt(
-            user.email,
-            ENCRYPTION_KEY
-          ).toString();
-          updates.push(`encrypted_email = $${paramIndex++}`);
-          values.push(encryptedEmail);
-        }
-
-        // Encrypt phone if exists and not already encrypted
-        if (user.phone && !user.encrypted_phone) {
-          const encryptedPhone = CryptoJS.AES.encrypt(
-            user.phone,
-            ENCRYPTION_KEY
-          ).toString();
-          updates.push(`encrypted_phone = $${paramIndex++}`);
-          values.push(encryptedPhone);
-        }
-
-        if (updates.length > 0) {
-          values.push(user.id);
-          await client.query(
-            `UPDATE users SET ${updates.join(', ')} WHERE id = $${paramIndex}`,
-            values
-          );
-
-          console.log(`✅ Encrypted user ID ${user.id}`);
-          successCount++;
-        }
-      } catch (error) {
-        console.error(`❌ Error encrypting user ID ${user.id}:`, error.message);
-        errorCount++;
-      }
-    }
-
-    console.log('\n========================================');
-    console.log('Migration Summary');
-    console.log('========================================');
-    console.log(`Total users processed: ${users.length}`);
-    console.log(`✅ Successfully encrypted: ${successCount}`);
-    console.log(`❌ Errors: ${errorCount}`);
-    console.log('========================================\n');
-
-    // Verify encryption
-    console.log('Verifying encryption...\n');
-    const verifyResult = await client.query(`
-      SELECT id, email, encrypted_email, phone, encrypted_phone
-      FROM users
-      WHERE encrypted_email IS NOT NULL
-      LIMIT 5
-    `);
-
-    for (const user of verifyResult.rows) {
-      let emailMatch = false;
-      let phoneMatch = false;
-
-      if (user.encrypted_email) {
-        const decryptedEmail = CryptoJS.AES.decrypt(
-          user.encrypted_email,
-          ENCRYPTION_KEY
-        ).toString(CryptoJS.enc.Utf8);
-        emailMatch = decryptedEmail === user.email;
-        console.log(`User ${user.id} - Email: ${emailMatch ? '✅' : '❌'}`);
-      }
-
-      if (user.encrypted_phone) {
-        const decryptedPhone = CryptoJS.AES.decrypt(
-          user.encrypted_phone,
-          ENCRYPTION_KEY
-        ).toString(CryptoJS.enc.Utf8);
-        phoneMatch = decryptedPhone === user.phone;
-        console.log(`User ${user.id} - Phone: ${phoneMatch ? '✅' : '❌'}`);
-      }
-    }
-
-    console.log('\n✅ Migration completed successfully!\n');
-    console.log('⚠️  NEXT STEPS:');
-    console.log('1. Verify all data is encrypted correctly');
-    console.log('2. Update application code to use encrypted fields');
-    console.log('3. Test thoroughly in staging environment');
-    console.log('4. After verification, drop old columns:');
-    console.log('   ALTER TABLE users DROP COLUMN email;');
-    console.log('   ALTER TABLE users DROP COLUMN phone;\n');
+    logSummary(users.length, successCount, errorCount);
+    await verifyEncryption(client);
+    logNextSteps();
 
   } catch (error) {
     console.error('❌ Migration failed:', error);
@@ -148,6 +48,129 @@ async function migrateUsers() {
     await client.end();
     console.log('Disconnected from database\n');
   }
+}
+
+async function getUnencryptedUsers(client) {
+  const result = await client.query(`
+    SELECT id, email, phone 
+    FROM users 
+    WHERE encrypted_email IS NULL 
+       OR encrypted_phone IS NULL
+    ORDER BY id
+  `);
+  const users = result.rows;
+  console.log(`Found ${users.length} users to encrypt\n`);
+  return users;
+}
+
+async function processUsers(client, users) {
+  let successCount = 0;
+  let errorCount = 0;
+
+  for (const user of users) {
+    try {
+      const wasUpdated = await encryptAndSaveUser(client, user);
+      if (wasUpdated) successCount++;
+    } catch (error) {
+      console.error(`❌ Error encrypting user ID ${user.id}:`, error.message);
+      errorCount++;
+    }
+  }
+
+  return { successCount, errorCount };
+}
+
+async function encryptAndSaveUser(client, user) {
+  const { updates, values } = prepareUpdateData(user);
+
+  if (updates.length > 0) {
+    values.push(user.id);
+    await client.query(
+      `UPDATE users SET ${updates.join(', ')} WHERE id = $${values.length}`,
+      values
+    );
+
+    console.log(`✅ Encrypted user ID ${user.id}`);
+    return true;
+  }
+  return false;
+}
+
+function prepareUpdateData(user) {
+  const updates = [];
+  const values = [];
+  let paramIndex = 1;
+
+  if (shouldEncrypt(user.email, user.encrypted_email)) {
+    updates.push(`encrypted_email = $${paramIndex++}`);
+    values.push(encryptData(user.email));
+  }
+
+  if (shouldEncrypt(user.phone, user.encrypted_phone)) {
+    updates.push(`encrypted_phone = $${paramIndex++}`);
+    values.push(encryptData(user.phone));
+  }
+
+  return { updates, values };
+}
+
+function shouldEncrypt(original, encrypted) {
+  return original && !encrypted;
+}
+
+function encryptData(text) {
+  return CryptoJS.AES.encrypt(text, ENCRYPTION_KEY).toString();
+}
+
+function decryptData(ciphertext) {
+  return CryptoJS.AES.decrypt(ciphertext, ENCRYPTION_KEY).toString(CryptoJS.enc.Utf8);
+}
+
+function logSummary(total, success, error) {
+  console.log('\n========================================');
+  console.log('Migration Summary');
+  console.log('========================================');
+  console.log(`Total users processed: ${total}`);
+  console.log(`✅ Successfully encrypted: ${success}`);
+  console.log(`❌ Errors: ${error}`);
+  console.log('========================================\n');
+}
+
+async function verifyEncryption(client) {
+  console.log('Verifying encryption...\n');
+  const verifyResult = await client.query(`
+    SELECT id, email, encrypted_email, phone, encrypted_phone
+    FROM users
+    WHERE encrypted_email IS NOT NULL
+    LIMIT 5
+  `);
+
+  for (const user of verifyResult.rows) {
+    verifyUserEncryption(user);
+  }
+}
+
+function verifyUserEncryption(user) {
+  if (user.encrypted_email) {
+    const isMatch = decryptData(user.encrypted_email) === user.email;
+    console.log(`User ${user.id} - Email: ${isMatch ? '✅' : '❌'}`);
+  }
+
+  if (user.encrypted_phone) {
+    const isMatch = decryptData(user.encrypted_phone) === user.phone;
+    console.log(`User ${user.id} - Phone: ${isMatch ? '✅' : '❌'}`);
+  }
+}
+
+function logNextSteps() {
+  console.log('\n✅ Migration completed successfully!\n');
+  console.log('⚠️  NEXT STEPS:');
+  console.log('1. Verify all data is encrypted correctly');
+  console.log('2. Update application code to use encrypted fields');
+  console.log('3. Test thoroughly in staging environment');
+  console.log('4. After verification, drop old columns:');
+  console.log('   ALTER TABLE users DROP COLUMN email;');
+  console.log('   ALTER TABLE users DROP COLUMN phone;\n');
 }
 
 // Run migration
