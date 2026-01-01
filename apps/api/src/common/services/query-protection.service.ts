@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
 @Injectable()
-export class QueryProtectionService {
+export class QueryProtectionService implements OnModuleInit {
+  private readonly logger = new Logger(QueryProtectionService.name);
+
   // Dangerous SQL keywords that might indicate injection
   private readonly DANGEROUS_KEYWORDS = [
     'DROP',
@@ -29,22 +31,32 @@ export class QueryProtectionService {
   // Maximum query execution time (milliseconds)
   private readonly MAX_QUERY_TIME = 30000; // 30 seconds
 
-  constructor(@InjectDataSource() private dataSource: DataSource) {
-    this.setupQueryMonitoring();
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
+
+  async onModuleInit() {
+    await this.setupQueryMonitoring();
   }
 
   /**
    * Setup query monitoring and protection
    */
-  private setupQueryMonitoring(): void {
-    // Set statement timeout in PostgreSQL
-    this.dataSource.query(`SET statement_timeout = ${this.MAX_QUERY_TIME}`);
+  private async setupQueryMonitoring(): Promise<void> {
+    try {
+      // Set statement timeout in PostgreSQL
+      await this.dataSource.query(
+        `SET statement_timeout = ${this.MAX_QUERY_TIME}`,
+      );
 
-    // Set lock timeout
-    this.dataSource.query('SET lock_timeout = 10000'); // 10 seconds
+      // Set lock timeout
+      await this.dataSource.query('SET lock_timeout = 10000'); // 10 seconds
 
-    // Set idle in transaction timeout
-    this.dataSource.query('SET idle_in_transaction_session_timeout = 60000'); // 1 minute
+      // Set idle in transaction timeout
+      await this.dataSource.query(
+        'SET idle_in_transaction_session_timeout = 60000',
+      ); // 1 minute
+    } catch (error) {
+      this.logger.error('Failed to setup query protection settings', error);
+    }
   }
 
   /**
@@ -67,10 +79,10 @@ export class QueryProtectionService {
 
     // Check for common SQL injection patterns
     const injectionPatterns = [
-      /(\%27)|(\')|(\-\-)|(\%23)|(#)/i, // SQL meta-characters
-      /((\%3D)|(=))[^\n]*((\%27)|(\')|(\-\-)|(\%3B)|(;))/i, // Typical SQL injection
-      /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))/i, // 'or' pattern
-      /((\%27)|(\'))union/i, // UNION keyword
+      /(%27)|(')|(--)|(%23)|(#)/i, // SQL meta-characters
+      /((%3D)|(=))[^\n]*((%27)|(')|(--)|(%3B)|(;))/i, // Typical SQL injection
+      /\w*((%27)|('))((%6F)|o|(%4F))((%72)|r|(%52))/i, // 'or' pattern
+      /((%27)|('))union/i, // UNION keyword
       /exec(\s|\+)+(s|x)p\w+/i, // Stored procedure execution
     ];
 
@@ -111,13 +123,16 @@ export class QueryProtectionService {
   async killLongRunningQueries(): Promise<number> {
     const maxDuration = this.MAX_QUERY_TIME / 1000; // Convert to seconds
 
-    const result = await this.dataSource.query(`
+    // Explicitly type the result as an array of any (or specific shape if known)
+    // pg_terminate_backend usually returns boolean, but here we select it from a table?
+    // The query selects pg_terminate_backend(pid), so it returns rows [{ pg_terminate_backend: boolean }]
+    const result = (await this.dataSource.query(`
       SELECT pg_terminate_backend(pid)
       FROM pg_stat_activity
       WHERE state = 'active'
         AND (now() - query_start) > interval '${maxDuration} seconds'
         AND pid <> pg_backend_pid()
-    `);
+    `)) as Array<any>;
 
     const killedCount = result.length;
 
@@ -155,36 +170,37 @@ export class QueryProtectionService {
    * Kill specific query by PID
    */
   async killQuery(pid: number): Promise<boolean> {
-    const result = await this.dataSource.query(
+    const result = (await this.dataSource.query(
       'SELECT pg_terminate_backend($1)',
       [pid],
-    );
+    )) as Array<{ pg_terminate_backend: boolean }>;
 
     console.warn(`[SECURITY] Killed query with PID ${pid}`);
-    return result[0].pg_terminate_backend;
+    return result[0]?.pg_terminate_backend ?? false;
   }
 
   /**
    * Get connection count
    */
   async getConnectionCount(): Promise<number> {
-    const result = await this.dataSource.query(
+    const result = (await this.dataSource.query(
       'SELECT count(*) as count FROM pg_stat_activity',
-    );
-    return Number.parseInt(result[0].count, 10);
+    )) as Array<{ count: string }>;
+
+    return Number.parseInt(result[0]?.count ?? '0', 10);
   }
 
   /**
    * Kill idle connections
    */
   async killIdleConnections(idleMinutes = 30): Promise<number> {
-    const result = await this.dataSource.query(`
+    const result = (await this.dataSource.query(`
       SELECT pg_terminate_backend(pid)
       FROM pg_stat_activity
       WHERE state = 'idle'
         AND (now() - state_change) > interval '${idleMinutes} minutes'
         AND pid <> pg_backend_pid()
-    `);
+    `)) as Array<any>;
 
     const killedCount = result.length;
 
