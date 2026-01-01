@@ -57,6 +57,9 @@ export class NewsArticle {
   @Column({ type: 'jsonb', default: [] })
   image_urls: string[];
 
+  @Column({ type: 'jsonb', default: [] })
+  documents: { url: string; name: string }[];
+
   @Column({
     type: 'varchar',
     length: 50,

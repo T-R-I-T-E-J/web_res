@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { DashboardHeader } from '@/components/dashboard'
-import { ArrowLeft, Loader2, Save, Plus, X } from 'lucide-react'
+import { ArrowLeft, Loader2, Save, Plus, X, FileText } from 'lucide-react'
 import Cookies from 'js-cookie'
 
 export default function EditNewsPage({ params }: { params: { id: string } }) {
@@ -19,6 +19,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
     status: 'draft',
     featured_image_url: '',
     preview_image_url: '',
+    documents: [] as { url: string; name: string }[],
     image_urls: [''] as string[],
     tags: '',
     is_featured: false,
@@ -47,6 +48,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
             status: data.status || 'draft',
             featured_image_url: data.featured_image_url || '',
             preview_image_url: data.preview_image_url || '',
+            documents: Array.isArray(data.documents) ? data.documents : [],
             image_urls: Array.isArray(data.image_urls) && data.image_urls.length > 0 ? data.image_urls : [''],
             tags: Array.isArray(data.tags) ? data.tags.join(', ') : '',
             is_featured: data.is_featured || false,
@@ -79,6 +81,69 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
       [name]: val,
     }))
   }
+
+  const handleFeaturedImageUpload = async (file: File | undefined) => {
+    if (!file) return;
+
+    try {
+      const token = Cookies.get('auth_token');
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/file`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: uploadFormData,
+      });
+
+      if (!res.ok) throw new Error('Upload failed');
+      const responseJson = await res.json();
+      const uploadedData = responseJson.data;
+
+      if (!uploadedData?.file) throw new Error('Invalid server response');
+      
+      const apiBaseUrl = new URL(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1').origin;
+      const fullUrl = `${apiBaseUrl}${uploadedData.file.url}`;
+      
+      setFormData((prev) => ({ ...prev, featured_image_url: fullUrl }));
+    } catch (error) {
+      console.error(error);
+      alert('Failed to upload featured image');
+    }
+  };
+
+  const handleDocumentUpload = async (file: File | undefined) => {
+    if (!file) return;
+
+    try {
+      const token = Cookies.get('auth_token');
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/file`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: uploadFormData,
+      });
+
+      if (!res.ok) throw new Error('Upload failed');
+      const responseJson = await res.json();
+      const uploadedData = responseJson.data;
+
+      if (!uploadedData?.file) throw new Error('Invalid server response');
+      
+      const apiBaseUrl = new URL(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1').origin;
+      const fullUrl = `${apiBaseUrl}${uploadedData.file.url}`;
+      
+      setFormData((prev) => ({ 
+        ...prev, 
+        documents: [...prev.documents, { url: fullUrl, name: file.name }]
+      }));
+    } catch (error) {
+      console.error(error);
+      alert('Failed to upload document');
+    }
+  };
 
   const handleImageUrlChange = (index: number, value: string) => {
     const newImageUrls = [...formData.image_urls]
@@ -148,15 +213,11 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
     }
   };
 
-  const addImageUrl = () => {
-    setFormData((prev) => ({ ...prev, image_urls: [...prev.image_urls, ''] }))
-  }
-
-  const removeImageUrl = (index: number) => {
-    if (formData.image_urls.length > 1) {
-      const newImageUrls = formData.image_urls.filter((_, i) => i !== index)
-      setFormData((prev) => ({ ...prev, image_urls: newImageUrls }))
-    }
+  const removeDocument = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      documents: prev.documents.filter((_, i) => i !== index)
+    }));
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -168,7 +229,9 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
       const payload = {
         ...formData,
         tags: formData.tags.split(',').map((t) => t.trim()).filter(Boolean),
-        image_urls: formData.image_urls.filter((url) => url.trim() !== ''),
+        image_urls: [],
+        featured_image_url: formData.featured_image_url,
+        documents: formData.documents,
       }
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/news/${params.id}`, {
@@ -303,54 +366,80 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <label className="text-sm font-medium text-neutral-700">Image Uploads</label>
-                <div className="space-y-3">
-                  {formData.image_urls.map((url, index) => (
-                    <div key={index} className="flex flex-col gap-2">
-                      <div className="flex gap-2 items-center">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => handleImageUpload(index, e.target.files?.[0])}
-                          className="input w-full p-2"
-                        />
-                        {formData.image_urls.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => removeImageUrl(index)}
-                            className="btn-secondary px-3"
-                            title="Remove URL"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                      {url && (
-                        <div className="relative mt-2 h-40 w-full overflow-hidden rounded-md border border-neutral-200 bg-neutral-50">
-                          <img
-                            key={url}
-                            src={url}
-                            alt={`Preview ${index + 1}`}
-                            className="h-full w-full object-contain"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).style.display = 'none';
-                            }}
-                          />
-                        </div>
-                      )}
+                <label className="text-sm font-medium text-neutral-700">Featured Image (Banner)</label>
+                <div className="flex flex-col gap-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFeaturedImageUpload(e.target.files?.[0])}
+                    className="input w-full p-2"
+                  />
+                  {formData.featured_image_url && (
+                    <div className="relative mt-2 h-40 w-full overflow-hidden rounded-md border border-neutral-200 bg-neutral-50">
+                      <img
+                        src={formData.featured_image_url}
+                        alt="Featured Banner"
+                        className="h-full w-full object-cover"
+                      />
+                       <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, featured_image_url: '' }))}
+                        className="absolute top-2 right-2 bg-white/80 p-1 rounded-full text-error hover:bg-white"
+                      >
+                       <X className="w-4 h-4" />
+                      </button>
                     </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={addImageUrl}
-                    className="btn-secondary flex items-center gap-2"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Another Image
-                  </button>
+                  )}
+                  <p className="text-xs text-neutral-500">
+                    This is the main image shown at the top of the article.
+                  </p>
+                </div>
+              </div>
+
+               <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-medium text-neutral-700">Related Documents</label>
+                <div className="space-y-3">
+                   {formData.documents.map((doc, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg border border-neutral-200">
+                         <div className="flex items-center gap-3 overflow-hidden">
+                            <div className="w-10 h-10 bg-white rounded-md flex items-center justify-center border border-neutral-200 flex-shrink-0">
+                               <FileText className="w-5 h-5 text-primary" />
+                            </div>
+                            <div className="min-w-0">
+                               <p className="font-medium text-sm truncate text-neutral-900">{doc.name}</p>
+                               <a href={doc.url} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline truncate block">
+                                  View / Download
+                               </a>
+                            </div>
+                         </div>
+                         <button
+                           type="button"
+                           onClick={() => removeDocument(index)}
+                           className="text-neutral-400 hover:text-error p-1"
+                         >
+                           <X className="w-4 h-4" />
+                         </button>
+                      </div>
+                   ))}
+                   
+                   <div className="flex items-center gap-2">
+                      <label className="btn-secondary flex items-center gap-2 cursor-pointer">
+                        <Plus className="w-4 h-4" />
+                        <span>Upload Document</span>
+                         <input
+                           type="file"
+                           className="hidden"
+                           accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.csv"
+                           onChange={(e) => {
+                             handleDocumentUpload(e.target.files?.[0]);
+                             e.target.value = ''; // Reset input
+                           }}
+                         />
+                      </label>
+                   </div>
                 </div>
                 <p className="text-xs text-neutral-500 mt-1">
-                  Add multiple image URLs. The first image will be used as the featured image.
+                   Attach relevant files like PDF results, docx reports, etc.
                 </p>
               </div>
 

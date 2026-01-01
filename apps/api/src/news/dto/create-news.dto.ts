@@ -36,6 +36,10 @@ export class CreateNewsDto {
 
   @IsOptional()
   @IsArray()
+  documents?: { url: string; name: string }[];
+
+  @IsOptional()
+  @IsArray()
   @IsString({ each: true })
   tags?: string[];
 

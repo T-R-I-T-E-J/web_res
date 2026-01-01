@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Calendar, ArrowLeft, Share2, Facebook, Twitter, Linkedin } from 'lucide-react'
+import { Calendar, ArrowLeft, Share2, Facebook, Twitter, Linkedin, FileText, Download } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
@@ -180,6 +180,38 @@ export default async function NewsArticlePage({ params }: { params: Params }) {
                   ))
                 )}
               </div>
+
+              {/* Documents Section */}
+              {article.documents && Array.isArray(article.documents) && article.documents.length > 0 && (
+                <div className="mt-8 mb-8 p-6 bg-neutral-50 rounded-xl border border-neutral-200">
+                  <h3 className="font-heading font-bold text-lg text-primary mb-4 flex items-center gap-2">
+                    <Download className="w-5 h-5" />
+                    Related Documents
+                  </h3>
+                  <div className="space-y-3">
+                    {article.documents.map((doc: any, index: number) => (
+                      <a
+                        key={index}
+                        href={doc.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-3 bg-white rounded-lg border border-neutral-200 hover:border-primary/50 hover:shadow-sm transition-all group"
+                      >
+                        <div className="w-10 h-10 bg-primary/5 rounded-md flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                          <FileText className="w-5 h-5" />
+                        </div>
+                         <div className="min-w-0 flex-1">
+                            <p className="font-medium text-sm text-neutral-900 truncate group-hover:text-primary transition-colors">
+                              {doc.name || 'Document'}
+                            </p>
+                            <span className="text-xs text-neutral-500">Click to view/download</span>
+                         </div>
+                         <Download className="w-4 h-4 text-neutral-400 group-hover:text-primary transition-colors" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Share Section */}
               <div className="mt-12 pt-8 border-t border-neutral-200">
