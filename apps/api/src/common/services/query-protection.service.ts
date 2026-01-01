@@ -97,10 +97,10 @@ export class QueryProtectionService {
     sanitized = sanitized.replace(/\/\*.*?\*\//g, '');
 
     // Escape single quotes
-    sanitized = sanitized.replace(/'/g, "''");
+    sanitized = sanitized.replaceAll("'", "''");
 
     // Remove null bytes
-    sanitized = sanitized.replace(/\0/g, '');
+    sanitized = sanitized.replaceAll('\0', '');
 
     return sanitized.trim();
   }
@@ -171,7 +171,7 @@ export class QueryProtectionService {
     const result = await this.dataSource.query(
       'SELECT count(*) as count FROM pg_stat_activity',
     );
-    return parseInt(result[0].count);
+    return Number.parseInt(result[0].count, 10);
   }
 
   /**
