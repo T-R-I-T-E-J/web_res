@@ -87,34 +87,21 @@ import { envValidationSchema } from './config/env.validation';
     MediaModule,
     DownloadsModule,
 
-    // Serve Static Files (Frontend)
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '../../web/out'),
-      exclude: ['/api/(.*)'],
-    }),
+    // Serve Static Files (Frontend) - Disabled for Dev Split Mode
+    // ServeStaticModule.forRoot({
+    //   rootPath: join(__dirname, '../../web/out'),
+    //   exclude: ['/api/(.*)'],
+    // }),
+    // Serve General Uploads (Documents, Profiles, etc.)
     // Serve General Uploads (Documents, Profiles, etc.)
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
+      rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads',
-      serveStaticOptions: {
-        index: false,
-        setHeaders: (res) => {
-          res.setHeader('X-Content-Type-Options', 'nosniff');
-          res.setHeader('Cache-Control', 'public, max-age=3600');
-        },
-      },
     }),
     // Serve Uploaded Results
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads', 'results'),
+      rootPath: join(process.cwd(), 'uploads', 'results'),
       serveRoot: '/results',
-      serveStaticOptions: {
-        index: false, // Disable directory listing
-        setHeaders: (res) => {
-          res.setHeader('X-Content-Type-Options', 'nosniff');
-          res.setHeader('Cache-Control', 'public, max-age=3600');
-        },
-      },
     }),
   ],
   controllers: [AppController],

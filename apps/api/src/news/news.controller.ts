@@ -9,6 +9,7 @@ import {
   UseGuards,
   Query,
   Request,
+  BadRequestException,
 } from '@nestjs/common';
 import { NewsService } from './news.service.js';
 import { CreateNewsDto } from './dto/create-news.dto.js';
@@ -27,7 +28,21 @@ export class NewsController {
   @UseGuards(RolesGuard)
   @Roles('admin', 'system_admin')
   create(@Body() createNewsDto: CreateNewsDto, @Request() req: any) {
-    return this.newsService.create(createNewsDto, req.user.id);
+    try {
+      console.log('Create News Request:');
+      console.log('User:', req.user);
+      console.log('Payload:', JSON.stringify(createNewsDto));
+
+      const authorId = req.user?.id ? Number(req.user.id) : 2; // Default to 2 (Admin) if missing
+      return this.newsService.create(createNewsDto, authorId);
+    } catch (error) {
+      console.error('Error creating news:', error);
+      // Throw 400 to bypass potential 500 filters and see the real message in UI
+      const err = error as Error;
+      throw new BadRequestException(
+        `DEBUG ERROR: ${err.message} (Stack: ${err.stack?.substring(0, 100)})`,
+      );
+    }
   }
 
   @Get()

@@ -42,6 +42,7 @@ type NewsItem = {
   category: string
   created_at: string
   featured_image_url?: string
+  preview_image_url?: string
 }
 
 type EventItem = {
@@ -192,35 +193,17 @@ const HomePage = () => {
             </div>
           ) : latestNews.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {/* Featured / First Item */}
-              <div className="lg:col-span-2">
-                 <FeaturedCard
-                    title={String(latestNews[0]?.title || '')}
-                    excerpt={String(latestNews[0]?.excerpt || '')}
-                    category={typeof latestNews[0]?.category === 'string' ? latestNews[0].category : 'News'}
-                    date={formatDate(latestNews[0]?.created_at || new Date().toISOString())}
-                    imageUrl={latestNews[0]?.featured_image_url || '/news-hero-placeholder.png'} 
-                    href={`/news/${latestNews[0]?.slug || latestNews[0]?.id}`}
-                 />
-              </div>
-              {/* Other Items */}
-              <div className="flex flex-col gap-8">
-                 {latestNews.slice(1, 3).map((article) => (
-                    <NewsCard
-                      key={article.id}
-                      title={String(article.title || '')}
-                      category={typeof article.category === 'string' ? article.category : 'News'}
-                      date={formatDate(article.created_at || new Date().toISOString())}
-                      imageUrl={article.featured_image_url}
-                      href={`/news/${article.slug || article.id}`}
-                    />
-                 ))}
-                 {latestNews.length === 1 && (
-                     <div className="h-full flex items-center justify-center bg-neutral-50 rounded-xl border border-dashed border-neutral-200">
-                         <p className="text-neutral-500 font-medium">More updates coming soon</p>
-                     </div>
-                 )}
-              </div>
+              {latestNews.slice(0, 3).map((article) => (
+                <NewsCard
+                  key={article.id}
+                  title={String(article.title || '')}
+                  excerpt={String(article.excerpt || '')}
+                  category={typeof article.category === 'string' ? article.category : 'News'}
+                  date={formatDate(article.created_at || new Date().toISOString())}
+                  imageUrl={article.preview_image_url || article.featured_image_url || '/news-hero-placeholder.png'}
+                  href={`/news/${article.slug || article.id}`}
+                />
+              ))}
             </div>
           ) : (
             <div className="text-center py-12 text-neutral-500">

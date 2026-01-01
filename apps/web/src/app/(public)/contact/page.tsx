@@ -39,17 +39,7 @@ const ContactPage = () => {
 
   return (
     <>
-      {/* Hero Banner */}
-      <section className="gradient-hero py-16 md:py-20">
-        <div className="container-main text-center">
-          <h1 className="font-heading text-3xl md:text-4xl font-bold text-white mb-4">
-            Contact Us
-          </h1>
-          <p className="text-white/90 max-w-2xl mx-auto">
-            The STC Para Shooting office, part of the Paralympic Committee of India, handles administration, events, and selections for Indian para-shooters.
-          </p>
-        </div>
-      </section>
+
 
       {/* Breadcrumb */}
       <nav className="bg-neutral-100 py-3 text-sm" aria-label="Breadcrumb">

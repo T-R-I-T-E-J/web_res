@@ -20,7 +20,7 @@ export const developmentSecurityConfig: HelmetOptions = {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // Allow inline scripts for dev tools
       styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles
-      imgSrc: ["'self'", 'data:', 'https:'],
+      imgSrc: ["'self'", 'data:', 'https:', 'http:', 'blob:'],
       connectSrc: ["'self'", 'http://localhost:*', 'ws://localhost:*'], // Allow local connections
       fontSrc: ["'self'", 'data:'],
       objectSrc: ["'none'"],

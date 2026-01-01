@@ -49,7 +49,10 @@ export class NewsArticle {
   content: string;
 
   @Column({ type: 'text', nullable: true })
-  featured_image_url?: string; // DEPRECATED: Use image_urls instead
+  featured_image_url?: string;
+
+  @Column({ type: 'text', nullable: true })
+  preview_image_url?: string;
 
   @Column({ type: 'jsonb', default: [] })
   image_urls: string[];

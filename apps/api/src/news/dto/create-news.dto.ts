@@ -23,7 +23,11 @@ export class CreateNewsDto {
 
   @IsOptional()
   @IsString()
-  featured_image_url?: string; // DEPRECATED: Use image_urls instead
+  featured_image_url?: string;
+
+  @IsOptional()
+  @IsString()
+  preview_image_url?: string;
 
   @IsOptional()
   @IsArray()

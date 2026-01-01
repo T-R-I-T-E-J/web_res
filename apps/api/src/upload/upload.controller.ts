@@ -36,6 +36,7 @@ export class UploadController {
         mimetype: file.mimetype,
         size: file.size,
         path: file.path,
+        url: `/uploads/${file.filename}`,
       },
     };
   }

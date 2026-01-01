@@ -19,7 +19,7 @@ export const FeaturedCard = ({ title, excerpt, date, href, imageUrl, category }:
     <Link href={href} className="group relative block w-full overflow-hidden rounded-2xl bg-white shadow-card transition-all hover:shadow-card-hover border border-neutral-200 h-full">
       <div className="flex flex-col md:flex-row h-full">
          {/* Image Section */}
-         <div className="relative h-64 md:h-auto md:w-[55%] overflow-hidden">
+         <div className="relative h-52 w-full md:w-[55%] overflow-hidden">
              <img 
                 src={imageUrl} 
                 alt={title} 
@@ -36,7 +36,7 @@ export const FeaturedCard = ({ title, excerpt, date, href, imageUrl, category }:
          </div>
 
          {/* Content Section */}
-         <div className="flex flex-col justify-center p-6 md:p-8 md:w-[45%] bg-white relative">
+         <div className="flex flex-col justify-center p-6 md:p-8 w-full md:w-[45%] bg-white relative">
             {/* Category for desktop - optional position */}
             <div className="mb-4">
                {category && (
@@ -82,9 +82,12 @@ type NewsCardProps = {
 
 export const NewsCard = ({ title, excerpt, category, date, href, imageUrl }: NewsCardProps) => {
   return (
-    <Link href={href} className="group flex flex-col overflow-hidden rounded-xl bg-white shadow-card transition-all hover:-translate-y-1 hover:shadow-card-hover border border-neutral-200 h-full">
-      {/* Image Section - Top */}
-      <div className="relative aspect-video w-full overflow-hidden bg-neutral-100">
+    <Link 
+      href={href} 
+      className="group flex flex-col overflow-hidden rounded-xl bg-white shadow-card transition-all hover:-translate-y-1 hover:shadow-card-hover border border-neutral-200 h-[400px]"
+    >
+      {/* Image Section - Fixed height */}
+      <div className="relative h-52 w-full shrink-0 overflow-hidden bg-neutral-100">
         {imageUrl ? (
           <img 
             src={imageUrl} 
@@ -105,25 +108,27 @@ export const NewsCard = ({ title, excerpt, category, date, href, imageUrl }: New
         )}
       </div>
 
-      {/* Content Section - Bottom */}
-      <div className="flex flex-1 flex-col p-5">
-        <h3 className="mb-3 text-lg font-bold leading-snug text-neutral-900 group-hover:text-interactive transition-colors line-clamp-2">
-          {title}
-        </h3>
+      {/* Content Section */}
+      <div className="flex flex-1 flex-col justify-between p-5 overflow-hidden">
+        <div className="overflow-hidden">
+          <h3 className="mb-2 text-lg font-bold leading-snug text-neutral-900 group-hover:text-interactive transition-colors line-clamp-2">
+            {title}
+          </h3>
+          
+          {excerpt && (
+            <p className="text-sm text-neutral-600 line-clamp-3 leading-relaxed">
+               {excerpt}
+            </p>
+          )}
+        </div>
         
-        {excerpt && (
-          <p className="mb-4 text-sm text-neutral-600 line-clamp-2 leading-relaxed flex-1">
-             {excerpt}
-          </p>
-        )}
-        
-        <div className="mt-auto flex items-center justify-between pt-4 border-t border-neutral-50">
+        <div className="flex items-center justify-between pt-3 border-t border-neutral-50 shrink-0">
            {date ? (
             <span className="text-xs font-medium text-neutral-400">
                {date}
             </span>
            ) : (
-             <span /> // Spacer
+             <span /> 
            )}
            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-neutral-50 text-neutral-400 group-hover:bg-primary group-hover:text-white transition-all">
              <ArrowRight className="h-4 w-4" />

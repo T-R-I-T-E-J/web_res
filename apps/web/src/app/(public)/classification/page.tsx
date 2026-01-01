@@ -120,15 +120,7 @@ const ClassificationPage = async () => {
         </div>
       </nav>
 
-      {/* Page Header */}
-      <section className="py-12 bg-gradient-to-r from-primary to-secondary text-white">
-        <div className="container-main text-center">
-          <h1 className="text-4xl font-bold mb-4">Shooter Classification</h1>
-          <p className="text-lg text-blue-100 max-w-3xl mx-auto">
-            Information about shooter classification system, categories, and assessment guidelines for para shooting athletes.
-          </p>
-        </div>
-      </section>
+
 
       {/* Quick Access Categories */}
       <section className="py-8 bg-white border-b border-neutral-200">
