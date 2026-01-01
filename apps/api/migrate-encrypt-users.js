@@ -2,9 +2,11 @@
 // Data Migration Script: Encrypt Existing User Data
 // Run with: node migrate-encrypt-users.js
 
-require('dotenv').config();
-const { Client } = require('pg');
-const CryptoJS = require('crypto-js');
+import 'dotenv/config';
+import pg from 'pg';
+import CryptoJS from 'crypto-js';
+
+const { Client } = pg;
 
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 const DATABASE_URL = process.env.DATABASE_URL;
@@ -176,13 +178,12 @@ function logNextSteps() {
 }
 
 // Run migration
-(async () => {
-  try {
-    await migrateUsers();
-    console.log('🎉 Migration script completed!');
-    process.exit(0);
-  } catch (error) {
-    console.error('💥 Migration script failed:', error);
-    process.exit(1);
-  }
-})();
+// Run migration
+try {
+  await migrateUsers();
+  console.log('🎉 Migration script completed!');
+  process.exit(0);
+} catch (error) {
+  console.error('💥 Migration script failed:', error);
+  process.exit(1);
+}
