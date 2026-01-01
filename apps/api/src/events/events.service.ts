@@ -18,7 +18,7 @@ export class EventsService {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
-    
+
     // Ensure uniqueness
     let slug = baseSlug;
     let counter = 1;
@@ -26,7 +26,7 @@ export class EventsService {
       slug = `${baseSlug}-${counter}`;
       counter++;
     }
-    
+
     const event = this.eventsRepository.create({
       ...createEventDto,
       slug,
@@ -50,7 +50,8 @@ export class EventsService {
 
   async findOneBySlug(slug: string) {
     const event = await this.eventsRepository.findOne({ where: { slug } });
-    if (!event) throw new NotFoundException(`Event with slug "${slug}" not found`);
+    if (!event)
+      throw new NotFoundException(`Event with slug "${slug}" not found`);
     return event;
   }
 

@@ -13,7 +13,7 @@ interface LoginAttempt {
 @Injectable()
 export class BruteForceProtectionService {
   private attempts: Map<string, LoginAttempt> = new Map();
-  
+
   // Configuration
   private readonly MAX_ATTEMPTS = 5; // Max failed attempts
   private readonly WINDOW_MS = 15 * 60 * 1000; // 15 minutes
@@ -27,7 +27,7 @@ export class BruteForceProtectionService {
    */
   canAttemptLogin(identifier: string): boolean {
     const attempt = this.attempts.get(identifier);
-    
+
     if (!attempt) {
       return true; // First attempt
     }
@@ -35,7 +35,7 @@ export class BruteForceProtectionService {
     // Check if permanently blocked
     if (attempt.count >= this.PERMANENT_BLOCK_THRESHOLD) {
       throw new UnauthorizedException(
-        'Account permanently locked due to suspicious activity. Contact administrator.'
+        'Account permanently locked due to suspicious activity. Contact administrator.',
       );
     }
 
@@ -43,10 +43,10 @@ export class BruteForceProtectionService {
     if (attempt.blocked && attempt.blockUntil) {
       if (new Date() < attempt.blockUntil) {
         const minutesLeft = Math.ceil(
-          (attempt.blockUntil.getTime() - Date.now()) / 60000
+          (attempt.blockUntil.getTime() - Date.now()) / 60000,
         );
         throw new UnauthorizedException(
-          `Too many failed attempts. Try again in ${minutesLeft} minutes.`
+          `Too many failed attempts. Try again in ${minutesLeft} minutes.`,
         );
       } else {
         // Block expired, reset
@@ -56,9 +56,9 @@ export class BruteForceProtectionService {
     }
 
     // Check if window expired
-    const windowExpired = 
+    const windowExpired =
       Date.now() - attempt.firstAttempt.getTime() > this.WINDOW_MS;
-    
+
     if (windowExpired) {
       // Reset counter
       this.attempts.delete(identifier);
@@ -94,11 +94,11 @@ export class BruteForceProtectionService {
     if (attempt.count >= this.MAX_ATTEMPTS) {
       attempt.blocked = true;
       attempt.blockUntil = new Date(Date.now() + this.BLOCK_DURATION_MS);
-      
+
       // Log security event
       console.error(
         `[SECURITY] Brute force detected from ${identifier}. ` +
-        `${attempt.count} failed attempts. Blocked for 1 hour.`
+          `${attempt.count} failed attempts. Blocked for 1 hour.`,
       );
     }
 
@@ -129,7 +129,9 @@ export class BruteForceProtectionService {
       firstAttempt: now,
       lastAttempt: now,
       blocked: true,
-      blockUntil: permanent ? undefined : new Date(Date.now() + this.BLOCK_DURATION_MS),
+      blockUntil: permanent
+        ? undefined
+        : new Date(Date.now() + this.BLOCK_DURATION_MS),
     });
   }
 
@@ -160,13 +162,18 @@ export class BruteForceProtectionService {
     const now = Date.now();
     this.attempts.forEach((attempt, identifier) => {
       // Remove if window expired and not blocked
-      if (!attempt.blocked && 
-          now - attempt.firstAttempt.getTime() > this.WINDOW_MS) {
+      if (
+        !attempt.blocked &&
+        now - attempt.firstAttempt.getTime() > this.WINDOW_MS
+      ) {
         this.attempts.delete(identifier);
       }
       // Remove if block expired
-      if (attempt.blocked && attempt.blockUntil && 
-          now > attempt.blockUntil.getTime()) {
+      if (
+        attempt.blocked &&
+        attempt.blockUntil &&
+        now > attempt.blockUntil.getTime()
+      ) {
         this.attempts.delete(identifier);
       }
     });

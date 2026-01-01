@@ -1,4 +1,11 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsBoolean, IsUrl } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsEnum,
+  IsBoolean,
+  IsUrl,
+} from 'class-validator';
 import { MediaType } from '../entities/media.entity.js';
 
 export class CreateMediaDto {

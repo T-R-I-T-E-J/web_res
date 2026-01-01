@@ -22,10 +22,7 @@ export class SessionService {
     expiresIn: number = 7 * 24 * 60 * 60 * 1000, // 7 days default
   ): Promise<Session> {
     // Hash the token for storage (never store plain JWT)
-    const hashedToken = crypto
-      .createHash('sha256')
-      .update(token)
-      .digest('hex');
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
     // Parse device from user agent
     const device = this.parseDevice(userAgent);
@@ -48,10 +45,7 @@ export class SessionService {
    * Find session by token
    */
   async findByToken(token: string): Promise<Session | null> {
-    const hashedToken = crypto
-      .createHash('sha256')
-      .update(token)
-      .digest('hex');
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
     return this.sessionRepository.findOne({
       where: { token: hashedToken, isActive: true },
@@ -155,9 +149,7 @@ export class SessionService {
 
     // Check for rapid session creation (more than 5 in last hour)
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-    const recentSessions = sessions.filter(
-      (s) => s.createdAt > oneHourAgo,
-    );
+    const recentSessions = sessions.filter((s) => s.createdAt > oneHourAgo);
 
     if (recentSessions.length > 5) {
       return true;

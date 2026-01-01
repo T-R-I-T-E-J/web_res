@@ -18,5 +18,10 @@
     "strictBindCallApply": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true
-  }
+  },
+  "include": [
+    "src",
+    "test",
+    "migrate-encrypt-users.js"
+  ]
 }

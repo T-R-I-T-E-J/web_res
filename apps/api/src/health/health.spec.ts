@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Test, TestingModule } from '@nestjs/testing';
 import { getConnectionToken } from '@nestjs/typeorm';
 import { HealthService } from './health.service';
@@ -23,8 +24,8 @@ describe('HealthService', () => {
     service = module.get<HealthService>(HealthService);
   });
 
-  it('should return ok status with expected metadata from check()', async () => {
-    const result = await service.check();
+  it('should return ok status with expected metadata from check()', () => {
+    const result = service.check();
     expect(result).toEqual(
       expect.objectContaining({
         status: 'ok',
@@ -38,11 +39,11 @@ describe('HealthService', () => {
     expect(new Date(result.timestamp).toISOString()).toBe(result.timestamp);
   });
 
-  it('should reflect NODE_ENV in the environment field from check()', async () => {
+  it('should reflect NODE_ENV in the environment field from check()', () => {
     const original = process.env.NODE_ENV;
     process.env.NODE_ENV = 'test-env';
 
-    const result = await service.check();
+    const result = service.check();
 
     expect(result.environment).toBe('test-env');
 
@@ -115,11 +116,11 @@ describe('HealthController', () => {
     controller = module.get<HealthController>(HealthController);
   });
 
-  it('should delegate check() to HealthService.check', async () => {
+  it('should delegate check() to HealthService.check', () => {
     const payload = { status: 'ok' };
-    service.check.mockResolvedValueOnce(payload);
+    service.check.mockReturnValueOnce(payload);
 
-    await expect(controller.check()).resolves.toEqual(payload);
+    expect(controller.check()).toEqual(payload);
     expect(service.check).toHaveBeenCalledTimes(1);
   });
 

@@ -25,7 +25,7 @@ export class IPFilterService {
     // Whitelist localhost and Docker network
     this.addToWhitelist('127.0.0.1', 'Localhost', true);
     this.addToWhitelist('::1', 'Localhost IPv6', true);
-    
+
     // Whitelist Docker network range
     for (let i = 0; i <= 255; i++) {
       this.addToWhitelist(`172.25.0.${i}`, 'Docker network', true);
@@ -33,11 +33,11 @@ export class IPFilterService {
 
     // Blacklist known malicious IPs (examples)
     this.addToBlacklist('0.0.0.0', 'Invalid IP', true);
-    
+
     // Add your production server IPs to whitelist
     const allowedIPs = this.configService.get<string>('ALLOWED_IPS');
     if (allowedIPs) {
-      allowedIPs.split(',').forEach(ip => {
+      allowedIPs.split(',').forEach((ip) => {
         this.addToWhitelist(ip.trim(), 'Configured allowed IP', true);
       });
     }
@@ -54,7 +54,7 @@ export class IPFilterService {
     if (this.blacklist.has(ip)) {
       const rule = this.blacklist.get(ip)!;
       throw new ForbiddenException(
-        `Access denied. IP ${ip} is blacklisted. Reason: ${rule.reason}`
+        `Access denied. IP ${ip} is blacklisted. Reason: ${rule.reason}`,
       );
     }
 
@@ -74,9 +74,7 @@ export class IPFilterService {
     }
 
     // Not in whitelist
-    throw new ForbiddenException(
-      `Access denied. IP ${ip} is not whitelisted.`
-    );
+    throw new ForbiddenException(`Access denied. IP ${ip} is not whitelisted.`);
   }
 
   /**
@@ -89,9 +87,11 @@ export class IPFilterService {
     }
 
     // Check private network ranges
-    if (ip.startsWith('10.') || 
-        ip.startsWith('192.168.') ||
-        ip.startsWith('172.16.')) {
+    if (
+      ip.startsWith('10.') ||
+      ip.startsWith('192.168.') ||
+      ip.startsWith('172.16.')
+    ) {
       return true;
     }
 
@@ -102,24 +102,26 @@ export class IPFilterService {
    * Add IP to whitelist
    */
   addToWhitelist(
-    ip: string, 
-    reason: string, 
+    ip: string,
+    reason: string,
     permanent = false,
-    durationHours = 24
+    durationHours = 24,
   ): void {
     const rule: IPRule = {
       ip,
       type: 'whitelist',
       reason,
       addedAt: new Date(),
-      expiresAt: permanent ? undefined : new Date(Date.now() + durationHours * 60 * 60 * 1000),
+      expiresAt: permanent
+        ? undefined
+        : new Date(Date.now() + durationHours * 60 * 60 * 1000),
     };
-    
+
     this.whitelist.set(ip, rule);
-    
+
     // Remove from blacklist if exists
     this.blacklist.delete(ip);
-    
+
     console.log(`[SECURITY] IP ${ip} added to whitelist. Reason: ${reason}`);
   }
 
@@ -127,24 +129,26 @@ export class IPFilterService {
    * Add IP to blacklist
    */
   addToBlacklist(
-    ip: string, 
-    reason: string, 
+    ip: string,
+    reason: string,
     permanent = false,
-    durationHours = 24
+    durationHours = 24,
   ): void {
     const rule: IPRule = {
       ip,
       type: 'blacklist',
       reason,
       addedAt: new Date(),
-      expiresAt: permanent ? undefined : new Date(Date.now() + durationHours * 60 * 60 * 1000),
+      expiresAt: permanent
+        ? undefined
+        : new Date(Date.now() + durationHours * 60 * 60 * 1000),
     };
-    
+
     this.blacklist.set(ip, rule);
-    
+
     // Remove from whitelist if exists
     this.whitelist.delete(ip);
-    
+
     console.error(`[SECURITY] IP ${ip} added to blacklist. Reason: ${reason}`);
   }
 
@@ -181,13 +185,13 @@ export class IPFilterService {
    */
   private cleanupExpired(): void {
     const now = new Date();
-    
+
     this.whitelist.forEach((rule, ip) => {
       if (rule.expiresAt && now > rule.expiresAt) {
         this.whitelist.delete(ip);
       }
     });
-    
+
     this.blacklist.forEach((rule, ip) => {
       if (rule.expiresAt && now > rule.expiresAt) {
         this.blacklist.delete(ip);

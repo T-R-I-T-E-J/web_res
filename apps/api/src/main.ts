@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
+import * as cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
@@ -28,6 +29,7 @@ async function bootstrap() {
   // Apply security headers based on environment
   const securityConfig = getSecurityConfig(environment);
   app.use(helmet(securityConfig));
+  app.use(cookieParser());
 
   logger.log(`🔒 Security headers enabled for: ${environment}`);
 

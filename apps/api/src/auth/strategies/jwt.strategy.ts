@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
+import { Request } from 'express';
 import { JwtPayload } from '../interfaces/jwt-payload.interface.js';
 import { UsersService } from '../../users/users.service.js';
 
@@ -16,7 +17,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       'default-secret-change-in-production';
 
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (request: Request) => {
+          const data = request?.cookies as Record<string, string> | undefined;
+          return data?.auth_token || null;
+        },
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ]),
       ignoreExpiration: false,
       secretOrKey: secret,
     });

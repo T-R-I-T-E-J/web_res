@@ -220,7 +220,8 @@ export class AuditService {
       data_modification_history: allLogs.filter(
         (log) => log.action === 'UPDATE' || log.action === 'DELETE',
       ),
-      first_activity: allLogs.length > 0 ? allLogs[allLogs.length - 1].created_at : null,
+      first_activity:
+        allLogs.length > 0 ? allLogs[allLogs.length - 1].created_at : null,
       last_activity: allLogs.length > 0 ? allLogs[0].created_at : null,
     };
   }

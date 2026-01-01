@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Body,
-  Param,
-} from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param } from '@nestjs/common';
 import { ShootersService } from './shooters.service.js';
 import { CreateShooterProfileDto } from './dto/create-shooter-profile.dto.js';
 import { CreateShooterClassificationDto } from './dto/create-shooter-classification.dto.js';

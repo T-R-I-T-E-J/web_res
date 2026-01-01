@@ -6,10 +6,24 @@ import { DataSource } from 'typeorm';
 export class QueryProtectionService {
   // Dangerous SQL keywords that might indicate injection
   private readonly DANGEROUS_KEYWORDS = [
-    'DROP', 'DELETE', 'TRUNCATE', 'ALTER', 'CREATE',
-    'EXEC', 'EXECUTE', 'SCRIPT', 'JAVASCRIPT',
-    'UNION', 'CONCAT', 'CHAR', 'NCHAR',
-    '--', '/*', '*/', 'xp_', 'sp_',
+    'DROP',
+    'DELETE',
+    'TRUNCATE',
+    'ALTER',
+    'CREATE',
+    'EXEC',
+    'EXECUTE',
+    'SCRIPT',
+    'JAVASCRIPT',
+    'UNION',
+    'CONCAT',
+    'CHAR',
+    'NCHAR',
+    '--',
+    '/*',
+    '*/',
+    'xp_',
+    'sp_',
   ];
 
   // Maximum query execution time (milliseconds)
@@ -25,10 +39,10 @@ export class QueryProtectionService {
   private setupQueryMonitoring(): void {
     // Set statement timeout in PostgreSQL
     this.dataSource.query(`SET statement_timeout = ${this.MAX_QUERY_TIME}`);
-    
+
     // Set lock timeout
     this.dataSource.query('SET lock_timeout = 10000'); // 10 seconds
-    
+
     // Set idle in transaction timeout
     this.dataSource.query('SET idle_in_transaction_session_timeout = 60000'); // 1 minute
   }
@@ -45,7 +59,7 @@ export class QueryProtectionService {
     for (const keyword of this.DANGEROUS_KEYWORDS) {
       if (upperInput.includes(keyword)) {
         console.error(
-          `[SECURITY] Potential SQL injection detected: "${input}" contains "${keyword}"`
+          `[SECURITY] Potential SQL injection detected: "${input}" contains "${keyword}"`,
         );
         return false;
       }
@@ -63,7 +77,7 @@ export class QueryProtectionService {
     for (const pattern of injectionPatterns) {
       if (pattern.test(input)) {
         console.error(
-          `[SECURITY] SQL injection pattern detected in: "${input}"`
+          `[SECURITY] SQL injection pattern detected in: "${input}"`,
         );
         return false;
       }
@@ -106,10 +120,10 @@ export class QueryProtectionService {
     `);
 
     const killedCount = result.length;
-    
+
     if (killedCount > 0) {
       console.warn(
-        `[SECURITY] Killed ${killedCount} long-running queries (>${maxDuration}s)`
+        `[SECURITY] Killed ${killedCount} long-running queries (>${maxDuration}s)`,
       );
     }
 
@@ -143,9 +157,9 @@ export class QueryProtectionService {
   async killQuery(pid: number): Promise<boolean> {
     const result = await this.dataSource.query(
       'SELECT pg_terminate_backend($1)',
-      [pid]
+      [pid],
     );
-    
+
     console.warn(`[SECURITY] Killed query with PID ${pid}`);
     return result[0].pg_terminate_backend;
   }
@@ -155,7 +169,7 @@ export class QueryProtectionService {
    */
   async getConnectionCount(): Promise<number> {
     const result = await this.dataSource.query(
-      'SELECT count(*) as count FROM pg_stat_activity'
+      'SELECT count(*) as count FROM pg_stat_activity',
     );
     return parseInt(result[0].count);
   }
@@ -173,10 +187,10 @@ export class QueryProtectionService {
     `);
 
     const killedCount = result.length;
-    
+
     if (killedCount > 0) {
       console.log(
-        `[SECURITY] Killed ${killedCount} idle connections (>${idleMinutes}min)`
+        `[SECURITY] Killed ${killedCount} idle connections (>${idleMinutes}min)`,
       );
     }
 
@@ -188,15 +202,15 @@ export class QueryProtectionService {
    */
   async preventConnectionFlooding(maxConnections = 100): Promise<boolean> {
     const count = await this.getConnectionCount();
-    
+
     if (count > maxConnections) {
       console.error(
-        `[SECURITY] Connection flooding detected! ${count} connections (max: ${maxConnections})`
+        `[SECURITY] Connection flooding detected! ${count} connections (max: ${maxConnections})`,
       );
-      
+
       // Kill oldest idle connections
       await this.killIdleConnections(5); // Kill idle > 5 minutes
-      
+
       return false;
     }
 

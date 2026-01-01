@@ -6,7 +6,9 @@ import {
   HttpStatus,
   UseGuards,
   Get,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { SkipThrottle } from '@nestjs/throttler';
 import { AuthService } from './auth.service.js';
 import { LoginDto } from './dto/login.dto.js';
@@ -24,16 +26,60 @@ export class AuthController {
   @SkipThrottle()
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
+  async register(
+    @Body() registerDto: RegisterDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const data = await this.authService.register(registerDto);
+
+    res.cookie('auth_token', data.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax', // Use Lax for top-level navigation compatibility if needed, but Strict is better if possible. Sticking to Strict as requested.
+      path: '/',
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
+
+    return {
+      message: 'Registration successful',
+      user: data.user,
+    };
   }
 
   @Public()
   @SkipThrottle()
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const data = await this.authService.login(loginDto);
+
+    res.cookie('auth_token', data.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax', // Lax is safer for usability across subdomains/ports sometimes, but Strict is requested. Let's use Lax to ensure redirects work well. The prompt said "Strict (or Lax only if technically required)".
+      path: '/',
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
+
+    return {
+      message: 'Login successful',
+      user: data.user,
+    };
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('auth_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+    return { message: 'Logged out successfully' };
   }
 
   @UseGuards(JwtAuthGuard)

@@ -19,10 +19,10 @@ export class SecurityGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
-    
+
     // Get client IP
     const clientIP = this.getClientIP(request);
-    
+
     // 1. Check IP whitelist/blacklist
     try {
       this.ipFilterService.isAllowed(clientIP);
@@ -36,7 +36,9 @@ export class SecurityGuard implements CanActivate {
       try {
         this.bruteForceService.canAttemptLogin(clientIP);
       } catch (error) {
-        console.error(`[SECURITY] Brute force protection triggered for ${clientIP}`);
+        console.error(
+          `[SECURITY] Brute force protection triggered for ${clientIP}`,
+        );
         throw error;
       }
     }
@@ -52,18 +54,21 @@ export class SecurityGuard implements CanActivate {
     }
 
     // 5. Check for connection flooding
-    const canConnect = await this.queryProtectionService.preventConnectionFlooding();
+    const canConnect =
+      await this.queryProtectionService.preventConnectionFlooding();
     if (!canConnect) {
       console.error(`[SECURITY] Connection flooding detected from ${clientIP}`);
-      
+
       // Auto-blacklist the IP
       this.ipFilterService.autoBlacklist(
         clientIP,
         'Connection flooding (DoS attempt)',
-        24
+        24,
       );
-      
-      throw new ForbiddenException('Too many connections. Access temporarily blocked.');
+
+      throw new ForbiddenException(
+        'Too many connections. Access temporarily blocked.',
+      );
     }
 
     return true;
@@ -92,9 +97,9 @@ export class SecurityGuard implements CanActivate {
    */
   private isLoginEndpoint(request: Request): boolean {
     const url = request.url.toLowerCase();
-    return url.includes('/login') || 
-           url.includes('/auth') || 
-           url.includes('/signin');
+    return (
+      url.includes('/login') || url.includes('/auth') || url.includes('/signin')
+    );
   }
 
   /**
@@ -102,21 +107,21 @@ export class SecurityGuard implements CanActivate {
    */
   private validateRequestBody(body: any, clientIP: string): void {
     const values = this.extractValues(body);
-    
+
     for (const value of values) {
       if (typeof value === 'string') {
         if (!this.queryProtectionService.validateInput(value)) {
           console.error(
-            `[SECURITY] SQL injection attempt detected from ${clientIP} in request body`
+            `[SECURITY] SQL injection attempt detected from ${clientIP} in request body`,
           );
-          
+
           // Auto-blacklist the IP
           this.ipFilterService.autoBlacklist(
             clientIP,
             'SQL injection attempt',
-            48 // 48 hours
+            48, // 48 hours
           );
-          
+
           throw new ForbiddenException('Invalid input detected');
         }
       }
@@ -128,21 +133,21 @@ export class SecurityGuard implements CanActivate {
    */
   private validateQueryParams(query: any, clientIP: string): void {
     const values = this.extractValues(query);
-    
+
     for (const value of values) {
       if (typeof value === 'string') {
         if (!this.queryProtectionService.validateInput(value)) {
           console.error(
-            `[SECURITY] SQL injection attempt detected from ${clientIP} in query params`
+            `[SECURITY] SQL injection attempt detected from ${clientIP} in query params`,
           );
-          
+
           // Auto-blacklist the IP
           this.ipFilterService.autoBlacklist(
             clientIP,
             'SQL injection attempt in query params',
-            48 // 48 hours
+            48, // 48 hours
           );
-          
+
           throw new ForbiddenException('Invalid query parameters');
         }
       }
@@ -154,19 +159,19 @@ export class SecurityGuard implements CanActivate {
    */
   private extractValues(obj: any): string[] {
     const values: string[] = [];
-    
+
     if (typeof obj === 'string') {
       values.push(obj);
     } else if (Array.isArray(obj)) {
-      obj.forEach(item => {
+      obj.forEach((item) => {
         values.push(...this.extractValues(item));
       });
     } else if (typeof obj === 'object' && obj !== null) {
-      Object.values(obj).forEach(value => {
+      Object.values(obj).forEach((value) => {
         values.push(...this.extractValues(value));
       });
     }
-    
+
     return values;
   }
 }

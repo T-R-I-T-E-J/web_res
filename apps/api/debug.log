@@ -1,0 +1,4 @@
+[2026-01-01T06:12:47.114Z] Entering create news
+User: {"id":"1","public_id":"fe386a2a-6c2c-465e-940f-9ebd03571b4d","email":"admin@psci.in","first_name":"Admin","last_name":"User","roles":["admin"]}
+Payload: {"title":"sdas","content":"asd","excerpt":"","category":"NEWS","status":"published","featured_image_url":"","preview_image_url":"http://localhost:4000/uploads/1767247956916_1bb93c07842388fe947c02edd426b25a.jpeg","documents":[[]],"image_urls":[],"tags":[],"is_featured":false,"is_pinned":false}
+[2026-01-01T06:12:47.216Z] Create success

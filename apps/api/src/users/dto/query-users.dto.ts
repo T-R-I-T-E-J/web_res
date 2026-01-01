@@ -27,7 +27,7 @@ export class QueryUsersDto {
   @IsOptional()
   @IsEmail()
   email?: string;
-  
+
   @IsOptional()
   @IsString()
   search?: string;

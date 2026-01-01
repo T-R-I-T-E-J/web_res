@@ -1,4 +1,3 @@
-
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -37,10 +36,13 @@ export class DownloadsService implements OnModuleInit {
   }
 
   async findOne(id: string): Promise<Download> {
-    const download = await this.downloadRepository.findOneBy({ id, isActive: true });
+    const download = await this.downloadRepository.findOneBy({
+      id,
+      isActive: true,
+    });
     if (!download) {
-       const { NotFoundException } = await import('@nestjs/common');
-       throw new NotFoundException(`Download with ID "${id}" not found`);
+      const { NotFoundException } = await import('@nestjs/common');
+      throw new NotFoundException(`Download with ID "${id}" not found`);
     }
     return download;
   }
@@ -48,15 +50,15 @@ export class DownloadsService implements OnModuleInit {
   async remove(id: string): Promise<{ message: string }> {
     this.logger.log(`Attempting to remove download with id: ${id}`);
     const result = await this.downloadRepository.delete(id);
-    
+
     if (result.affected === 0) {
       this.logger.warn(`Download with id ${id} not found for deletion`);
-      // We can throw an error or just return a message. 
+      // We can throw an error or just return a message.
       // Throwing NotFoundException is better for API semantics.
       const { NotFoundException } = await import('@nestjs/common');
       throw new NotFoundException(`Download with ID "${id}" not found`);
     }
-    
+
     this.logger.log(`Successfully removed download with id: ${id}`);
     return { message: 'Download deleted successfully' };
   }
@@ -77,7 +79,8 @@ export class DownloadsService implements OnModuleInit {
       },
       {
         title: 'WSPS Rulebook 2026',
-        description: 'Official World Shooting Para Sport Rulebook - Final Version',
+        description:
+          'Official World Shooting Para Sport Rulebook - Final Version',
         fileType: 'PDF',
         size: 'External',
         href: 'https://www.paralympic.org/sites/default/files/2025-12/WSPS%20Rulebook%202026_vFinal_0.pdf',
@@ -119,7 +122,8 @@ export class DownloadsService implements OnModuleInit {
       },
       {
         title: 'Selection Policy - Paris 2024 Paralympics',
-        description: 'Selection criteria for Paris France 2024 Paralympic Games',
+        description:
+          'Selection criteria for Paris France 2024 Paralympic Games',
         fileType: 'PDF',
         href: '/selection-policy-paris-2024.pdf',
         category: DownloadCategory.SELECTION,
@@ -144,7 +148,8 @@ export class DownloadsService implements OnModuleInit {
     const eventCalendar = [
       {
         title: '2026-2027 Para Shooting Event Calendar',
-        description: 'Official event calendar for Para Shooting competitions 2026-2027',
+        description:
+          'Official event calendar for Para Shooting competitions 2026-2027',
         fileType: 'PDF',
         href: '/2026-2027-event-calendar.pdf',
         category: DownloadCategory.CALENDAR,
@@ -154,7 +159,8 @@ export class DownloadsService implements OnModuleInit {
     const matchDocuments = [
       {
         title: 'Match Book - Zonal & National Championship 2022',
-        description: 'Match book for Zonal and National Para Shooting Championship 2022',
+        description:
+          'Match book for Zonal and National Para Shooting Championship 2022',
         fileType: 'PDF',
         href: '/match-book-2022.pdf',
         category: DownloadCategory.MATCH,
@@ -209,12 +215,17 @@ export class DownloadsService implements OnModuleInit {
       },
     ];
 
-    const allDownloads = [...rules, ...selectionPolicies, ...eventCalendar, ...matchDocuments];
+    const allDownloads = [
+      ...rules,
+      ...selectionPolicies,
+      ...eventCalendar,
+      ...matchDocuments,
+    ];
 
     for (const item of allDownloads) {
       await this.downloadRepository.save(item);
     }
-    
+
     this.logger.log(`Seeded ${allDownloads.length} download items.`);
   }
 }
