@@ -1,26 +1,26 @@
 -- Insert WSPS Grand Prix France 2026 News Article
 INSERT INTO news_articles (
-        title,
-        slug,
-        excerpt,
-        content,
-        featured_image_url,
-        category,
-        tags,
-        author_id,
-        status,
-        is_featured,
-        is_pinned,
-        created_at,
-        updated_at,
-        published_at
-    )
+    title,
+    slug,
+    excerpt,
+    content,
+    featured_image_url,
+    category,
+    tags,
+    author_id,
+    status,
+    is_featured,
+    is_pinned,
+    created_at,
+    updated_at,
+    published_at
+  )
 VALUES (
-        'WSPS Grand Prix France 2026 and Champagne Cup Announced',
-        'wsps-grand-prix-france-2026',
-        'Official announcement for the WSPS Grand Prix France 2026 and Champagne Cup Shooting Parasport to be held from 26th Feb to 1st March 2026.',
-        '<p>The Para Shooting Committee of India is pleased to announce the details for the upcoming <strong>WSPS Grand Prix France 2026</strong> and <strong>Champagne Cup Shooting Parasport</strong> (2nd competition).</p>
-<p class="text-lg mb-4"><strong>📅 Date:</strong> 26th February – 1st March 2026</p>
+    'WSPS Grand Prix France 2026 and Champagne Cup Announced',
+    'wsps-grand-prix-france-2026',
+    'Official announcement for the WSPS Grand Prix France 2026 and Champagne Cup Shooting Parasport to be held from 26th Feb to 1st March 2026.',
+    '<p>The Para Shooting Committee of India is pleased to announce the details for the upcoming <strong>WSPS Grand Prix France 2026</strong> and <strong>Champagne Cup Shooting Parasport</strong> (2nd competition).</p>
+<p class="text-lg mb-4"><strong>📅 Date:</strong> 26th February - 1st March 2026</p>
 <p>This prestigious event will bring together top para shooters from around the globe. Please refer to the official document below for detailed information regarding the event schedule, venue, and participation guidelines.</p>
 
 <h3 class="text-xl font-bold mt-8 mb-4">Official Event Document</h3>
@@ -38,14 +38,14 @@ VALUES (
      Download Official Circular (PDF)
   </a>
 </div>',
-        '/wsps-france-2026.png',
-        'EVENT',
-        '["wsps", "france", "2026", "grand-prix", "international"]'::jsonb,
-        1,
-        'published',
-        true,
-        false,
-        NOW(),
-        NOW(),
-        NOW()
-    );
+    '/wsps-france-2026.png',
+    'EVENT',
+    '["wsps", "france", "2026", "grand-prix", "international"]'::jsonb,
+    1,
+    'published',
+    true,
+    false,
+    NOW(),
+    NOW(),
+    NOW()
+  );

@@ -1,23 +1,23 @@
 -- Insert news article about 2026-2027 Para Shooting Calendar
 INSERT INTO news_articles (
-        title,
-        slug,
-        excerpt,
-        content,
-        featured_image_url,
-        category,
-        tags,
-        author_id,
-        status,
-        is_featured,
-        is_pinned,
-        published_at
-    )
+    title,
+    slug,
+    excerpt,
+    content,
+    featured_image_url,
+    category,
+    tags,
+    author_id,
+    status,
+    is_featured,
+    is_pinned,
+    published_at
+  )
 VALUES (
-        '2026 – 2027 Para Shooting Calendar Released',
-        '2026-2027-para-shooting-calendar-released',
-        'The Para Shooting Committee of India announces the complete calendar for domestic and international competitions for 2026-2027, featuring 22 major events including World Cups, Championships, and National Camps.',
-        '<h2>2026 – 2027 Para Shooting Calendar - Domestics and International Competition</h2>
+    '2026 - 2027 Para Shooting Calendar Released',
+    '2026-2027-para-shooting-calendar-released',
+    'The Para Shooting Committee of India announces the complete calendar for domestic and international competitions for 2026-2027, featuring 22 major events including World Cups, Championships, and National Camps.',
+    '<h2>2026 - 2027 Para Shooting Calendar - Domestics and International Competition</h2>
 
 <p>The Para Shooting Committee of India is pleased to announce the comprehensive competition and training calendar for 2026-2027. This calendar includes a total of 22 events covering domestic championships, international competitions, coaching camps, and technical courses.</p>
 
@@ -67,12 +67,12 @@ VALUES (
 <p><strong>Download the complete calendar:</strong> <a href="https://drive.google.com/file/d/1bwL9g9zV3PZGuYq8JG53Efnrkws4emyP/view?usp=sharing" target="_blank" rel="noopener noreferrer">2026-2027 Para Shooting Calendar (PDF)</a></p>
 
 <p>For more information about specific events, please visit our <a href="/events">Events Calendar</a> page.</p>',
-        'https://drive.google.com/uc?export=view&id=1bwL9g9zV3PZGuYq8JG53Efnrkws4emyP',
-        'ANNOUNCEMENT',
-        '["calendar", "2026", "2027", "competitions", "world cup", "championship", "coaching camps"]'::jsonb,
-        1,
-        'published',
-        true,
-        true,
-        NOW()
-    );
+    'https://drive.google.com/uc?export=view&id=1bwL9g9zV3PZGuYq8JG53Efnrkws4emyP',
+    'ANNOUNCEMENT',
+    '["calendar", "2026", "2027", "competitions", "world cup", "championship", "coaching camps"]'::jsonb,
+    1,
+    'published',
+    true,
+    true,
+    NOW()
+  );
