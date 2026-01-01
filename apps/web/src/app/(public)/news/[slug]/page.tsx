@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import DOMPurify from 'isomorphic-dompurify'
 import { Calendar, ArrowLeft, Share2, Facebook, Twitter, Linkedin, FileText, Download } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
@@ -170,8 +171,10 @@ export default async function NewsArticlePage({ params }: { params: Params }) {
 
               {/* Article Body */}
               <div className="prose prose-lg max-w-none text-neutral-700">
+
+// ... (in the component)
                 {isHtmlContent ? (
-                  <div dangerouslySetInnerHTML={{ __html: article.content }} />
+                  <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content) }} />
                 ) : (
                   contentParagraphs.map((paragraph: string, index: number) => (
                     <p key={index} className="mb-6 leading-relaxed">

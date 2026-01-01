@@ -52,19 +52,15 @@ const LoginPage = () => {
       }
 
       // Login Successful - Backend wraps response in { success, data }
-      const { access_token, user } = responseData.data || responseData
+      // Login Successful - Backend sets HttpOnly cookie
+      const { user } = responseData.data || responseData
       
-      if (!user || !access_token) {
+      if (!user) {
         throw new Error('Invalid response from server')
       }
 
-      // Store token in cookie for Middleware
-      // Expires in 1 day (or match backend expiry)
-      Cookies.set('auth_token', access_token, { 
-        expires: 1, 
-        secure: window.location.protocol === 'https:',
-        sameSite: 'strict' 
-      })
+      // No need to set cookie manually anymore
+      // Cookies are handled by the backend (HttpOnly)
 
       // Redirect based on role
       const roles = user.roles || []

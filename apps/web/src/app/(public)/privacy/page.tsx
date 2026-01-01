@@ -180,7 +180,11 @@ const PrivacyPolicyPage = () => {
               </h2>
               <p className="text-neutral-700 leading-relaxed">
                 We use cookies and similar tracking technologies to enhance your browsing experience, analyze website traffic, 
-                and understand user preferences. You can control cookie settings through your browser preferences.
+                and understand user preferences. We categorize cookies into "Strictly Necessary" (required for the site to work) 
+                and "Analytics" (optional).
+                <br /><br />
+                You can manage your preferences at any time using our Cookie Consent Manager, or through your browser settings.
+                We do not use marketing or advertising cookies.
               </p>
             </div>
 

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Script from 'next/script'
 import './globals.css'
+import CookieConsent from '@/components/common/CookieConsent'
 
 export const metadata: Metadata = {
   title: {
@@ -69,25 +70,16 @@ const RootLayout = ({ children }: RootLayoutProps) => {
           content="upgrade-insecure-requests"
         />
       </head>
+
       <body className="min-h-screen bg-neutral-50 text-neutral-700 font-body">
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
-        {children}
         
-        {/* Analytics Scripts (Loaded after consent) */}
-        <Script
-          id="google-analytics"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              // GA will be initialized after cookie consent
-            `,
-          }}
-        />
+        {/* Cookie Consent Banner & Analytics Management */}
+        <CookieConsent />
+
+        {children}
       </body>
     </html>
   )

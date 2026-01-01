@@ -38,9 +38,19 @@ const Sidebar = ({ items, user }: SidebarProps) => {
   const handleToggle = () => setCollapsed(!collapsed)
   const handleMobileToggle = () => setMobileOpen(!mobileOpen)
 
-  const handleLogout = () => {
-    Cookies.remove('auth_token')
-    router.push('/login')
+  const handleLogout = async () => {
+    try {
+      // Call backend to clear HttpOnly cookie
+      await fetch('/api/v1/auth/logout', { 
+        method: 'POST',
+      });
+    } catch (error) {
+      console.error('Logout failed', error);
+    } finally {
+      // Clean up any potential client-side leftovers (if any existed previously)
+      Cookies.remove('auth_token');
+      router.push('/login');
+    }
   }
 
   const toggleExpand = (label: string) => {
