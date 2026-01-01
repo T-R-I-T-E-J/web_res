@@ -22,6 +22,42 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// Helper class for Payment Testing
+class PaymentGatewayMock {
+    private attemptCount = 0;
+    constructor(private succeedAfter: number) {}
+
+    async process() {
+        this.attemptCount++;
+        if (this.attemptCount < this.succeedAfter) {
+            throw new Error('Payment gateway timeout');
+        }
+        return { success: true, id: 'pay_123' };
+    }
+
+    get attempts() { return this.attemptCount; }
+}
+
+// Helper function for Connection Recovery Testing
+const executeConnectionWithRetry = async (maxRetries: number, succeedOnAttempt: number): Promise<{ success: boolean, attempts: number }> => {
+    let connectionAttempts = 0;
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            connectionAttempts++;
+            if (connectionAttempts < succeedOnAttempt) {
+                 throw new Error('Connection timeout');
+            }
+            console.log(`   ✅ Connected on attempt ${connectionAttempts}`);
+            return { success: true, attempts: connectionAttempts };
+        } catch (error) {
+            console.log(`   ❌ Attempt ${i + 1} failed: ${(error as Error).message}`);
+            if (i === maxRetries - 1) throw error;
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+    }
+    return { success: false, attempts: connectionAttempts };
+};
+
 describe('Enhanced API Flow Tests - Advanced Scenarios', () => {
     beforeAll(async () => {
         await prisma.user.deleteMany();
@@ -477,26 +513,19 @@ describe('Enhanced API Flow Tests - Advanced Scenarios', () => {
     });
 
     describe('NEW FEATURE: Payment Retry Logic', () => {
-        it('should retry failed payments with exponential backoff', async () => {
+            it('should retry failed payments with exponential backoff', async () => {
             console.log('\n💳 Testing PAYMENT RETRY WITH BACKOFF');
 
-            let attemptCount = 0;
             const maxAttempts = 3;
             const baseDelay = 1000; // ms
+            const succeedAfter = 3; // Follows logic: if attempts < 3 throw error, so succeeds on 3
 
-            const mockPayment = async () => {
-                attemptCount++;
-                if (attemptCount < 3) {
-                    throw new Error('Payment gateway timeout');
-                }
-                return { success: true, id: 'pay_123' };
-            };
-
+            const gateway = new PaymentGatewayMock(succeedAfter);
             const delays: number[] = [];
 
             for (let attempt = 0; attempt < maxAttempts; attempt++) {
                 try {
-                    const result = await mockPayment();
+                    const result = await gateway.process();
                     console.log(`   ✅ Payment succeeded on attempt ${attempt + 1}`);
                     expect(result.success).toBe(true);
                     break;
@@ -512,8 +541,9 @@ describe('Enhanced API Flow Tests - Advanced Scenarios', () => {
             }
 
             console.log(`   Retry delays: ${delays.join(', ')}ms`);
-            expect(attemptCount).toBe(3);
+            expect(gateway.attempts).toBe(3);
         });
+
 
         it('should handle payment webhook retries idempotently', async () => {
             console.log('\n💳 Testing WEBHOOK IDEMPOTENCY');
@@ -644,34 +674,15 @@ describe('Enhanced API Flow Tests - Advanced Scenarios', () => {
     describe('FAILURE RECOVERY: Database Failures', () => {
         it('should recover from connection timeout', async () => {
             console.log('\n🔧 Testing DATABASE CONNECTION RECOVERY');
-
-            let connectionAttempts = 0;
             const maxRetries = 3;
+            const succeedOnAttempt = 3;
 
-            const connectWithRetry = async () => {
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        connectionAttempts++;
-
-                        // Simulate connection failure first 2 times
-                        if (connectionAttempts < 3) {
-                            throw new Error('Connection timeout');
-                        }
-
-                        console.log(`   ✅ Connected on attempt ${connectionAttempts}`);
-                        return true;
-                    } catch (error) {
-                        console.log(`   ❌ Attempt ${i + 1} failed: ${(error as Error).message}`);
-                        if (i === maxRetries - 1) throw error;
-                        await new Promise(resolve => setTimeout(resolve, 100));
-                    }
-                }
-            };
-
-            const connected = await connectWithRetry();
-            expect(connected).toBe(true);
-            expect(connectionAttempts).toBe(3);
+            const { success, attempts } = await executeConnectionWithRetry(maxRetries, succeedOnAttempt);
+            
+            expect(success).toBe(true);
+            expect(attempts).toBe(3);
         });
+
 
         it('should handle transaction rollback on error', async () => {
             console.log('\n🔧 Testing TRANSACTION ROLLBACK');
