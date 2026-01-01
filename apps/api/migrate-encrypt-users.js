@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument */
 // Data Migration Script: Encrypt Existing User Data
 // Run with: node migrate-encrypt-users.js
 
@@ -40,7 +41,6 @@ async function migrateUsers() {
     logSummary(users.length, successCount, errorCount);
     await verifyEncryption(client);
     logNextSteps();
-
   } catch (error) {
     console.error('❌ Migration failed:', error);
     throw error;
@@ -87,7 +87,7 @@ async function encryptAndSaveUser(client, user) {
     values.push(user.id);
     await client.query(
       `UPDATE users SET ${updates.join(', ')} WHERE id = $${values.length}`,
-      values
+      values,
     );
 
     console.log(`✅ Encrypted user ID ${user.id}`);
@@ -123,7 +123,9 @@ function encryptData(text) {
 }
 
 function decryptData(ciphertext) {
-  return CryptoJS.AES.decrypt(ciphertext, ENCRYPTION_KEY).toString(CryptoJS.enc.Utf8);
+  return CryptoJS.AES.decrypt(ciphertext, ENCRYPTION_KEY).toString(
+    CryptoJS.enc.Utf8,
+  );
 }
 
 function logSummary(total, success, error) {

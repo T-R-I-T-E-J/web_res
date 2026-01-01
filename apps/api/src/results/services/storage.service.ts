@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -24,7 +24,7 @@ export interface StorageResult {
 }
 
 @Injectable()
-export class StorageService {
+export class StorageService implements OnModuleInit {
   private readonly logger = new Logger(StorageService.name);
   private readonly uploadDir: string;
   private readonly baseUrl: string;
@@ -38,9 +38,11 @@ export class StorageService {
     // Get base URL for serving files
     this.baseUrl =
       this.configService.get<string>('APP_URL') || 'http://localhost:8080';
+  }
 
+  async onModuleInit() {
     // Ensure upload directory exists
-    this.ensureUploadDirectory();
+    await this.ensureUploadDirectory();
   }
 
   /**
@@ -103,8 +105,9 @@ export class StorageService {
         url,
       };
     } catch (error) {
-      this.logger.error(`Failed to upload file: ${error.message}`, error.stack);
-      throw new Error(`File upload failed: ${error.message}`);
+      const err = error as Error;
+      this.logger.error(`Failed to upload file: ${err.message}`, err.stack);
+      throw new Error(`File upload failed: ${err.message}`);
     }
   }
 
@@ -120,8 +123,9 @@ export class StorageService {
       await fs.unlink(filePath);
       this.logger.log(`File deleted successfully: ${storedFileName}`);
     } catch (error) {
-      this.logger.error(`Failed to delete file: ${error.message}`, error.stack);
-      throw new Error(`File deletion failed: ${error.message}`);
+      const err = error as Error;
+      this.logger.error(`Failed to delete file: ${err.message}`, err.stack);
+      throw new Error(`File deletion failed: ${err.message}`);
     }
   }
 
@@ -163,11 +167,12 @@ export class StorageService {
         modifiedAt: stats.mtime,
       };
     } catch (error) {
+      const err = error as Error;
       this.logger.error(
-        `Failed to get file metadata: ${error.message}`,
-        error.stack,
+        `Failed to get file metadata: ${err.message}`,
+        err.stack,
       );
-      throw new Error(`Failed to get file metadata: ${error.message}`);
+      throw new Error(`Failed to get file metadata: ${err.message}`);
     }
   }
 }

@@ -21,7 +21,6 @@
   },
   "include": [
     "src",
-    "test",
-    "migrate-encrypt-users.js"
+    "test"
   ]
 }
