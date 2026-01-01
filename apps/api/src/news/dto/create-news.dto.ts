@@ -1,11 +1,21 @@
+import { Type } from 'class-transformer';
 import {
   IsString,
   IsEnum,
   IsOptional,
   IsBoolean,
   IsArray,
+  ValidateNested,
 } from 'class-validator';
 import { NewsCategory, NewsStatus } from '../entities/news.entity';
+
+export class DocumentDto {
+  @IsString()
+  url: string;
+
+  @IsString()
+  name: string;
+}
 
 export class CreateNewsDto {
   @IsString()
@@ -36,7 +46,9 @@ export class CreateNewsDto {
 
   @IsOptional()
   @IsArray()
-  documents?: { url: string; name: string }[];
+  @ValidateNested({ each: true })
+  @Type(() => DocumentDto)
+  documents?: DocumentDto[];
 
   @IsOptional()
   @IsArray()

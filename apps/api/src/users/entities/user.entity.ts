@@ -9,6 +9,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import { UserRole } from '../../auth/entities/user-role.entity.js';
 
 @Entity('users')
 export class User {
@@ -131,4 +132,7 @@ export class User {
     const phone = this.getDecryptedPhone(encryptionService);
     return encryptionService.maskPhone(phone);
   }
+
+  @OneToMany(() => UserRole, (userRole) => userRole.user)
+  user_roles: UserRole[];
 }

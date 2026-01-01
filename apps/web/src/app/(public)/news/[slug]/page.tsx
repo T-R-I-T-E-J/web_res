@@ -153,10 +153,10 @@ export default async function NewsArticlePage({ params }: { params: Params }) {
                       </div>
                     ))}
                   </div>
-                ) : article.featured_image_url ? (
-                  // Fallback to featured_image_url for backward compatibility
+                ) : article.featured_image_url || article.preview_image_url ? (
+                  // Fallback to featured_image_url or preview_image_url
                   <div className="aspect-[16/9] rounded-card overflow-hidden bg-neutral-100">
-                    <img src={article.featured_image_url} alt={article.title} className="w-full h-full object-cover" />
+                    <img src={article.featured_image_url || article.preview_image_url} alt={article.title} className="w-full h-full object-cover" />
                   </div>
                 ) : (
                   // No images available
@@ -189,7 +189,7 @@ export default async function NewsArticlePage({ params }: { params: Params }) {
                     Related Documents
                   </h3>
                   <div className="space-y-3">
-                    {article.documents.map((doc: any, index: number) => (
+                    {article.documents.filter((doc: any) => doc && doc.url && doc.name).map((doc: any, index: number) => (
                       <a
                         key={index}
                         href={doc.url}

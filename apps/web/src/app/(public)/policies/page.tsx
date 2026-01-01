@@ -10,7 +10,6 @@ export const metadata: Metadata = {
 const categories = [
   { label: 'Rules & Guidelines', icon: BookOpen, id: 'rules' },
   { label: 'Selection Policies', icon: Trophy, id: 'selection' },
-  { label: 'Event Calendar', icon: Calendar, id: 'calendar' },
   { label: 'Match Documents', icon: ClipboardList, id: 'match' },
 ]
 
@@ -101,7 +100,6 @@ const DownloadsPage = async () => {
   
   const rules = downloads.filter(d => d.category === 'rules');
   const selection = downloads.filter(d => d.category === 'selection');
-  const calendarItems = downloads.filter(d => d.category === 'calendar');
   const match = downloads.filter(d => d.category === 'match');
 
   return (
@@ -173,23 +171,6 @@ const DownloadsPage = async () => {
         </div>
       </section>
 
-      {/* Event Calendar Section */}
-      <section id="calendar" className="section bg-white">
-        <div className="container-main">
-          <h2 className="section-title">Event Calendar</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {calendarItems.length > 0 ? calendarItems.map((item) => (
-              <DownloadCard 
-                key={item.id} 
-                {...item} 
-                date={item.createdAt}
-              />
-            )) : (
-              <p className="text-neutral-500">No documents found.</p>
-            )}
-          </div>
-        </div>
-      </section>
 
       {/* Match Documents Section */}
       <section id="match" className="section bg-neutral-50">

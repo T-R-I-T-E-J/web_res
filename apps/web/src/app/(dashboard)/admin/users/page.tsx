@@ -1,44 +1,81 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Cookies from 'js-cookie'
 import { DashboardHeader } from '@/components/dashboard'
 import {
   Search, Filter, Download, Plus, MoreVertical, CheckCircle,
   XCircle, Clock, Eye, Edit, Trash2, Mail
 } from 'lucide-react'
 import clsx from 'clsx'
+import { format } from 'date-fns'
 
-const users = [
-  { id: 1, name: 'Avani Lekhara', email: 'avani@example.com', state: 'Rajasthan', classification: 'SH1', status: 'active', role: 'Shooter', joined: 'Jan 2018' },
-  { id: 2, name: 'Manish Narwal', email: 'manish@example.com', state: 'Haryana', classification: 'SH1', status: 'active', role: 'Shooter', joined: 'Mar 2019' },
-  { id: 3, name: 'Singhraj Adhana', email: 'singhraj@example.com', state: 'Haryana', classification: 'SH1', status: 'active', role: 'Shooter', joined: 'May 2017' },
-  { id: 4, name: 'Rahul Sharma', email: 'rahul@example.com', state: 'Maharashtra', classification: 'SH2', status: 'pending', role: 'Shooter', joined: 'Dec 2024' },
-  { id: 5, name: 'Priya Singh', email: 'priya@example.com', state: 'Delhi', classification: 'SH1', status: 'pending', role: 'Shooter', joined: 'Dec 2024' },
-  { id: 6, name: 'Admin User', email: 'admin@example.com', state: 'Delhi', classification: '-', status: 'active', role: 'Admin', joined: 'Jan 2015' },
-  { id: 7, name: 'Coach Verma', email: 'coach@example.com', state: 'Gujarat', classification: '-', status: 'active', role: 'Coach', joined: 'Aug 2020' },
-  { id: 8, name: 'Deepak Kumar', email: 'deepak@example.com', state: 'Punjab', classification: 'VI2', status: 'suspended', role: 'Shooter', joined: 'Jun 2021' },
-]
+interface User {
+  id: number
+  first_name: string
+  last_name: string
+  email: string
+  created_at: string
+  is_active: boolean
+  user_roles: { role: { name: string } }[]
+  // Add other fields as needed
+}
 
 const AdminUsersPage = () => {
+  const [users, setUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(true)
   const [selectedUsers, setSelectedUsers] = useState<number[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [roleFilter, setRoleFilter] = useState('all')
 
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch = user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          user.email.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesStatus = statusFilter === 'all' || user.status === statusFilter
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter
-    return matchesSearch && matchesStatus && matchesRole
-  })
+  const fetchUsers = async () => {
+    setLoading(true)
+    try {
+      const token = Cookies.get('auth_token')
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1'
+      
+      const params = new URLSearchParams()
+      if (searchQuery) params.append('search', searchQuery)
+      if (statusFilter === 'active') params.append('is_active', 'true')
+      if (statusFilter === 'suspended') params.append('is_active', 'false')
+      if (roleFilter !== 'all') params.append('role', roleFilter.toLowerCase())
+      params.append('limit', '50') // Fetch reasonable amount
+
+      const res = await fetch(`${apiUrl}/users?${params.toString()}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+
+      if (res.ok) {
+        const json = await res.json()
+        // Handle nested data structure from TransformInterceptor + Pagination
+        const userData = json.data?.data || json.data || []
+        setUsers(Array.isArray(userData) ? userData : [])
+      } else {
+        setUsers([])
+        console.error('Failed to fetch users')
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error)
+      setUsers([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      fetchUsers()
+    }, 500) // Debounce search
+    return () => clearTimeout(timeoutId)
+  }, [searchQuery, statusFilter, roleFilter])
 
   const handleSelectAll = () => {
-    if (selectedUsers.length === filteredUsers.length) {
+    if (selectedUsers.length === users.length) {
       setSelectedUsers([])
     } else {
-      setSelectedUsers(filteredUsers.map((u) => u.id))
+      setSelectedUsers(users.map((u) => u.id))
     }
   }
 
@@ -47,6 +84,14 @@ const AdminUsersPage = () => {
       setSelectedUsers(selectedUsers.filter((uid) => uid !== id))
     } else {
       setSelectedUsers([...selectedUsers, id])
+    }
+  }
+
+  const getRoleBadgeColor = (role: string) => {
+    switch (role.toLowerCase()) {
+      case 'admin': return 'bg-primary/10 text-primary'
+      case 'coach': return 'bg-interactive/10 text-interactive'
+      default: return 'bg-neutral-100 text-neutral-600'
     }
   }
 
@@ -82,7 +127,6 @@ const AdminUsersPage = () => {
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
-                <option value="pending">Pending</option>
                 <option value="suspended">Suspended</option>
               </select>
 
@@ -146,7 +190,7 @@ const AdminUsersPage = () => {
                   <th className="w-12">
                     <input
                       type="checkbox"
-                      checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
+                      checked={selectedUsers.length === users.length && users.length > 0}
                       onChange={handleSelectAll}
                       className="w-4 h-4 rounded border-neutral-300"
                     />
@@ -161,106 +205,106 @@ const AdminUsersPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.map((user) => (
-                  <tr key={user.id}>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={selectedUsers.includes(user.id)}
-                        onChange={() => handleSelectUser(user.id)}
-                        className="w-4 h-4 rounded border-neutral-300"
-                      />
-                    </td>
-                    <td>
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-neutral-100 rounded-full flex items-center justify-center">
-                          <span className="text-xs font-medium text-neutral-500">
-                            {user.name.split(' ').map(n => n[0]).join('')}
+                {loading ? (
+                   <tr><td colSpan={8} className="text-center py-8 text-neutral-500">Loading users...</td></tr>
+                ) : users.length === 0 ? (
+                   <tr><td colSpan={8} className="text-center py-8 text-neutral-500">No users found.</td></tr>
+                ) : (
+                  users.map((user) => {
+                    const roleName = user.user_roles?.[0]?.role?.name || 'User';
+                    const fullName = `${user.first_name} ${user.last_name}`;
+                    const initials = (user.first_name[0] || '') + (user.last_name[0] || '');
+
+                    return (
+                      <tr key={user.id}>
+                        <td>
+                          <input
+                            type="checkbox"
+                            checked={selectedUsers.includes(user.id)}
+                            onChange={() => handleSelectUser(user.id)}
+                            className="w-4 h-4 rounded border-neutral-300"
+                          />
+                        </td>
+                        <td>
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-neutral-100 rounded-full flex items-center justify-center">
+                              <span className="text-xs font-medium text-neutral-500">
+                                {initials.toUpperCase()}
+                              </span>
+                            </div>
+                            <div>
+                              <Link
+                                href={`/admin/users/${user.id}`}
+                                className="font-medium text-neutral-700 hover:text-primary"
+                              >
+                                {fullName}
+                              </Link>
+                              <p className="text-xs text-neutral-500">{user.email}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="text-neutral-600">-</td> 
+                        <td><span className="text-neutral-400">-</span></td>
+                        <td>
+                          <span className={clsx(
+                            'badge capitalize',
+                            getRoleBadgeColor(roleName)
+                          )}>
+                            {roleName}
                           </span>
-                        </div>
-                        <div>
-                          <Link
-                            href={`/admin/users/${user.id}`}
-                            className="font-medium text-neutral-700 hover:text-primary"
-                          >
-                            {user.name}
-                          </Link>
-                          <p className="text-xs text-neutral-500">{user.email}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="text-neutral-600">{user.state}</td>
-                    <td>
-                      {user.classification !== '-' ? (
-                        <span className="font-data font-medium text-neutral-700">
-                          {user.classification}
-                        </span>
-                      ) : (
-                        <span className="text-neutral-400">-</span>
-                      )}
-                    </td>
-                    <td>
-                      <span className={clsx(
-                        'badge',
-                        user.role === 'Admin' && 'bg-primary/10 text-primary',
-                        user.role === 'Coach' && 'bg-interactive/10 text-interactive',
-                        user.role === 'Shooter' && 'bg-neutral-100 text-neutral-600'
-                      )}>
-                        {user.role}
-                      </span>
-                    </td>
-                    <td>
-                      <span className={clsx(
-                        'badge',
-                        user.status === 'active' && 'badge-success',
-                        user.status === 'pending' && 'badge-warning',
-                        user.status === 'suspended' && 'badge-error'
-                      )}>
-                        {user.status === 'active' && <CheckCircle className="w-3 h-3 mr-1" />}
-                        {user.status === 'pending' && <Clock className="w-3 h-3 mr-1" />}
-                        {user.status === 'suspended' && <XCircle className="w-3 h-3 mr-1" />}
-                        {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="text-neutral-500 text-sm">{user.joined}</td>
-                    <td>
-                      <div className="flex items-center gap-1">
-                        <Link
-                          href={`/admin/users/${user.id}`}
-                          className="p-1.5 text-neutral-400 hover:text-primary hover:bg-neutral-100 rounded"
-                          title="View"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Link>
-                        <Link
-                          href={`/admin/users/${user.id}/edit`}
-                          className="p-1.5 text-neutral-400 hover:text-interactive hover:bg-neutral-100 rounded"
-                          title="Edit"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Link>
-                        <button
-                          className="p-1.5 text-neutral-400 hover:text-error hover:bg-error/10 rounded"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                        </td>
+                        <td>
+                          <span className={clsx(
+                            'badge',
+                            user.is_active ? 'badge-success' : 'badge-error'
+                          )}>
+                            {user.is_active ? <CheckCircle className="w-3 h-3 mr-1" /> : <XCircle className="w-3 h-3 mr-1" />}
+                            {user.is_active ? 'Active' : 'Suspended'}
+                          </span>
+                        </td>
+                        <td className="text-neutral-500 text-sm">
+                          {user.created_at ? new Date(user.created_at).toLocaleDateString() : '-'}
+                        </td>
+                        <td>
+                          <div className="flex items-center gap-1">
+                            <Link
+                              href={`/admin/users/${user.id}`}
+                              className="p-1.5 text-neutral-400 hover:text-primary hover:bg-neutral-100 rounded"
+                              title="View"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Link>
+                            <Link
+                              href={`/admin/users/${user.id}/edit`}
+                              className="p-1.5 text-neutral-400 hover:text-interactive hover:bg-neutral-100 rounded"
+                              title="Edit"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Link>
+                            <button
+                              className="p-1.5 text-neutral-400 hover:text-error hover:bg-error/10 rounded"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })
+                )}
               </tbody>
             </table>
           </div>
 
-          {/* Pagination */}
+          {/* Pagination (Simplified for now) */}
           <div className="flex items-center justify-between px-4 py-3 border-t border-neutral-100">
             <p className="text-sm text-neutral-600">
-              Showing {filteredUsers.length} of {users.length} users
+              Showing {users.length} users
             </p>
             <div className="flex gap-2">
               <button className="btn-ghost text-sm py-2" disabled>Previous</button>
-              <button className="btn-ghost text-sm py-2">Next</button>
+              <button className="btn-ghost text-sm py-2" disabled>Next</button>
             </div>
           </div>
         </div>

@@ -134,7 +134,7 @@ const NewsPage = async ({ searchParams }: { searchParams: { category?: string } 
                         excerpt={String(heroArticle.excerpt || '')}
                         category={typeof heroArticle.category === 'string' ? heroArticle.category : 'NEWS'}
                         date={formatDate(heroArticle.created_at)}
-                        imageUrl={heroArticle.featured_image_url || '/news-hero-placeholder.png'}
+                        imageUrl={heroArticle.featured_image_url || heroArticle.preview_image_url || '/news-hero-placeholder.png'}
                         href={`/news/${heroArticle.slug || heroArticle.id}`}
                       />
                    </div>
@@ -145,8 +145,8 @@ const NewsPage = async ({ searchParams }: { searchParams: { category?: string } 
                          {sideArticles.map((article: any) => (
                            <Link key={article.id} href={`/news/${article.slug || article.id}`} className="group relative flex flex-col gap-4 rounded-xl bg-white p-4 shadow-sm transition-all hover:shadow-md border border-neutral-100 h-full">
                              <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-neutral-200">
-                               {article.featured_image_url ? (
-                                  <img src={article.featured_image_url} alt={article.title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                               {article.preview_image_url || article.featured_image_url ? (
+                                  <img src={article.preview_image_url || article.featured_image_url} alt={article.title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
                                ) : (
                                   <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
                                     <span className="text-2xl">{getCategoryImage(String(article.category))}</span>
@@ -180,7 +180,7 @@ const NewsPage = async ({ searchParams }: { searchParams: { category?: string } 
                                   excerpt={String(article.excerpt || '')}
                                   category={typeof article.category === 'string' ? article.category : 'NEWS'}
                                   date={formatDate(article.created_at)}
-                                  imageUrl={article.featured_image_url}
+                                  imageUrl={article.preview_image_url || article.featured_image_url || '/news-hero-placeholder.png'}
                                   href={`/news/${article.slug || article.id}`}
                                />
                             ))}

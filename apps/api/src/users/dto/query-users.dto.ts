@@ -1,11 +1,12 @@
 import {
-  IsEmail,
+  IsEnum,
+  IsString,
   IsOptional,
+  IsEmail,
   IsBoolean,
   IsInt,
   Min,
   Max,
-  IsEnum,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -26,6 +27,14 @@ export class QueryUsersDto {
   @IsOptional()
   @IsEmail()
   email?: string;
+  
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @IsOptional()
+  @IsString()
+  role?: string;
 
   @IsOptional()
   @IsBoolean()

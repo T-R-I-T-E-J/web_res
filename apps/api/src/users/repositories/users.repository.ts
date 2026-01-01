@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere, IsNull, Not } from 'typeorm';
+import { Repository, FindOptionsWhere, IsNull, Not, ILike } from 'typeorm';
 import { User } from '../entities/user.entity.js';
 import { CreateUserDto } from '../dto/create-user.dto.js';
 import { UpdateUserDto } from '../dto/update-user.dto.js';
@@ -41,27 +41,45 @@ export class UsersRepository {
       email,
       is_active,
       email_verified,
+      search,
+      role,
     } = queryDto;
 
-    const where: FindOptionsWhere<User> = {};
+    const baseWhere: FindOptionsWhere<User> = {
+      deleted_at: IsNull(),
+    };
 
     if (email) {
-      where.email = email;
+      baseWhere.email = email;
     }
 
     if (is_active !== undefined) {
-      where.is_active = is_active;
+      baseWhere.is_active = is_active;
     }
 
     if (email_verified !== undefined) {
-      where.email_verified_at = email_verified ? Not(IsNull()) : IsNull();
+      baseWhere.email_verified_at = email_verified ? Not(IsNull()) : IsNull();
     }
 
-    // Exclude soft-deleted users
-    where.deleted_at = IsNull();
+    if (role) {
+      // @ts-ignore - nested relation query
+      baseWhere.user_roles = { role: { name: role } };
+    }
+
+    let where: FindOptionsWhere<User> | FindOptionsWhere<User>[] = baseWhere;
+
+    if (search) {
+      const searchStr = `%${search}%`;
+      where = [
+        { ...baseWhere, first_name: ILike(searchStr) },
+        { ...baseWhere, last_name: ILike(searchStr) },
+        { ...baseWhere, email: ILike(searchStr) },
+      ];
+    }
 
     const [users, total] = await this.userRepository.findAndCount({
       where,
+      relations: ['user_roles', 'user_roles.role'],
       order: sortBy ? { [sortBy]: sortOrder } : { created_at: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
