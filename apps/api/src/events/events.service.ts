@@ -17,7 +17,7 @@ export class EventsService {
     const baseSlug = createEventDto.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
+      .replace(/(?:^-+)|(?:-+$)/g, '');
 
     // Ensure uniqueness
     let slug = baseSlug;
