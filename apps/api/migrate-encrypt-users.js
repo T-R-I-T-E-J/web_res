@@ -176,12 +176,13 @@ function logNextSteps() {
 }
 
 // Run migration
-migrateUsers()
-  .then(() => {
+(async () => {
+  try {
+    await migrateUsers();
     console.log('🎉 Migration script completed!');
     process.exit(0);
-  })
-  .catch((error) => {
+  } catch (error) {
     console.error('💥 Migration script failed:', error);
     process.exit(1);
-  });
+  }
+})();
