@@ -11,7 +11,7 @@ interface LoginAttempt {
 
 @Injectable()
 export class BruteForceProtectionService {
-  private attempts: Map<string, LoginAttempt> = new Map();
+  private readonly attempts: Map<string, LoginAttempt> = new Map();
 
   // Configuration
   private readonly MAX_ATTEMPTS = 5; // Max failed attempts
