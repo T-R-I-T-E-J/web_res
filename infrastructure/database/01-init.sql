@@ -11,6 +11,9 @@ SET row_security = off;
 -- Note: Some values (e.g., 'pending', 'completed', 'cancelled') appear in multiple ENUMs.
 -- This is intentional - each ENUM represents a different domain concept and PostgreSQL
 -- ENUMs are strongly typed (values cannot be interchanged between different ENUM types).
+-- NOSONAR: String literal duplication in ENUM definitions is required in PostgreSQL DDL.
+-- Unlike procedural code, SQL DDL does not support constants that can be shared across
+-- separate ENUM type definitions. Each ENUM must explicitly list its values.
 create type public.event_type_enum as enum ('RIFLE', 'PISTOL', 'BOTH');
 create type public.competition_status_enum as enum (
     'draft',
