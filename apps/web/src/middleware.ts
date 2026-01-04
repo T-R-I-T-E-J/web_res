@@ -15,13 +15,22 @@ const SECRET_KEY = new TextEncoder().encode(JWT_SECRET || 'default-secret-change
 const ADMIN_PATHS = /^\/admin(\/.*)?$/
 const SHOOTER_PATHS = /^\/shooter(\/.*)?$/
 
-export async function middleware(request: NextRequest) {
-  // 1. Generate CSP Nonce
-  const nonce = crypto.randomUUID()
-  
-  // 2. Define Strict CSP
-  // In development, Next.js requires 'unsafe-eval' for hot module replacement
-  // In production, we use strict CSP without eval
+// Types
+type UserRoles = string[] | null
+
+// Helper to verify token
+async function verifyToken(token: string | undefined): Promise<UserRoles> {
+  if (!token) return null
+  try {
+    const { payload } = await jwtVerify(token, SECRET_KEY)
+    return (payload.roles as string[]) || []
+  } catch {
+    return null
+  }
+}
+
+// Helper to generate CSP header
+function generateCSPHeader(nonce: string): string {
   const isDevelopment = process.env.NODE_ENV === 'development'
   
   const scriptSrc = isDevelopment
@@ -47,84 +56,132 @@ export async function middleware(request: NextRequest) {
     ${isDevelopment ? '' : 'upgrade-insecure-requests;'}
   `.replace(/\s{2,}/g, ' ').trim()
 
-  // 3. Setup Request Headers (for Server Components to access nonce)
+  return cspHeader
+}
+
+// Helper to attach CSP header to response
+function makeResponse(response: NextResponse, csp: string): NextResponse {
+  response.headers.set('Content-Security-Policy', csp)
+  return response
+}
+
+// Helper to create redirect with CSP
+function redirectWithCSP(url: URL, cspHeader: string): NextResponse {
+  return makeResponse(NextResponse.redirect(url), cspHeader)
+}
+
+// Helper to handle login page access
+function handleLoginPageAccess(roles: UserRoles, request: NextRequest, cspHeader: string): NextResponse {
+  if (!roles) {
+    const requestHeaders = new Headers(request.headers)
+    return makeResponse(NextResponse.next({ request: { headers: requestHeaders } }), cspHeader)
+  }
+
+  if (roles.includes('admin')) {
+    return redirectWithCSP(new URL('/admin', request.url), cspHeader)
+  }
+
+  if (roles.includes('shooter')) {
+    return redirectWithCSP(new URL('/shooter', request.url), cspHeader)
+  }
+
+  const requestHeaders = new Headers(request.headers)
+  return makeResponse(NextResponse.next({ request: { headers: requestHeaders } }), cspHeader)
+}
+
+// Helper to handle unauthorized access
+function handleUnauthorizedAccess(pathname: string, request: NextRequest, cspHeader: string): NextResponse {
+  const url = new URL('/login', request.url)
+  url.searchParams.set('callbackUrl', pathname)
+  return redirectWithCSP(url, cspHeader)
+}
+
+// Helper to handle admin route access
+function handleAdminRouteAccess(roles: UserRoles, request: NextRequest, cspHeader: string): NextResponse {
+  if (roles?.includes('admin')) {
+    const requestHeaders = new Headers(request.headers)
+    return makeResponse(NextResponse.next({ request: { headers: requestHeaders } }), cspHeader)
+  }
+
+  if (roles?.includes('shooter')) {
+    return redirectWithCSP(new URL('/shooter', request.url), cspHeader)
+  }
+
+  return redirectWithCSP(new URL('/login', request.url), cspHeader)
+}
+
+// Helper to handle shooter route access
+function handleShooterRouteAccess(roles: UserRoles, request: NextRequest, cspHeader: string): NextResponse {
+  const hasAccess = roles?.includes('shooter') || roles?.includes('admin')
+  
+  if (hasAccess) {
+    const requestHeaders = new Headers(request.headers)
+    return makeResponse(NextResponse.next({ request: { headers: requestHeaders } }), cspHeader)
+  }
+
+  return redirectWithCSP(new URL('/login', request.url), cspHeader)
+}
+
+// Helper to check if route needs protection
+function isProtectedRoute(pathname: string): { isAdmin: boolean; isShooter: boolean; needsProtection: boolean } {
+  const isAdmin = ADMIN_PATHS.test(pathname)
+  const isShooter = SHOOTER_PATHS.test(pathname)
+  return {
+    isAdmin,
+    isShooter,
+    needsProtection: isAdmin || isShooter
+  }
+}
+
+export async function middleware(request: NextRequest) {
+  // 1. Generate CSP Nonce
+  const nonce = crypto.randomUUID()
+  const cspHeader = generateCSPHeader(nonce)
+  
+  // 2. Setup Request Headers (for Server Components to access nonce)
   const requestHeaders = new Headers(request.headers)
   requestHeaders.set('x-nonce', nonce)
   requestHeaders.set('Content-Security-Policy', cspHeader)
 
-  // Helper to verify token
-  async function verifyToken(token: string | undefined) {
-    if (!token) return null
-    try {
-      const { payload } = await jwtVerify(token, SECRET_KEY)
-      return (payload.roles as string[]) || []
-    } catch {
-      return null
-    }
-  }
-
   const token = request.cookies.get('auth_token')?.value
   const { pathname } = request.nextUrl
   
-  // 4. Auth Logic with CSP Support
-
-  // Redirect to dashboard if trying to access login while authenticated
+  // 3. Handle login page access
   if (pathname === '/login') {
     const roles = await verifyToken(token)
-    if (roles) {
-      if (roles.includes('admin')) {
-        return makeResponse(NextResponse.redirect(new URL('/admin', request.url)), cspHeader)
-      }
-      if (roles.includes('shooter')) {
-        return makeResponse(NextResponse.redirect(new URL('/shooter', request.url)), cspHeader)
-      }
-    }
+    return handleLoginPageAccess(roles, request, cspHeader)
+  }
+
+  // 4. Check if route needs protection
+  const { isAdmin, isShooter, needsProtection } = isProtectedRoute(pathname)
+
+  if (!needsProtection) {
     return makeResponse(NextResponse.next({ request: { headers: requestHeaders } }), cspHeader)
   }
 
-  // Identify protection needed
-  const isAdminRoute = ADMIN_PATHS.test(pathname)
-  const isShooterRoute = SHOOTER_PATHS.test(pathname)
-
-  if (!isAdminRoute && !isShooterRoute) {
-    return makeResponse(NextResponse.next({ request: { headers: requestHeaders } }), cspHeader)
-  }
-
-  // Check token
+  // 5. Check if user has valid token
   if (!token) {
-    const url = new URL('/login', request.url)
-    url.searchParams.set('callbackUrl', pathname)
-    return makeResponse(NextResponse.redirect(url), cspHeader)
+    return handleUnauthorizedAccess(pathname, request, cspHeader)
   }
 
-  // Verify and Role Check
+  // 6. Verify token and get roles
   const roles = await verifyToken(token)
   
   if (!roles) {
-    // Invalid token
-    const url = new URL('/login', request.url)
-    return makeResponse(NextResponse.redirect(url), cspHeader)
+    return redirectWithCSP(new URL('/login', request.url), cspHeader)
   }
 
-  if (isAdminRoute && !roles.includes('admin')) {
-    if (roles.includes('shooter')) {
-      return makeResponse(NextResponse.redirect(new URL('/shooter', request.url)), cspHeader)
-    }
-    return makeResponse(NextResponse.redirect(new URL('/login', request.url)), cspHeader)
+  // 7. Handle route-specific access control
+  if (isAdmin) {
+    return handleAdminRouteAccess(roles, request, cspHeader)
   }
 
-  if (isShooterRoute && !roles.includes('shooter') && !roles.includes('admin')) {
-    return makeResponse(NextResponse.redirect(new URL('/login', request.url)), cspHeader)
+  if (isShooter) {
+    return handleShooterRouteAccess(roles, request, cspHeader)
   }
 
-  // Allowed
+  // Fallback (should not reach here)
   return makeResponse(NextResponse.next({ request: { headers: requestHeaders } }), cspHeader)
-}
-
-// Helper to attach CSP header to response
-function makeResponse(response: NextResponse, csp: string) {
-  response.headers.set('Content-Security-Policy', csp)
-  return response
 }
 
 export const config = {

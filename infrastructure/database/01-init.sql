@@ -1,16 +1,14 @@
 -- Auto-generated Master Database Initialization Script
 -- Generated: 2025-12-28
 -- Source: docs/database/*.md and 02-refinements.sql
-
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
-
-
-
+-- Create ENUM types to avoid duplicated string literals
+create type public.event_type_enum as enum ('RIFLE', 'PISTOL', 'BOTH');
 -- Block 1 ========================================
 create table public.users (
     id bigint generated always as identity primary key,
@@ -28,9 +26,7 @@ create table public.users (
     updated_at timestamptz not null default now(),
     deleted_at timestamptz
 );
-
 comment on table public.users is 'Base user accounts for authentication and profile information. All platform users have an entry here.';
-
 -- Block 2 ========================================
 create table public.roles (
     id bigint generated always as identity primary key,
@@ -43,9 +39,7 @@ create table public.roles (
     level integer not null default 0,
     created_at timestamptz not null default now()
 );
-
 comment on table public.roles is 'Role definitions for RBAC. System roles include: admin, shooter, coach, official.';
-
 -- Block 3 ========================================
 create table public.user_roles (
     id bigint generated always as identity primary key,
@@ -56,9 +50,7 @@ create table public.user_roles (
     expires_at timestamptz,
     unique(user_id, role_id)
 );
-
 comment on table public.user_roles is 'Junction table for user-role assignments. Supports temporary role assignments via expires_at.';
-
 -- Block 4 ========================================
 create table public.user_sessions (
     id bigint generated always as identity primary key,
@@ -71,9 +63,7 @@ create table public.user_sessions (
     expires_at timestamptz not null,
     created_at timestamptz not null default now()
 );
-
 comment on table public.user_sessions is 'Active user sessions for JWT refresh token management. Sessions older than 30 days are auto-purged.';
-
 -- Block 5 ========================================
 create table public.state_associations (
     id bigint generated always as identity primary key,
@@ -89,24 +79,20 @@ create table public.state_associations (
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
-
 comment on table public.state_associations is 'State/unit rifle associations affiliated with Para Shooting Committee of India.';
-
 -- Block 6 ========================================
 create table public.disability_categories (
     id bigint generated always as identity primary key,
     code varchar(10) not null unique,
     name varchar(100) not null,
     description text not null,
-    event_type varchar(20) not null check (event_type in ('RIFLE', 'PISTOL', 'BOTH')),
+    event_type public.event_type_enum not null,
     min_impairment text,
     equipment_allowed jsonb,
     is_active boolean not null default true,
     created_at timestamptz not null default now()
 );
-
 comment on table public.disability_categories is 'World Para Shooting (WSPS) sport classification categories for para-athletes.';
-
 -- Block 7 ========================================
 create table public.shooters (
     id bigint generated always as identity primary key,
@@ -130,25 +116,16 @@ create table public.shooters (
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
-
 comment on table public.shooters is 'Para-shooter profiles with personal information, affiliations, and achievements.';
-
 -- Auto-generate Shooter ID (PSCI-XXXX)
 create sequence public.shooter_id_seq start 1001;
-
-create or replace function public.generate_shooter_id() returns trigger as $$
-begin
-    new.shooter_id := 'PSCI-' || nextval('public.shooter_id_seq');
-    return new;
+create or replace function public.generate_shooter_id() returns trigger as $$ begin new.shooter_id := 'PSCI-' || nextval('public.shooter_id_seq');
+return new;
 end;
 $$ language plpgsql;
-
-create trigger set_shooter_id
-before insert on public.shooters
-for each row
-when (new.shooter_id is null)
-execute function public.generate_shooter_id();
-
+create trigger set_shooter_id before
+insert on public.shooters for each row
+    when (new.shooter_id is null) execute function public.generate_shooter_id();
 -- Block 8 ========================================
 create table public.shooter_classifications (
     id bigint generated always as identity primary key,
@@ -167,9 +144,7 @@ create table public.shooter_classifications (
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
-
 comment on table public.shooter_classifications is 'WSPS classification records for shooters. Maintains history with is_current flag.';
-
 -- Block 9 ========================================
 create table public.venues (
     id bigint generated always as identity primary key,
@@ -180,8 +155,8 @@ create table public.venues (
     state varchar(100) not null,
     country varchar(100) not null default 'India',
     pin_code varchar(10),
-    latitude decimal(10,8),
-    longitude decimal(11,8),
+    latitude decimal(10, 8),
+    longitude decimal(11, 8),
     facilities jsonb default '{}',
     capacity integer,
     contact_name varchar(200),
@@ -191,9 +166,7 @@ create table public.venues (
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
-
 comment on table public.venues is 'Shooting ranges and competition venues with location and facility details.';
-
 -- Block 10 ========================================
 create table public.event_categories (
     id bigint generated always as identity primary key,
@@ -205,9 +178,7 @@ create table public.event_categories (
     is_active boolean not null default true,
     created_at timestamptz not null default now()
 );
-
 comment on table public.event_categories is 'High-level shooting event categories: Rifle, Pistol, Shotgun.';
-
 -- Block 11 ========================================
 create table public.shooting_events (
     id bigint generated always as identity primary key,
@@ -217,8 +188,8 @@ create table public.shooting_events (
     distance varchar(20) not null,
     shots_qualification integer not null,
     shots_final integer,
-    max_score_qualification decimal(7,1) not null,
-    max_score_final decimal(7,1),
+    max_score_qualification decimal(7, 1) not null,
+    max_score_final decimal(7, 1),
     time_limit_minutes integer,
     gender varchar(10) check (gender in ('men', 'women', 'mixed')),
     disability_categories jsonb default '[]',
@@ -229,9 +200,7 @@ create table public.shooting_events (
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
-
 comment on table public.shooting_events is 'Specific shooting event definitions with scoring parameters and eligibility.';
-
 -- Block 12 ========================================
 create table public.competitions (
     id bigint generated always as identity primary key,
@@ -239,23 +208,44 @@ create table public.competitions (
     name varchar(200) not null,
     code varchar(30) unique,
     competition_type varchar(30) not null check (
-        competition_type in ('CHAMPIONSHIP', 'WORLD_CUP', 'GRAND_PRIX', 'OPEN', 'SELECTION_TRIAL', 'LEAGUE')
+        competition_type in (
+            'CHAMPIONSHIP',
+            'WORLD_CUP',
+            'GRAND_PRIX',
+            'OPEN',
+            'SELECTION_TRIAL',
+            'LEAGUE'
+        )
     ),
     level varchar(20) not null check (
-        level in ('INTERNATIONAL', 'NATIONAL', 'STATE', 'ZONAL', 'CLUB')
+        level in (
+            'INTERNATIONAL',
+            'NATIONAL',
+            'STATE',
+            'ZONAL',
+            'CLUB'
+        )
     ),
     venue_id bigint references public.venues(id),
     start_date date not null,
     end_date date not null,
     registration_opens timestamptz,
     registration_closes timestamptz,
-    entry_fee decimal(10,2) default 0,
+    entry_fee decimal(10, 2) default 0,
     max_participants integer,
     description text,
     rules_document_url text,
     schedule_document_url text,
     status varchar(20) not null default 'draft' check (
-        status in ('draft', 'upcoming', 'registration_open', 'registration_closed', 'ongoing', 'completed', 'cancelled')
+        status in (
+            'draft',
+            'upcoming',
+            'registration_open',
+            'registration_closed',
+            'ongoing',
+            'completed',
+            'cancelled'
+        )
     ),
     is_wsps_ranked boolean not null default false,
     is_record_eligible boolean not null default true,
@@ -267,9 +257,7 @@ create table public.competitions (
     updated_at timestamptz not null default now(),
     check (end_date >= start_date)
 );
-
 comment on table public.competitions is 'Championships, tournaments, and competition events with scheduling and registration details.';
-
 -- Block 13 ========================================
 create table public.competition_events (
     id bigint generated always as identity primary key,
@@ -280,18 +268,23 @@ create table public.competition_events (
     qualification_end_time time,
     final_time time,
     max_entries integer,
-    entry_fee_override decimal(10,2),
+    entry_fee_override decimal(10, 2),
     status varchar(20) not null default 'scheduled' check (
-        status in ('scheduled', 'ongoing', 'qualification_complete', 'final_ongoing', 'completed', 'cancelled')
+        status in (
+            'scheduled',
+            'ongoing',
+            'qualification_complete',
+            'final_ongoing',
+            'completed',
+            'cancelled'
+        )
     ),
     results_finalized_at timestamptz,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now(),
     unique(competition_id, shooting_event_id)
 );
-
 comment on table public.competition_events is 'Individual shooting events within a competition with scheduling details.';
-
 -- Block 14 ========================================
 create table public.event_relays (
     id bigint generated always as identity primary key,
@@ -304,9 +297,7 @@ create table public.event_relays (
     created_at timestamptz not null default now(),
     unique(competition_event_id, relay_number)
 );
-
 comment on table public.event_relays is 'Specific relays and time slots for competition events.';
-
 -- Block 15 ========================================
 create table public.competition_entries (
     id bigint generated always as identity primary key,
@@ -317,13 +308,21 @@ create table public.competition_entries (
     bib_number varchar(10),
     firing_point varchar(10),
     entry_status varchar(20) not null default 'pending' check (
-        entry_status in ('pending', 'confirmed', 'waitlisted', 'withdrawn', 'disqualified', 'dns', 'dnf')
+        entry_status in (
+            'pending',
+            'confirmed',
+            'waitlisted',
+            'withdrawn',
+            'disqualified',
+            'dns',
+            'dnf'
+        )
     ),
     payment_status varchar(20) not null default 'pending' check (
         payment_status in ('pending', 'paid', 'waived', 'refunded')
     ),
     payment_id bigint,
-    entry_fee_paid decimal(10,2),
+    entry_fee_paid decimal(10, 2),
     registered_at timestamptz not null default now(),
     confirmed_at timestamptz,
     withdrawn_at timestamptz,
@@ -334,9 +333,7 @@ create table public.competition_entries (
     unique(competition_event_id, shooter_id),
     unique(event_relay_id, firing_point)
 );
-
 comment on table public.competition_entries is 'Shooter registrations for competition events with payment and status tracking.';
-
 -- Block 16 ========================================
 create table public.scores (
     id bigint generated always as identity primary key,
@@ -344,12 +341,18 @@ create table public.scores (
     stage varchar(20) not null check (stage in ('QUALIFICATION', 'FINAL', 'SHOOTOFF')),
     series_scores jsonb not null default '[]',
     inner_tens integer default 0,
-    total_score decimal(7,1) not null check (total_score >= 0),
+    total_score decimal(7, 1) not null check (total_score >= 0),
     rank_in_stage integer,
     qualified_for_final boolean default false,
     is_record boolean default false,
     record_type varchar(30) check (
-        record_type in ('WORLD_RECORD', 'ASIAN_RECORD', 'NATIONAL_RECORD', 'COMPETITION_RECORD', 'PERSONAL_BEST')
+        record_type in (
+            'WORLD_RECORD',
+            'ASIAN_RECORD',
+            'NATIONAL_RECORD',
+            'COMPETITION_RECORD',
+            'PERSONAL_BEST'
+        )
     ),
     equipment_check_passed boolean default true,
     protest_filed boolean default false,
@@ -360,9 +363,7 @@ create table public.scores (
     updated_at timestamptz not null default now(),
     unique(competition_entry_id, stage)
 );
-
 comment on table public.scores is 'Individual shooter scores with detailed series breakdown, records, and verification status.';
-
 -- Block 17 ========================================
 create table public.rankings (
     id bigint generated always as identity primary key,
@@ -371,8 +372,8 @@ create table public.rankings (
     ranking_type varchar(20) not null check (ranking_type in ('NATIONAL', 'WORLD', 'ASIAN')),
     rank integer not null check (rank > 0),
     previous_rank integer,
-    ranking_points decimal(10,2) not null default 0,
-    best_score decimal(7,1),
+    ranking_points decimal(10, 2) not null default 0,
+    best_score decimal(7, 1),
     competitions_counted integer default 0,
     last_competition_date date,
     valid_from date not null,
@@ -380,11 +381,14 @@ create table public.rankings (
     is_current boolean not null default true,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now(),
-    unique(shooter_id, shooting_event_id, ranking_type, valid_from)
+    unique(
+        shooter_id,
+        shooting_event_id,
+        ranking_type,
+        valid_from
+    )
 );
-
 comment on table public.rankings is 'National and international rankings by event with historical tracking.';
-
 -- Block 18 ========================================
 create table public.membership_types (
     id bigint generated always as identity primary key,
@@ -392,14 +396,12 @@ create table public.membership_types (
     code varchar(20) not null unique,
     description text,
     duration_months integer,
-    price decimal(10,2) not null check (price >= 0),
+    price decimal(10, 2) not null check (price >= 0),
     benefits jsonb default '[]',
     is_active boolean not null default true,
     created_at timestamptz not null default now()
 );
-
 comment on table public.membership_types is 'Membership type definitions with pricing and benefits.';
-
 -- Block 19 ========================================
 create table public.memberships (
     id bigint generated always as identity primary key,
@@ -410,9 +412,15 @@ create table public.memberships (
     start_date date not null,
     end_date date,
     status varchar(20) not null default 'pending' check (
-        status in ('pending', 'active', 'expired', 'cancelled', 'suspended')
+        status in (
+            'pending',
+            'active',
+            'expired',
+            'cancelled',
+            'suspended'
+        )
     ),
-    amount_paid decimal(10,2) not null,
+    amount_paid decimal(10, 2) not null,
     payment_id bigint,
     approved_by bigint references public.users(id),
     approved_at timestamptz,
@@ -420,21 +428,33 @@ create table public.memberships (
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
-
 comment on table public.memberships is 'User membership records with status and payment tracking.';
-
 -- Block 20 ========================================
 create table public.payments (
     id bigint generated always as identity primary key,
     public_id uuid not null default gen_random_uuid() unique,
     user_id bigint not null references public.users(id) on delete restrict,
     payment_type varchar(30) not null check (
-        payment_type in ('MEMBERSHIP', 'ENTRY_FEE', 'FINE', 'DONATION', 'OTHER')
+        payment_type in (
+            'MEMBERSHIP',
+            'ENTRY_FEE',
+            'FINE',
+            'DONATION',
+            'OTHER'
+        )
     ),
-    amount decimal(10,2) not null check (amount > 0),
+    amount decimal(10, 2) not null check (amount > 0),
     currency varchar(3) not null default 'INR',
     status varchar(20) not null default 'pending' check (
-        status in ('pending', 'processing', 'completed', 'failed', 'cancelled', 'refunded', 'partially_refunded')
+        status in (
+            'pending',
+            'processing',
+            'completed',
+            'failed',
+            'cancelled',
+            'refunded',
+            'partially_refunded'
+        )
     ),
     razorpay_order_id varchar(50) unique,
     razorpay_payment_id varchar(50) unique,
@@ -450,14 +470,12 @@ create table public.payments (
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
-
 comment on table public.payments is 'Payment transactions with Razorpay integration for memberships and entry fees.';
-
 -- Block 21 ========================================
 create table public.refunds (
     id bigint generated always as identity primary key,
     payment_id bigint not null references public.payments(id),
-    amount decimal(10,2) not null check (amount > 0),
+    amount decimal(10, 2) not null check (amount > 0),
     status varchar(20) not null default 'pending' check (
         status in ('pending', 'processing', 'completed', 'failed')
     ),
@@ -469,9 +487,7 @@ create table public.refunds (
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
-
 comment on table public.refunds is 'Refund records for payment reversals with Razorpay integration.';
-
 -- Block 22 ========================================
 create table public.news_articles (
     id bigint generated always as identity primary key,
@@ -482,12 +498,24 @@ create table public.news_articles (
     content text not null,
     featured_image_url text,
     category varchar(50) not null check (
-        category in ('NEWS', 'ANNOUNCEMENT', 'RESULT', 'ACHIEVEMENT', 'EVENT', 'PRESS_RELEASE')
+        category in (
+            'NEWS',
+            'ANNOUNCEMENT',
+            'RESULT',
+            'ACHIEVEMENT',
+            'EVENT',
+            'PRESS_RELEASE'
+        )
     ),
     tags jsonb default '[]',
     author_id bigint not null references public.users(id),
     status varchar(20) not null default 'draft' check (
-        status in ('draft', 'pending_review', 'published', 'archived')
+        status in (
+            'draft',
+            'pending_review',
+            'published',
+            'archived'
+        )
     ),
     is_featured boolean default false,
     is_pinned boolean default false,
@@ -497,15 +525,21 @@ create table public.news_articles (
     updated_at timestamptz not null default now(),
     deleted_at timestamptz
 );
-
 comment on table public.news_articles is 'News articles, announcements, and press releases for the public website.';
-
 -- Block 23 ========================================
 create table public.notifications (
     id bigint generated always as identity primary key,
     user_id bigint not null references public.users(id) on delete cascade,
     type varchar(50) not null check (
-        type in ('SYSTEM', 'COMPETITION', 'PAYMENT', 'RESULT', 'MEMBERSHIP', 'REMINDER', 'ALERT')
+        type in (
+            'SYSTEM',
+            'COMPETITION',
+            'PAYMENT',
+            'RESULT',
+            'MEMBERSHIP',
+            'REMINDER',
+            'ALERT'
+        )
     ),
     title varchar(255) not null,
     message text not null,
@@ -515,9 +549,7 @@ create table public.notifications (
     read_at timestamptz,
     created_at timestamptz not null default now()
 );
-
 comment on table public.notifications is 'System notifications for users including competition updates, payments, and alerts.';
-
 -- Block 24 ========================================
 create table public.document_categories (
     id bigint generated always as identity primary key,
@@ -529,9 +561,7 @@ create table public.document_categories (
     is_active boolean default true,
     created_at timestamptz not null default now()
 );
-
 comment on table public.document_categories is 'Categories for organizing downloadable documents (Forms, Rules, Guidelines).';
-
 -- Block 25 ========================================
 create table public.documents (
     id bigint generated always as identity primary key,
@@ -552,9 +582,7 @@ create table public.documents (
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
-
 comment on table public.documents is 'Downloadable documents including forms, rules, and guidelines.';
-
 -- Block 26 ========================================
 create table public.contact_messages (
     id bigint generated always as identity primary key,
@@ -565,7 +593,13 @@ create table public.contact_messages (
     message text not null,
     category varchar(50),
     status varchar(20) default 'new' check (
-        status in ('new', 'in_progress', 'responded', 'closed', 'spam')
+        status in (
+            'new',
+            'in_progress',
+            'responded',
+            'closed',
+            'spam'
+        )
     ),
     assigned_to bigint references public.users(id),
     response text,
@@ -575,9 +609,7 @@ create table public.contact_messages (
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
-
 comment on table public.contact_messages is 'Contact form submissions from the public website.';
-
 -- Block 27 ========================================
 create table public.committee_members (
     id bigint generated always as identity primary key,
@@ -590,22 +622,36 @@ create table public.committee_members (
     term_start date,
     term_end date,
     committee_type varchar(50) not null check (
-        committee_type in ('EXECUTIVE', 'TECHNICAL', 'SELECTION', 'DISCIPLINARY', 'FINANCE')
+        committee_type in (
+            'EXECUTIVE',
+            'TECHNICAL',
+            'SELECTION',
+            'DISCIPLINARY',
+            'FINANCE'
+        )
     ),
     sort_order integer default 0,
     is_active boolean default true,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
-
 comment on table public.committee_members is 'Executive and technical committee member profiles for the About Us page.';
-
 -- Block 28 ========================================
 create table public.audit_logs (
     id bigint generated always as identity primary key,
     user_id bigint references public.users(id),
     action varchar(50) not null check (
-        action in ('CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'PASSWORD_CHANGE', 'ROLE_CHANGE', 'EXPORT', 'BULK_UPDATE')
+        action in (
+            'CREATE',
+            'UPDATE',
+            'DELETE',
+            'LOGIN',
+            'LOGOUT',
+            'PASSWORD_CHANGE',
+            'ROLE_CHANGE',
+            'EXPORT',
+            'BULK_UPDATE'
+        )
     ),
     table_name varchar(100) not null,
     record_id bigint,
@@ -616,15 +662,20 @@ create table public.audit_logs (
     request_id uuid,
     created_at timestamptz not null default now()
 );
-
 comment on table public.audit_logs is 'Comprehensive audit trail for compliance and security monitoring.';
-
 -- Block 29 ========================================
 create table public.scheduled_jobs (
     id bigint generated always as identity primary key,
     job_name varchar(100) not null unique,
     job_type varchar(50) not null check (
-        job_type in ('CLEANUP', 'RANKING_UPDATE', 'EMAIL_DIGEST', 'BACKUP', 'REPORT', 'SYNC')
+        job_type in (
+            'CLEANUP',
+            'RANKING_UPDATE',
+            'EMAIL_DIGEST',
+            'BACKUP',
+            'REPORT',
+            'SYNC'
+        )
     ),
     schedule varchar(50),
     last_run_at timestamptz,
@@ -639,128 +690,133 @@ create table public.scheduled_jobs (
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
-
 comment on table public.scheduled_jobs is 'Background job scheduling and execution tracking.';
-
 -- Block 30 ========================================
 -- Users
 create index idx_users_email on public.users(email);
 create index idx_users_public_id on public.users(public_id);
-create index idx_users_deleted_at on public.users(deleted_at) where deleted_at is null;
-
+create index idx_users_deleted_at on public.users(deleted_at)
+where deleted_at is null;
 -- Shooters
 create index idx_shooters_user_id on public.shooters(user_id);
 create index idx_shooters_shooter_id on public.shooters(shooter_id);
 create index idx_shooters_state_association on public.shooters(state_association_id);
-
 -- Shooter Classifications
 create index idx_shooter_classifications_shooter on public.shooter_classifications(shooter_id);
-create index idx_shooter_classifications_current on public.shooter_classifications(shooter_id, is_current) where is_current = true;
-
+create index idx_shooter_classifications_current on public.shooter_classifications(shooter_id, is_current)
+where is_current = true;
 -- Competitions
 create index idx_competitions_dates on public.competitions(start_date, end_date);
 create index idx_competitions_status on public.competitions(status);
 create index idx_competitions_level on public.competitions(level);
-
 -- Competition Entries
 create index idx_competition_entries_shooter on public.competition_entries(shooter_id);
 create index idx_competition_entries_event on public.competition_entries(competition_event_id);
 create index idx_competition_entries_status on public.competition_entries(entry_status);
-
 -- Scores
 create index idx_scores_entry on public.scores(competition_entry_id);
 create index idx_scores_stage on public.scores(stage);
-
 -- Rankings
 create index idx_rankings_shooter_event on public.rankings(shooter_id, shooting_event_id);
-create index idx_rankings_current on public.rankings(is_current) where is_current = true;
-
+create index idx_rankings_current on public.rankings(is_current)
+where is_current = true;
 -- Payments
 create index idx_payments_user on public.payments(user_id);
 create index idx_payments_status on public.payments(status);
 create index idx_payments_razorpay_order on public.payments(razorpay_order_id);
-
 -- Memberships
 create index idx_memberships_user on public.memberships(user_id);
 create index idx_memberships_status on public.memberships(status);
-
 -- News Articles
 create index idx_news_articles_status on public.news_articles(status);
-create index idx_news_articles_published on public.news_articles(published_at) where status = 'published';
+create index idx_news_articles_published on public.news_articles(published_at)
+where status = 'published';
 create index idx_news_articles_slug on public.news_articles(slug);
-
 -- Notifications
-create index idx_notifications_user_unread on public.notifications(user_id, is_read) where is_read = false;
-
+create index idx_notifications_user_unread on public.notifications(user_id, is_read)
+where is_read = false;
 -- Audit Logs
 create index idx_audit_logs_user on public.audit_logs(user_id);
 create index idx_audit_logs_table_record on public.audit_logs(table_name, record_id);
 create index idx_audit_logs_created on public.audit_logs(created_at);
-
 -- Block 31 ========================================
 -- Function to update updated_at timestamp
-create or replace function public.update_updated_at_column()
-returns trigger as $$
-begin
-    new.updated_at = now();
-    return new;
+create or replace function public.update_updated_at_column() returns trigger as $$ begin new.updated_at = now();
+return new;
 end;
 $$ language plpgsql;
-
 -- Apply to all tables with updated_at
-create trigger update_users_updated_at before update on public.users
-    for each row execute function public.update_updated_at_column();
-
-create trigger update_shooters_updated_at before update on public.shooters
-    for each row execute function public.update_updated_at_column();
-
-create trigger update_competitions_updated_at before update on public.competitions
-    for each row execute function public.update_updated_at_column();
-
+create trigger update_users_updated_at before
+update on public.users for each row execute function public.update_updated_at_column();
+create trigger update_shooters_updated_at before
+update on public.shooters for each row execute function public.update_updated_at_column();
+create trigger update_competitions_updated_at before
+update on public.competitions for each row execute function public.update_updated_at_column();
 -- ... (apply to all tables with updated_at column)
-
 -- Apply Audit Log Triggers
-create trigger audit_users_changes after insert or update or delete on public.users
-    for each row execute function public.audit_log_changes();
-
-create trigger audit_shooters_changes after insert or update or delete on public.shooters
-    for each row execute function public.audit_log_changes();
-
-create trigger audit_competitions_changes after insert or update or delete on public.competitions
-    for each row execute function public.audit_log_changes();
-
-create trigger audit_payments_changes after insert or update or delete on public.payments
-    for each row execute function public.audit_log_changes();
-
-create trigger audit_scores_changes after insert or update or delete on public.scores
-    for each row execute function public.audit_log_changes();
-
+create trigger audit_users_changes
+after
+insert
+    or
+update
+    or delete on public.users for each row execute function public.audit_log_changes();
+create trigger audit_shooters_changes
+after
+insert
+    or
+update
+    or delete on public.shooters for each row execute function public.audit_log_changes();
+create trigger audit_competitions_changes
+after
+insert
+    or
+update
+    or delete on public.competitions for each row execute function public.audit_log_changes();
+create trigger audit_payments_changes
+after
+insert
+    or
+update
+    or delete on public.payments for each row execute function public.audit_log_changes();
+create trigger audit_scores_changes
+after
+insert
+    or
+update
+    or delete on public.scores for each row execute function public.audit_log_changes();
 -- Block 32 ========================================
 -- Function to create audit log entries
-create or replace function public.audit_log_changes()
-returns trigger as $$
-begin
-    if (tg_op = 'DELETE') then
-        insert into public.audit_logs (action, table_name, record_id, old_values)
-        values ('DELETE', tg_table_name, old.id, to_jsonb(old));
-        return old;
-    elsif (tg_op = 'UPDATE') then
-        insert into public.audit_logs (action, table_name, record_id, old_values, new_values)
-        values ('UPDATE', tg_table_name, new.id, to_jsonb(old), to_jsonb(new));
-        return new;
-    elsif (tg_op = 'INSERT') then
-        insert into public.audit_logs (action, table_name, record_id, new_values)
-        values ('CREATE', tg_table_name, new.id, to_jsonb(new));
-        return new;
-    end if;
-    return null;
+create or replace function public.audit_log_changes() returns trigger as $$ begin if (tg_op = 'DELETE') then
+insert into public.audit_logs (action, table_name, record_id, old_values)
+values ('DELETE', tg_table_name, old.id, to_jsonb(old));
+return old;
+elsif (tg_op = 'UPDATE') then
+insert into public.audit_logs (
+        action,
+        table_name,
+        record_id,
+        old_values,
+        new_values
+    )
+values (
+        'UPDATE',
+        tg_table_name,
+        new.id,
+        to_jsonb(old),
+        to_jsonb(new)
+    );
+return new;
+elsif (tg_op = 'INSERT') then
+insert into public.audit_logs (action, table_name, record_id, new_values)
+values ('CREATE', tg_table_name, new.id, to_jsonb(new));
+return new;
+end if;
+return null;
 end;
 $$ language plpgsql;
-
 -- Block 33 ========================================
 create or replace view public.v_active_shooters as
-select
-    s.id,
+select s.id,
     s.shooter_id,
     u.first_name,
     u.last_name,
@@ -772,18 +828,17 @@ select
     dc.name as classification_name,
     sc.classification_status
 from public.shooters s
-join public.users u on s.user_id = u.id
-left join public.state_associations sa on s.state_association_id = sa.id
-left join public.shooter_classifications sc on s.id = sc.shooter_id and sc.is_current = true
-left join public.disability_categories dc on sc.disability_category_id = dc.id
-where u.is_active = true and u.deleted_at is null;
-
+    join public.users u on s.user_id = u.id
+    left join public.state_associations sa on s.state_association_id = sa.id
+    left join public.shooter_classifications sc on s.id = sc.shooter_id
+    and sc.is_current = true
+    left join public.disability_categories dc on sc.disability_category_id = dc.id
+where u.is_active = true
+    and u.deleted_at is null;
 comment on view public.v_active_shooters is 'Active shooters with their current classification and state association.';
-
 -- Block 34 ========================================
 create or replace view public.v_upcoming_competitions as
-select
-    c.id,
+select c.id,
     c.public_id,
     c.name,
     c.competition_type,
@@ -798,19 +853,19 @@ select
     c.status,
     count(ce.id) as total_events
 from public.competitions c
-left join public.venues v on c.venue_id = v.id
-left join public.competition_events ce on c.id = ce.competition_id
+    left join public.venues v on c.venue_id = v.id
+    left join public.competition_events ce on c.id = ce.competition_id
 where c.start_date >= current_date
-  and c.status not in ('cancelled', 'completed')
-group by c.id, v.name, v.city, v.state
+    and c.status not in ('cancelled', 'completed')
+group by c.id,
+    v.name,
+    v.city,
+    v.state
 order by c.start_date;
-
 comment on view public.v_upcoming_competitions is 'Upcoming competitions with venue and event count.';
-
 -- Block 35 ========================================
 create or replace view public.v_current_rankings as
-select
-    r.id,
+select r.id,
     s.shooter_id,
     u.first_name || ' ' || u.last_name as shooter_name,
     se.name as event_name,
@@ -828,185 +883,214 @@ select
         else 'SAME'
     end as rank_change
 from public.rankings r
-join public.shooters s on r.shooter_id = s.id
-join public.users u on s.user_id = u.id
-join public.shooting_events se on r.shooting_event_id = se.id
+    join public.shooters s on r.shooter_id = s.id
+    join public.users u on s.user_id = u.id
+    join public.shooting_events se on r.shooting_event_id = se.id
 where r.is_current = true
-order by r.ranking_type, se.code, r.rank;
-
+order by r.ranking_type,
+    se.code,
+    r.rank;
 comment on view public.v_current_rankings is 'Current rankings with rank change indicators.';
-
 -- Block 36 ========================================
 create index idx_audit_logs_user on audit_logs(user_id);
 create index idx_audit_logs_table_record on audit_logs(table_name, record_id);
 create index idx_audit_logs_action on audit_logs(action);
 create index idx_audit_logs_created on audit_logs(created_at);
 create index idx_audit_logs_request on audit_logs(request_id);
-
 -- Block 37 ========================================
 -- Audit trigger function
-create or replace function audit_log_trigger()
-returns trigger as $$
-declare
-    audit_user_id bigint;
-    audit_ip inet;
-    audit_request_id uuid;
-begin
-    -- Get context from session variables (set by application)
-    audit_user_id := nullif(current_setting('app.current_user_id', true), '')::bigint;
-    audit_ip := nullif(current_setting('app.client_ip', true), '')::inet;
-    audit_request_id := nullif(current_setting('app.request_id', true), '')::uuid;
-    
-    if (tg_op = 'DELETE') then
-        insert into audit_logs (
-            user_id, action, table_name, record_id, 
-            old_values, ip_address, request_id
-        ) values (
-            audit_user_id, 'DELETE', tg_table_name, old.id,
-            to_jsonb(old), audit_ip, audit_request_id
-        );
-        return old;
-        
-    elsif (tg_op = 'UPDATE') then
-        -- Only log if values actually changed
-        if to_jsonb(old) is distinct from to_jsonb(new) then
-            insert into audit_logs (
-                user_id, action, table_name, record_id,
-                old_values, new_values, ip_address, request_id
-            ) values (
-                audit_user_id, 'UPDATE', tg_table_name, new.id,
-                to_jsonb(old), to_jsonb(new), audit_ip, audit_request_id
-            );
-        end if;
-        return new;
-        
-    elsif (tg_op = 'INSERT') then
-        insert into audit_logs (
-            user_id, action, table_name, record_id,
-            new_values, ip_address, request_id
-        ) values (
-            audit_user_id, 'CREATE', tg_table_name, new.id,
-            to_jsonb(new), audit_ip, audit_request_id
-        );
-        return new;
-    end if;
-    
-    return null;
+create or replace function audit_log_trigger() returns trigger as $$
+declare audit_user_id bigint;
+audit_ip inet;
+audit_request_id uuid;
+begin -- Get context from session variables (set by application)
+audit_user_id := nullif(current_setting('app.current_user_id', true), '')::bigint;
+audit_ip := nullif(current_setting('app.client_ip', true), '')::inet;
+audit_request_id := nullif(current_setting('app.request_id', true), '')::uuid;
+if (tg_op = 'DELETE') then
+insert into audit_logs (
+        user_id,
+        action,
+        table_name,
+        record_id,
+        old_values,
+        ip_address,
+        request_id
+    )
+values (
+        audit_user_id,
+        'DELETE',
+        tg_table_name,
+        old.id,
+        to_jsonb(old),
+        audit_ip,
+        audit_request_id
+    );
+return old;
+elsif (tg_op = 'UPDATE') then -- Only log if values actually changed
+if to_jsonb(old) is distinct
+from to_jsonb(new) then
+insert into audit_logs (
+        user_id,
+        action,
+        table_name,
+        record_id,
+        old_values,
+        new_values,
+        ip_address,
+        request_id
+    )
+values (
+        audit_user_id,
+        'UPDATE',
+        tg_table_name,
+        new.id,
+        to_jsonb(old),
+        to_jsonb(new),
+        audit_ip,
+        audit_request_id
+    );
+end if;
+return new;
+elsif (tg_op = 'INSERT') then
+insert into audit_logs (
+        user_id,
+        action,
+        table_name,
+        record_id,
+        new_values,
+        ip_address,
+        request_id
+    )
+values (
+        audit_user_id,
+        'CREATE',
+        tg_table_name,
+        new.id,
+        to_jsonb(new),
+        audit_ip,
+        audit_request_id
+    );
+return new;
+end if;
+return null;
 end;
 $$ language plpgsql;
-
 -- Apply to tables
-create trigger audit_users after insert or update or delete on users
-    for each row execute function audit_log_trigger();
-    
-create trigger audit_shooters after insert or update or delete on shooters
-    for each row execute function audit_log_trigger();
-    
-create trigger audit_scores after insert or update or delete on scores
-    for each row execute function audit_log_trigger();
-    
-create trigger audit_payments after insert or update or delete on payments
-    for each row execute function audit_log_trigger();
-
+create trigger audit_users
+after
+insert
+    or
+update
+    or delete on users for each row execute function audit_log_trigger();
+create trigger audit_shooters
+after
+insert
+    or
+update
+    or delete on shooters for each row execute function audit_log_trigger();
+create trigger audit_scores
+after
+insert
+    or
+update
+    or delete on scores for each row execute function audit_log_trigger();
+create trigger audit_payments
+after
+insert
+    or
+update
+    or delete on payments for each row execute function audit_log_trigger();
 -- Block 38 ========================================
 -- Export all audit logs for a user (GDPR request)
-select
-    created_at,
+select created_at,
     action,
     table_name,
     record_id,
     ip_address,
     -- Exclude sensitive new_values/old_values
-    case when action = 'LOGIN' then new_values else null end as details
+    case
+        when action = 'LOGIN' then new_values
+        else null
+    end as details
 from audit_logs
 where user_id = $1
 order by created_at desc;
-
 -- Block 39 ========================================
 -- Anonymize user in audit logs (Right to Erasure)
 update audit_logs
-set 
-    ip_address = null,
+set ip_address = null,
     user_agent = null,
     old_values = old_values - 'email' - 'phone' - 'firstName' - 'lastName',
     new_values = new_values - 'email' - 'phone' - 'firstName' - 'lastName'
 where user_id = $1;
-
 -- Note: Keep the audit record but remove PII;
-
 -- Block 40 ========================================
 -- Who modified this score and when?
-select 
-    al.created_at,
+select al.created_at,
     al.action,
     u.email as modified_by,
     al.old_values->>'total_score' as old_score,
     al.new_values->>'total_score' as new_score,
     al.ip_address
 from audit_logs al
-left join users u on al.user_id = u.id
+    left join users u on al.user_id = u.id
 where al.table_name = 'scores'
-  and al.record_id = 12345
+    and al.record_id = 12345
 order by al.created_at desc;
-
 -- Block 41 ========================================
 -- All actions by a user in the last 24 hours
-select 
-    created_at,
+select created_at,
     action,
     table_name,
     record_id,
     ip_address
 from audit_logs
 where user_id = $1
-  and created_at >= now() - interval '24 hours'
+    and created_at >= now() - interval '24 hours'
 order by created_at desc;
-
 -- Block 42 ========================================
 -- Failed login attempts from suspicious IPs
-select 
-    ip_address,
+select ip_address,
     count(*) as attempts,
     min(created_at) as first_attempt,
     max(created_at) as last_attempt
 from audit_logs
 where action = 'LOGIN'
-  and new_values->>'success' = 'false'
-  and created_at >= now() - interval '1 hour'
+    and new_values->>'success' = 'false'
+    and created_at >= now() - interval '1 hour'
 group by ip_address
 having count(*) >= 5
 order by attempts desc;
-
 -- Block 43 ========================================
 -- Daily change summary by table
-select 
-    date(created_at) as date,
+select date(created_at) as date,
     table_name,
     action,
     count(*) as count
 from audit_logs
 where created_at >= current_date - interval '7 days'
-group by date(created_at), table_name, action
-order by date desc, table_name, action;
-
+group by date(created_at),
+    table_name,
+    action
+order by date desc,
+    table_name,
+    action;
 -- Block 44 ========================================
 -- Archive old audit logs to cold storage
 create table audit_logs_archive (like audit_logs including all);
-
 -- Move records older than 2 years to archive
 insert into audit_logs_archive
-select * from audit_logs
+select *
+from audit_logs
 where created_at < now() - interval '2 years'
-  and table_name not in ('payments', 'refunds', 'scores');
-
+    and table_name not in ('payments', 'refunds', 'scores');
 -- Delete archived records from main table
 delete from audit_logs
 where created_at < now() - interval '2 years'
-  and table_name not in ('payments', 'refunds', 'scores');
-
+    and table_name not in ('payments', 'refunds', 'scores');
 -- Vacuum to reclaim space
 vacuum analyze audit_logs;
-
 -- Block 45 ========================================
 -- Migration: 02-refinements.sql
 -- Description: Applies schema review improvements (Shooter ID, Event Relays, Constraints)
@@ -1091,15 +1175,20 @@ INSERT
 UPDATE
     OR DELETE ON public.scores FOR EACH ROW EXECUTE FUNCTION public.audit_log_changes();
 COMMIT;
-
 -- Block 46 ========================================
 -- Roles seed data
-insert into public.roles (name, display_name, description, permissions, is_system) values
-(
-    'admin',
-    'Administrator',
-    'Full system access including user management, competition administration, and all settings.',
-    '{
+insert into public.roles (
+        name,
+        display_name,
+        description,
+        permissions,
+        is_system
+    )
+values (
+        'admin',
+        'Administrator',
+        'Full system access including user management, competition administration, and all settings.',
+        '{
         "users": ["create", "read", "update", "delete"],
         "shooters": ["create", "read", "update", "delete", "verify"],
         "competitions": ["create", "read", "update", "delete", "publish"],
@@ -1108,330 +1197,630 @@ insert into public.roles (name, display_name, description, permissions, is_syste
         "content": ["create", "read", "update", "delete", "publish"],
         "settings": ["read", "update"]
     }'::jsonb,
-    true
-),
-(
-    'shooter',
-    'Shooter',
-    'Registered para-shooter with access to personal dashboard, competition registration, and score viewing.',
-    '{
+        true
+    ),
+    (
+        'shooter',
+        'Shooter',
+        'Registered para-shooter with access to personal dashboard, competition registration, and score viewing.',
+        '{
         "profile": ["read", "update"],
         "competitions": ["read", "register"],
         "scores": ["read"],
         "payments": ["create", "read"],
         "documents": ["read", "download"]
     }'::jsonb,
-    true
-),
-(
-    'coach',
-    'Coach',
-    'Team coach with access to shooter information and competition details.',
-    '{
+        true
+    ),
+    (
+        'coach',
+        'Coach',
+        'Team coach with access to shooter information and competition details.',
+        '{
         "shooters": ["read"],
         "competitions": ["read"],
         "scores": ["read"],
         "documents": ["read", "download"]
     }'::jsonb,
-    true
-),
-(
-    'official',
-    'Official',
-    'Competition official with access to scoring and shooter verification.',
-    '{
+        true
+    ),
+    (
+        'official',
+        'Official',
+        'Competition official with access to scoring and shooter verification.',
+        '{
         "competitions": ["read"],
         "scores": ["create", "read", "update"],
         "shooters": ["read"]
     }'::jsonb,
-    true
-),
-(
-    'viewer',
-    'Viewer',
-    'Read-only access to public information.',
-    '{
+        true
+    ),
+    (
+        'viewer',
+        'Viewer',
+        'Read-only access to public information.',
+        '{
         "news": ["read"],
         "competitions": ["read"],
         "rankings": ["read"],
         "documents": ["read"]
     }'::jsonb,
-    true
-);
-
+        true
+    );
 -- Block 47 ========================================
 -- Disability categories (WSPS classification) seed data
-insert into public.disability_categories (code, name, description, event_type, min_impairment, equipment_allowed, is_active) values
-(
-    'SH1',
-    'SH1 - Pistol/Rifle',
-    'Athletes with impairment in legs and/or shooting arm, but with sufficient arm function to support a firearm independently without a shooting stand. Includes athletes with paralysis, limb deficiency, or other physical impairments affecting lower body mobility.',
-    'BOTH',
-    'Loss of muscle strength, limb deficiency, impaired passive range of movement, or leg length difference',
-    '{"shooting_stand": false, "orthosis": true, "wheelchair": true, "back_support": true}'::jsonb,
-    true
-),
-(
-    'SH2',
-    'SH2 - Rifle',
-    'Athletes with impairment affecting upper limbs who require a shooting stand to support the weight of the rifle. Includes athletes with significant upper body impairments that prevent them from holding a rifle unsupported.',
-    'RIFLE',
-    'Upper limb deficiency, impaired muscle power in arms, or coordination impairment affecting rifle handling',
-    '{"shooting_stand": true, "orthosis": true, "wheelchair": true, "mouth_stick": true}'::jsonb,
-    true
-),
-(
-    'VI1',
-    'VI1 - Visually Impaired (B1)',
-    'Athletes who are totally blind - from no light perception in either eye to some light perception but inability to recognize the shape of a hand at any distance or in any direction. Uses audio sighting equipment.',
-    'RIFLE',
-    'No light perception (NLP) to light perception only - cannot recognize hand shape at any distance',
-    '{"audio_sighting": true, "shooting_stand": true, "guide": true, "tactile_markers": true}'::jsonb,
-    true
-),
-(
-    'VI2',
-    'VI2 - Visually Impaired (B2)',
-    'Athletes with severe visual impairment - able to recognize the shape of a hand but with visual acuity of 2/60 or less, or visual field of less than 5 degrees. Uses audio sighting equipment.',
-    'RIFLE',
-    'Visual acuity ≤ 2/60 and/or visual field < 5 degrees',
-    '{"audio_sighting": true, "shooting_stand": true, "guide": true, "magnification": false}'::jsonb,
-    true
-),
-(
-    'VI3',
-    'VI3 - Visually Impaired (B3)',
-    'Athletes with moderate visual impairment - visual acuity ranging from 2/60 to 6/60, or visual field of 5 to 20 degrees. Uses audio sighting equipment.',
-    'RIFLE',
-    'Visual acuity 2/60 to 6/60 and/or visual field 5-20 degrees',
-    '{"audio_sighting": true, "shooting_stand": true, "guide": true, "magnification": false}'::jsonb,
-    true
-);
-
+insert into public.disability_categories (
+        code,
+        name,
+        description,
+        event_type,
+        min_impairment,
+        equipment_allowed,
+        is_active
+    )
+values (
+        'SH1',
+        'SH1 - Pistol/Rifle',
+        'Athletes with impairment in legs and/or shooting arm, but with sufficient arm function to support a firearm independently without a shooting stand. Includes athletes with paralysis, limb deficiency, or other physical impairments affecting lower body mobility.',
+        'BOTH'::public.event_type_enum,
+        'Loss of muscle strength, limb deficiency, impaired passive range of movement, or leg length difference',
+        '{"shooting_stand": false, "orthosis": true, "wheelchair": true, "back_support": true}'::jsonb,
+        true
+    ),
+    (
+        'SH2',
+        'SH2 - Rifle',
+        'Athletes with impairment affecting upper limbs who require a shooting stand to support the weight of the rifle. Includes athletes with significant upper body impairments that prevent them from holding a rifle unsupported.',
+        'RIFLE'::public.event_type_enum,
+        'Upper limb deficiency, impaired muscle power in arms, or coordination impairment affecting rifle handling',
+        '{"shooting_stand": true, "orthosis": true, "wheelchair": true, "mouth_stick": true}'::jsonb,
+        true
+    ),
+    (
+        'VI1',
+        'VI1 - Visually Impaired (B1)',
+        'Athletes who are totally blind - from no light perception in either eye to some light perception but inability to recognize the shape of a hand at any distance or in any direction. Uses audio sighting equipment.',
+        'RIFLE'::public.event_type_enum,
+        'No light perception (NLP) to light perception only - cannot recognize hand shape at any distance',
+        '{"audio_sighting": true, "shooting_stand": true, "guide": true, "tactile_markers": true}'::jsonb,
+        true
+    ),
+    (
+        'VI2',
+        'VI2 - Visually Impaired (B2)',
+        'Athletes with severe visual impairment - able to recognize the shape of a hand but with visual acuity of 2/60 or less, or visual field of less than 5 degrees. Uses audio sighting equipment.',
+        'RIFLE'::public.event_type_enum,
+        'Visual acuity ≤ 2/60 and/or visual field < 5 degrees',
+        '{"audio_sighting": true, "shooting_stand": true, "guide": true, "magnification": false}'::jsonb,
+        true
+    ),
+    (
+        'VI3',
+        'VI3 - Visually Impaired (B3)',
+        'Athletes with moderate visual impairment - visual acuity ranging from 2/60 to 6/60, or visual field of 5 to 20 degrees. Uses audio sighting equipment.',
+        'RIFLE'::public.event_type_enum,
+        'Visual acuity 2/60 to 6/60 and/or visual field 5-20 degrees',
+        '{"audio_sighting": true, "shooting_stand": true, "guide": true, "magnification": false}'::jsonb,
+        true
+    );
 -- Block 48 ========================================
 -- Event categories seed data
-insert into public.event_categories (name, code, description, icon_url, sort_order, is_active) values
-(
-    'Rifle',
-    'R',
-    'Rifle shooting events including 10m Air Rifle and 50m Rifle disciplines. Includes standing, prone, and 3-position events.',
-    '/icons/rifle.svg',
-    1,
-    true
-),
-(
-    'Pistol',
-    'P',
-    'Pistol shooting events including 10m Air Pistol, 25m Pistol, and 50m Pistol disciplines. Includes precision and rapid-fire events.',
-    '/icons/pistol.svg',
-    2,
-    true
-),
-(
-    'Shotgun',
-    'S',
-    'Shotgun shooting events including Trap, Skeet, and Double Trap disciplines. Note: Shotgun events have limited para-shooting participation.',
-    '/icons/shotgun.svg',
-    3,
-    true
-);
-
+insert into public.event_categories (
+        name,
+        code,
+        description,
+        icon_url,
+        sort_order,
+        is_active
+    )
+values (
+        'Rifle',
+        'R',
+        'Rifle shooting events including 10m Air Rifle and 50m Rifle disciplines. Includes standing, prone, and 3-position events.',
+        '/icons/rifle.svg',
+        1,
+        true
+    ),
+    (
+        'Pistol',
+        'P',
+        'Pistol shooting events including 10m Air Pistol, 25m Pistol, and 50m Pistol disciplines. Includes precision and rapid-fire events.',
+        '/icons/pistol.svg',
+        2,
+        true
+    ),
+    (
+        'Shotgun',
+        'S',
+        'Shotgun shooting events including Trap, Skeet, and Double Trap disciplines. Note: Shotgun events have limited para-shooting participation.',
+        '/icons/shotgun.svg',
+        3,
+        true
+    );
 -- Block 49 ========================================
 -- Shooting events seed data
 insert into public.shooting_events (
-    event_category_id, name, code, distance, 
-    shots_qualification, shots_final, 
-    max_score_qualification, max_score_final,
-    time_limit_minutes, gender, disability_categories,
-    is_paralympic, is_wsps, is_active
-) values
--- Rifle Events (SH1)
-(
-    (select id from public.event_categories where code = 'R'),
-    '10m Air Rifle Standing SH1',
-    'R1',
-    '10m',
-    60, 24,
-    654.5, 261.2,
-    75, null,
-    '["SH1"]'::jsonb,
-    true, true, true
-),
-(
-    (select id from public.event_categories where code = 'R'),
-    '10m Air Rifle Prone SH1',
-    'R2',
-    '10m',
-    60, 24,
-    654.5, 261.2,
-    50, null,
-    '["SH1"]'::jsonb,
-    true, true, true
-),
--- Rifle Events (SH2)
-(
-    (select id from public.event_categories where code = 'R'),
-    '10m Air Rifle Prone SH2',
-    'R3',
-    '10m',
-    60, 24,
-    654.5, 261.2,
-    50, null,
-    '["SH2"]'::jsonb,
-    true, true, true
-),
-(
-    (select id from public.event_categories where code = 'R'),
-    '10m Air Rifle Standing SH2',
-    'R4',
-    '10m',
-    60, 24,
-    654.5, 261.2,
-    75, null,
-    '["SH2"]'::jsonb,
-    true, true, true
-),
-(
-    (select id from public.event_categories where code = 'R'),
-    '10m Air Rifle Prone Mixed SH2',
-    'R5',
-    '10m',
-    60, 24,
-    654.5, 261.2,
-    50, 'mixed',
-    '["SH2"]'::jsonb,
-    true, true, true
-),
--- 50m Rifle Events
-(
-    (select id from public.event_categories where code = 'R'),
-    '50m Rifle Prone SH1',
-    'R6',
-    '50m',
-    60, null,
-    654.5, null,
-    75, null,
-    '["SH1"]'::jsonb,
-    false, true, true
-),
-(
-    (select id from public.event_categories where code = 'R'),
-    '50m Rifle 3 Positions SH1',
-    'R7',
-    '50m',
-    120, null,
-    1185.5, null,
-    150, null,
-    '["SH1"]'::jsonb,
-    false, true, true
-),
--- Visually Impaired Events
-(
-    (select id from public.event_categories where code = 'R'),
-    '10m Air Rifle Standing VI',
-    'R8',
-    '10m',
-    60, 24,
-    654.5, 261.2,
-    75, null,
-    '["VI1", "VI2", "VI3"]'::jsonb,
-    false, true, true
-),
--- Pistol Events
-(
-    (select id from public.event_categories where code = 'P'),
-    '10m Air Pistol SH1',
-    'P1',
-    '10m',
-    60, 24,
-    246.1, 246.1,
-    75, null,
-    '["SH1"]'::jsonb,
-    true, true, true
-),
-(
-    (select id from public.event_categories where code = 'P'),
-    '25m Pistol SH1',
-    'P2',
-    '25m',
-    60, null,
-    594.0, null,
-    null, null,
-    '["SH1"]'::jsonb,
-    true, true, true
-),
-(
-    (select id from public.event_categories where code = 'P'),
-    '25m Pistol Mixed SH1',
-    'P3',
-    '25m',
-    60, null,
-    594.0, null,
-    null, 'mixed',
-    '["SH1"]'::jsonb,
-    false, true, true
-),
-(
-    (select id from public.event_categories where code = 'P'),
-    '50m Pistol SH1',
-    'P4',
-    '50m',
-    60, null,
-    580.0, null,
-    90, null,
-    '["SH1"]'::jsonb,
-    false, true, true
-);
-
+        event_category_id,
+        name,
+        code,
+        distance,
+        shots_qualification,
+        shots_final,
+        max_score_qualification,
+        max_score_final,
+        time_limit_minutes,
+        gender,
+        disability_categories,
+        is_paralympic,
+        is_wsps,
+        is_active
+    )
+values -- Rifle Events (SH1)
+    (
+        (
+            select id
+            from public.event_categories
+            where code = 'R'
+        ),
+        '10m Air Rifle Standing SH1',
+        'R1',
+        '10m',
+        60,
+        24,
+        654.5,
+        261.2,
+        75,
+        null,
+        '["SH1"]'::jsonb,
+        true,
+        true,
+        true
+    ),
+    (
+        (
+            select id
+            from public.event_categories
+            where code = 'R'
+        ),
+        '10m Air Rifle Prone SH1',
+        'R2',
+        '10m',
+        60,
+        24,
+        654.5,
+        261.2,
+        50,
+        null,
+        '["SH1"]'::jsonb,
+        true,
+        true,
+        true
+    ),
+    -- Rifle Events (SH2)
+    (
+        (
+            select id
+            from public.event_categories
+            where code = 'R'
+        ),
+        '10m Air Rifle Prone SH2',
+        'R3',
+        '10m',
+        60,
+        24,
+        654.5,
+        261.2,
+        50,
+        null,
+        '["SH2"]'::jsonb,
+        true,
+        true,
+        true
+    ),
+    (
+        (
+            select id
+            from public.event_categories
+            where code = 'R'
+        ),
+        '10m Air Rifle Standing SH2',
+        'R4',
+        '10m',
+        60,
+        24,
+        654.5,
+        261.2,
+        75,
+        null,
+        '["SH2"]'::jsonb,
+        true,
+        true,
+        true
+    ),
+    (
+        (
+            select id
+            from public.event_categories
+            where code = 'R'
+        ),
+        '10m Air Rifle Prone Mixed SH2',
+        'R5',
+        '10m',
+        60,
+        24,
+        654.5,
+        261.2,
+        50,
+        'mixed',
+        '["SH2"]'::jsonb,
+        true,
+        true,
+        true
+    ),
+    -- 50m Rifle Events
+    (
+        (
+            select id
+            from public.event_categories
+            where code = 'R'
+        ),
+        '50m Rifle Prone SH1',
+        'R6',
+        '50m',
+        60,
+        null,
+        654.5,
+        null,
+        75,
+        null,
+        '["SH1"]'::jsonb,
+        false,
+        true,
+        true
+    ),
+    (
+        (
+            select id
+            from public.event_categories
+            where code = 'R'
+        ),
+        '50m Rifle 3 Positions SH1',
+        'R7',
+        '50m',
+        120,
+        null,
+        1185.5,
+        null,
+        150,
+        null,
+        '["SH1"]'::jsonb,
+        false,
+        true,
+        true
+    ),
+    -- Visually Impaired Events
+    (
+        (
+            select id
+            from public.event_categories
+            where code = 'R'
+        ),
+        '10m Air Rifle Standing VI',
+        'R8',
+        '10m',
+        60,
+        24,
+        654.5,
+        261.2,
+        75,
+        null,
+        '["VI1", "VI2", "VI3"]'::jsonb,
+        false,
+        true,
+        true
+    ),
+    -- Pistol Events
+    (
+        (
+            select id
+            from public.event_categories
+            where code = 'P'
+        ),
+        '10m Air Pistol SH1',
+        'P1',
+        '10m',
+        60,
+        24,
+        246.1,
+        246.1,
+        75,
+        null,
+        '["SH1"]'::jsonb,
+        true,
+        true,
+        true
+    ),
+    (
+        (
+            select id
+            from public.event_categories
+            where code = 'P'
+        ),
+        '25m Pistol SH1',
+        'P2',
+        '25m',
+        60,
+        null,
+        594.0,
+        null,
+        null,
+        null,
+        '["SH1"]'::jsonb,
+        true,
+        true,
+        true
+    ),
+    (
+        (
+            select id
+            from public.event_categories
+            where code = 'P'
+        ),
+        '25m Pistol Mixed SH1',
+        'P3',
+        '25m',
+        60,
+        null,
+        594.0,
+        null,
+        null,
+        'mixed',
+        '["SH1"]'::jsonb,
+        false,
+        true,
+        true
+    ),
+    (
+        (
+            select id
+            from public.event_categories
+            where code = 'P'
+        ),
+        '50m Pistol SH1',
+        'P4',
+        '50m',
+        60,
+        null,
+        580.0,
+        null,
+        90,
+        null,
+        '["SH1"]'::jsonb,
+        false,
+        true,
+        true
+    );
 -- Block 50 ========================================
 -- State associations seed data
-insert into public.state_associations (code, name, state, is_active) values
-('AN', 'Andaman & Nicobar Rifle Association', 'Andaman & Nicobar Islands', true),
-('AP', 'Andhra Pradesh State Rifle Association', 'Andhra Pradesh', true),
-('AR', 'Arunachal Pradesh Rifle Association', 'Arunachal Pradesh', true),
-('AS', 'Assam State Rifle Association', 'Assam', true),
-('BR', 'Bihar State Rifle Association', 'Bihar', true),
-('CG', 'Chhattisgarh State Rifle Association', 'Chhattisgarh', true),
-('CH', 'Chandigarh State Rifle Association', 'Chandigarh', true),
-('DD', 'Dadra & Nagar Haveli Rifle Association', 'Dadra & Nagar Haveli', true),
-('DL', 'Delhi State Rifle Association', 'Delhi', true),
-('GA', 'Goa State Rifle Association', 'Goa', true),
-('GJ', 'Gujarat State Rifle Association', 'Gujarat', true),
-('HP', 'Himachal Pradesh State Rifle Association', 'Himachal Pradesh', true),
-('HR', 'Haryana State Rifle Association', 'Haryana', true),
-('JH', 'Jharkhand State Rifle Association', 'Jharkhand', true),
-('JK', 'Jammu & Kashmir State Rifle Association', 'Jammu & Kashmir', true),
-('KA', 'Karnataka State Rifle Association', 'Karnataka', true),
-('KL', 'Kerala State Rifle Association', 'Kerala', true),
-('LA', 'Ladakh Rifle Association', 'Ladakh', true),
-('MH', 'Maharashtra State Rifle Association', 'Maharashtra', true),
-('ML', 'Meghalaya State Rifle Association', 'Meghalaya', true),
-('MN', 'Manipur State Rifle Association', 'Manipur', true),
-('MP', 'Madhya Pradesh State Rifle Association', 'Madhya Pradesh', true),
-('MZ', 'Mizoram State Rifle Association', 'Mizoram', true),
-('NL', 'Nagaland State Rifle Association', 'Nagaland', true),
-('OD', 'Odisha State Rifle Association', 'Odisha', true),
-('PB', 'Punjab State Rifle Association', 'Punjab', true),
-('PY', 'Puducherry Rifle Association', 'Puducherry', true),
-('RJ', 'Rajasthan State Rifle Association', 'Rajasthan', true),
-('SK', 'Sikkim State Rifle Association', 'Sikkim', true),
-('TN', 'Tamil Nadu State Rifle Association', 'Tamil Nadu', true),
-('TS', 'Telangana State Rifle Association', 'Telangana', true),
-('TR', 'Tripura State Rifle Association', 'Tripura', true),
-('UK', 'Uttarakhand State Rifle Association', 'Uttarakhand', true),
-('UP', 'Uttar Pradesh State Rifle Association', 'Uttar Pradesh', true),
-('WB', 'West Bengal State Rifle Association', 'West Bengal', true);
-
+insert into public.state_associations (code, name, state, is_active)
+values (
+        'AN',
+        'Andaman & Nicobar Rifle Association',
+        'Andaman & Nicobar Islands',
+        true
+    ),
+    (
+        'AP',
+        'Andhra Pradesh State Rifle Association',
+        'Andhra Pradesh',
+        true
+    ),
+    (
+        'AR',
+        'Arunachal Pradesh Rifle Association',
+        'Arunachal Pradesh',
+        true
+    ),
+    (
+        'AS',
+        'Assam State Rifle Association',
+        'Assam',
+        true
+    ),
+    (
+        'BR',
+        'Bihar State Rifle Association',
+        'Bihar',
+        true
+    ),
+    (
+        'CG',
+        'Chhattisgarh State Rifle Association',
+        'Chhattisgarh',
+        true
+    ),
+    (
+        'CH',
+        'Chandigarh State Rifle Association',
+        'Chandigarh',
+        true
+    ),
+    (
+        'DD',
+        'Dadra & Nagar Haveli Rifle Association',
+        'Dadra & Nagar Haveli',
+        true
+    ),
+    (
+        'DL',
+        'Delhi State Rifle Association',
+        'Delhi',
+        true
+    ),
+    ('GA', 'Goa State Rifle Association', 'Goa', true),
+    (
+        'GJ',
+        'Gujarat State Rifle Association',
+        'Gujarat',
+        true
+    ),
+    (
+        'HP',
+        'Himachal Pradesh State Rifle Association',
+        'Himachal Pradesh',
+        true
+    ),
+    (
+        'HR',
+        'Haryana State Rifle Association',
+        'Haryana',
+        true
+    ),
+    (
+        'JH',
+        'Jharkhand State Rifle Association',
+        'Jharkhand',
+        true
+    ),
+    (
+        'JK',
+        'Jammu & Kashmir State Rifle Association',
+        'Jammu & Kashmir',
+        true
+    ),
+    (
+        'KA',
+        'Karnataka State Rifle Association',
+        'Karnataka',
+        true
+    ),
+    (
+        'KL',
+        'Kerala State Rifle Association',
+        'Kerala',
+        true
+    ),
+    ('LA', 'Ladakh Rifle Association', 'Ladakh', true),
+    (
+        'MH',
+        'Maharashtra State Rifle Association',
+        'Maharashtra',
+        true
+    ),
+    (
+        'ML',
+        'Meghalaya State Rifle Association',
+        'Meghalaya',
+        true
+    ),
+    (
+        'MN',
+        'Manipur State Rifle Association',
+        'Manipur',
+        true
+    ),
+    (
+        'MP',
+        'Madhya Pradesh State Rifle Association',
+        'Madhya Pradesh',
+        true
+    ),
+    (
+        'MZ',
+        'Mizoram State Rifle Association',
+        'Mizoram',
+        true
+    ),
+    (
+        'NL',
+        'Nagaland State Rifle Association',
+        'Nagaland',
+        true
+    ),
+    (
+        'OD',
+        'Odisha State Rifle Association',
+        'Odisha',
+        true
+    ),
+    (
+        'PB',
+        'Punjab State Rifle Association',
+        'Punjab',
+        true
+    ),
+    (
+        'PY',
+        'Puducherry Rifle Association',
+        'Puducherry',
+        true
+    ),
+    (
+        'RJ',
+        'Rajasthan State Rifle Association',
+        'Rajasthan',
+        true
+    ),
+    (
+        'SK',
+        'Sikkim State Rifle Association',
+        'Sikkim',
+        true
+    ),
+    (
+        'TN',
+        'Tamil Nadu State Rifle Association',
+        'Tamil Nadu',
+        true
+    ),
+    (
+        'TS',
+        'Telangana State Rifle Association',
+        'Telangana',
+        true
+    ),
+    (
+        'TR',
+        'Tripura State Rifle Association',
+        'Tripura',
+        true
+    ),
+    (
+        'UK',
+        'Uttarakhand State Rifle Association',
+        'Uttarakhand',
+        true
+    ),
+    (
+        'UP',
+        'Uttar Pradesh State Rifle Association',
+        'Uttar Pradesh',
+        true
+    ),
+    (
+        'WB',
+        'West Bengal State Rifle Association',
+        'West Bengal',
+        true
+    );
 -- Block 51 ========================================
 -- Membership types seed data
-insert into public.membership_types (name, code, description, duration_months, price, benefits, is_active) values
-(
-    'Life Membership',
-    'LIFE',
-    'Lifetime membership with full privileges including voting rights in elections and priority access to all events.',
-    null,
-    25000.00,
-    '[
+insert into public.membership_types (
+        name,
+        code,
+        description,
+        duration_months,
+        price,
+        benefits,
+        is_active
+    )
+values (
+        'Life Membership',
+        'LIFE',
+        'Lifetime membership with full privileges including voting rights in elections and priority access to all events.',
+        null,
+        25000.00,
+        '[
         "Lifetime validity",
         "Voting rights in elections",
         "Priority event registration",
@@ -1439,30 +1828,30 @@ insert into public.membership_types (name, code, description, duration_months, p
         "Newsletter subscription",
         "Discounted entry fees"
     ]'::jsonb,
-    true
-),
-(
-    'Annual Membership',
-    'ANNUAL',
-    'Annual membership with full access to shooter dashboard, event registration, and member benefits.',
-    12,
-    2500.00,
-    '[
+        true
+    ),
+    (
+        'Annual Membership',
+        'ANNUAL',
+        'Annual membership with full access to shooter dashboard, event registration, and member benefits.',
+        12,
+        2500.00,
+        '[
         "12 months validity",
         "Dashboard access",
         "Event registration",
         "Official membership card",
         "Newsletter subscription"
     ]'::jsonb,
-    true
-),
-(
-    'Institutional Membership',
-    'INSTITUTIONAL',
-    'Annual membership for clubs, academies, and shooting ranges with multiple user access.',
-    12,
-    10000.00,
-    '[
+        true
+    ),
+    (
+        'Institutional Membership',
+        'INSTITUTIONAL',
+        'Annual membership for clubs, academies, and shooting ranges with multiple user access.',
+        12,
+        10000.00,
+        '[
         "12 months validity",
         "Up to 10 user accounts",
         "Event registration for members",
@@ -1470,159 +1859,163 @@ insert into public.membership_types (name, code, description, duration_months, p
         "Newsletter subscription",
         "Listing in club directory"
     ]'::jsonb,
-    true
-),
-(
-    'Honorary Membership',
-    'HONORARY',
-    'Complimentary lifetime membership granted to distinguished persons and Arjuna/Padma awardees.',
-    null,
-    0.00,
-    '[
+        true
+    ),
+    (
+        'Honorary Membership',
+        'HONORARY',
+        'Complimentary lifetime membership granted to distinguished persons and Arjuna/Padma awardees.',
+        null,
+        0.00,
+        '[
         "Lifetime validity",
         "Full privileges",
         "VIP access at events",
         "Special recognition"
     ]'::jsonb,
-    true
-);
-
+        true
+    );
 -- Block 52 ========================================
 -- Document categories seed data
-insert into public.document_categories (name, slug, description, icon, sort_order, is_active) values
-(
-    'Forms',
-    'forms',
-    'Application forms for registration, ISSF ID, membership applications, import/export permits, and other official forms.',
-    'file-text',
-    1,
-    true
-),
-(
-    'Rules & Regulations',
-    'rules',
-    'Competition rules, ISSF rule books, WSPS technical rules, anti-doping regulations, and committee guidelines.',
-    'book-open',
-    2,
-    true
-),
-(
-    'Circulars & Notices',
-    'circulars',
-    'Official circulars, notifications, announcements, and important notices from the committee.',
-    'bell',
-    3,
-    true
-),
-(
-    'Results & Rankings',
-    'results',
-    'Competition results, official rankings, score sheets, and performance records.',
-    'trophy',
-    4,
-    true
-),
-(
-    'Annual Reports',
-    'reports',
-    'Annual reports, financial statements, audit reports, and activity summaries.',
-    'bar-chart-2',
-    5,
-    true
-);
-
+insert into public.document_categories (
+        name,
+        slug,
+        description,
+        icon,
+        sort_order,
+        is_active
+    )
+values (
+        'Forms',
+        'forms',
+        'Application forms for registration, ISSF ID, membership applications, import/export permits, and other official forms.',
+        'file-text',
+        1,
+        true
+    ),
+    (
+        'Rules & Regulations',
+        'rules',
+        'Competition rules, ISSF rule books, WSPS technical rules, anti-doping regulations, and committee guidelines.',
+        'book-open',
+        2,
+        true
+    ),
+    (
+        'Circulars & Notices',
+        'circulars',
+        'Official circulars, notifications, announcements, and important notices from the committee.',
+        'bell',
+        3,
+        true
+    ),
+    (
+        'Results & Rankings',
+        'results',
+        'Competition results, official rankings, score sheets, and performance records.',
+        'trophy',
+        4,
+        true
+    ),
+    (
+        'Annual Reports',
+        'reports',
+        'Annual reports, financial statements, audit reports, and activity summaries.',
+        'bar-chart-2',
+        5,
+        true
+    );
 -- Block 53 ========================================
 -- Scheduled jobs seed data
-insert into public.scheduled_jobs (job_name, job_type, schedule, is_enabled, metadata) values
-(
-    'cleanup_expired_sessions',
-    'CLEANUP',
-    '0 2 * * *',
-    true,
-    '{"target_table": "user_sessions", "condition": "expires_at < now()", "retention_days": 30}'::jsonb
-),
-(
-    'cleanup_old_notifications',
-    'CLEANUP',
-    '0 3 * * 0',
-    true,
-    '{"target_table": "notifications", "retention_days": 90}'::jsonb
-),
-(
-    'update_rankings',
-    'RANKING_UPDATE',
-    '0 4 * * 1',
-    true,
-    '{"events": "all", "ranking_types": ["NATIONAL"]}'::jsonb
-),
-(
-    'send_email_digest',
-    'EMAIL_DIGEST',
-    '0 8 * * 1',
-    true,
-    '{"template": "weekly_digest", "recipients": "all_active_users"}'::jsonb
-),
-(
-    'backup_database',
-    'BACKUP',
-    '0 1 * * *',
-    true,
-    '{"type": "full", "compression": "gzip", "retention_days": 30}'::jsonb
-),
-(
-    'generate_reports',
-    'REPORT',
-    '0 5 1 * *',
-    true,
-    '{"reports": ["monthly_summary", "financial_summary"], "format": "pdf"}'::jsonb
-);
-
+insert into public.scheduled_jobs (
+        job_name,
+        job_type,
+        schedule,
+        is_enabled,
+        metadata
+    )
+values (
+        'cleanup_expired_sessions',
+        'CLEANUP',
+        '0 2 * * *',
+        true,
+        '{"target_table": "user_sessions", "condition": "expires_at < now()", "retention_days": 30}'::jsonb
+    ),
+    (
+        'cleanup_old_notifications',
+        'CLEANUP',
+        '0 3 * * 0',
+        true,
+        '{"target_table": "notifications", "retention_days": 90}'::jsonb
+    ),
+    (
+        'update_rankings',
+        'RANKING_UPDATE',
+        '0 4 * * 1',
+        true,
+        '{"events": "all", "ranking_types": ["NATIONAL"]}'::jsonb
+    ),
+    (
+        'send_email_digest',
+        'EMAIL_DIGEST',
+        '0 8 * * 1',
+        true,
+        '{"template": "weekly_digest", "recipients": "all_active_users"}'::jsonb
+    ),
+    (
+        'backup_database',
+        'BACKUP',
+        '0 1 * * *',
+        true,
+        '{"type": "full", "compression": "gzip", "retention_days": 30}'::jsonb
+    ),
+    (
+        'generate_reports',
+        'REPORT',
+        '0 5 1 * *',
+        true,
+        '{"reports": ["monthly_summary", "financial_summary"], "format": "pdf"}'::jsonb
+    );
 -- Block 54 ========================================
 -- Para Shooting Database Seed Script
 -- Execute in order after schema creation
-
-\echo 'Starting seed data population...'
-
--- 1. Roles (no dependencies)
-\echo 'Seeding roles...'
-\i seed/01_roles.sql
-
--- 2. Disability categories (no dependencies)
-\echo 'Seeding disability categories...'
-\i seed/02_disability_categories.sql
-
--- 3. Event categories (no dependencies)
-\echo 'Seeding event categories...'
-\i seed/03_event_categories.sql
-
--- 4. Shooting events (depends on event_categories)
-\echo 'Seeding shooting events...'
-\i seed/04_shooting_events.sql
-
--- 5. State associations (no dependencies)
-\echo 'Seeding state associations...'
-\i seed/05_state_associations.sql
-
--- 6. Membership types (no dependencies)
-\echo 'Seeding membership types...'
-\i seed/06_membership_types.sql
-
--- 7. Document categories (no dependencies)
-\echo 'Seeding document categories...'
-\i seed/07_document_categories.sql
-
--- 8. Scheduled jobs (no dependencies)
-\echo 'Seeding scheduled jobs...'
-\i seed/08_scheduled_jobs.sql
-
-\echo 'Seed data population complete!'
-
--- Verify seed counts
-select 'roles' as table_name, count(*) as row_count from public.roles
-union all select 'disability_categories', count(*) from public.disability_categories
-union all select 'event_categories', count(*) from public.event_categories
-union all select 'shooting_events', count(*) from public.shooting_events
-union all select 'state_associations', count(*) from public.state_associations
-union all select 'membership_types', count(*) from public.membership_types
-union all select 'document_categories', count(*) from public.document_categories
-union all select 'scheduled_jobs', count(*) from public.scheduled_jobs;
+\ echo 'Starting seed data population...' -- 1. Roles (no dependencies)
+\ echo 'Seeding roles...' \ i seed / 01_roles.sql -- 2. Disability categories (no dependencies)
+\ echo 'Seeding disability categories...' \ i seed / 02_disability_categories.sql -- 3. Event categories (no dependencies)
+\ echo 'Seeding event categories...' \ i seed / 03_event_categories.sql -- 4. Shooting events (depends on event_categories)
+\ echo 'Seeding shooting events...' \ i seed / 04_shooting_events.sql -- 5. State associations (no dependencies)
+\ echo 'Seeding state associations...' \ i seed / 05_state_associations.sql -- 6. Membership types (no dependencies)
+\ echo 'Seeding membership types...' \ i seed / 06_membership_types.sql -- 7. Document categories (no dependencies)
+\ echo 'Seeding document categories...' \ i seed / 07_document_categories.sql -- 8. Scheduled jobs (no dependencies)
+\ echo 'Seeding scheduled jobs...' \ i seed / 08_scheduled_jobs.sql \ echo 'Seed data population complete!' -- Verify seed counts
+select 'roles' as table_name,
+    count(*) as row_count
+from public.roles
+union all
+select 'disability_categories',
+    count(*)
+from public.disability_categories
+union all
+select 'event_categories',
+    count(*)
+from public.event_categories
+union all
+select 'shooting_events',
+    count(*)
+from public.shooting_events
+union all
+select 'state_associations',
+    count(*)
+from public.state_associations
+union all
+select 'membership_types',
+    count(*)
+from public.membership_types
+union all
+select 'document_categories',
+    count(*)
+from public.document_categories
+union all
+select 'scheduled_jobs',
+    count(*)
+from public.scheduled_jobs;
