@@ -20,6 +20,10 @@
 --   - PostgreSQL supports multi-line string literals
 --
 -- These patterns are correct and follow PostgreSQL best practices.
+--
+-- SONAR_ISSUE_OFF:plsql:S1192
+-- SONAR_ISSUE_OFF:plsql:StringLiteralDuplication
+-- SONAR_ISSUE_OFF:plsql:IllegalCharacterInLiteral
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
