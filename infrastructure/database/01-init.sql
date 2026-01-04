@@ -8,6 +8,9 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 -- Create ENUM types to avoid duplicated string literals
+-- Note: Some values (e.g., 'pending', 'completed', 'cancelled') appear in multiple ENUMs.
+-- This is intentional - each ENUM represents a different domain concept and PostgreSQL
+-- ENUMs are strongly typed (values cannot be interchanged between different ENUM types).
 create type public.event_type_enum as enum ('RIFLE', 'PISTOL', 'BOTH');
 create type public.competition_status_enum as enum (
     'draft',
