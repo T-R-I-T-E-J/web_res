@@ -105,8 +105,8 @@ export class QueryProtectionService implements OnModuleInit {
     if (!input) return input;
 
     // Remove SQL comments
-    let sanitized = input.replace(/--.*$/gm, '');
-    sanitized = sanitized.replace(/\/\*.*?\*\//g, '');
+    let sanitized = input.replaceAll(/--.*$/gm, '');
+    sanitized = sanitized.replaceAll(/\/\*.*?\*\//g, '');
 
     // Escape single quotes
     sanitized = sanitized.replaceAll("'", "''");
@@ -126,13 +126,13 @@ export class QueryProtectionService implements OnModuleInit {
     // Explicitly type the result as an array of any (or specific shape if known)
     // pg_terminate_backend usually returns boolean, but here we select it from a table?
     // The query selects pg_terminate_backend(pid), so it returns rows [{ pg_terminate_backend: boolean }]
-    const result = (await this.dataSource.query(`
+    const result: Array<{ pg_terminate_backend: boolean }> = await this.dataSource.query(`
       SELECT pg_terminate_backend(pid)
       FROM pg_stat_activity
       WHERE state = 'active'
         AND (now() - query_start) > interval '${maxDuration} seconds'
         AND pid <> pg_backend_pid()
-    `)) as Array<any>;
+    `);
 
     const killedCount = result.length;
 
@@ -149,7 +149,16 @@ export class QueryProtectionService implements OnModuleInit {
    * Get active queries
    */
   async getActiveQueries(): Promise<any[]> {
-    return this.dataSource.query(`
+    const result: Array<{
+      pid: number;
+      usename: string;
+      application_name: string;
+      client_addr: string;
+      state: string;
+      query: string;
+      query_start: Date;
+      duration_seconds: number;
+    }> = await this.dataSource.query(`
       SELECT 
         pid,
         usename,
@@ -164,16 +173,17 @@ export class QueryProtectionService implements OnModuleInit {
         AND pid <> pg_backend_pid()
       ORDER BY query_start
     `);
+    return result;
   }
 
   /**
    * Kill specific query by PID
    */
   async killQuery(pid: number): Promise<boolean> {
-    const result = (await this.dataSource.query(
+    const result: Array<{ pg_terminate_backend: boolean }> = await this.dataSource.query(
       'SELECT pg_terminate_backend($1)',
       [pid],
-    )) as Array<{ pg_terminate_backend: boolean }>;
+    );
 
     console.warn(`[SECURITY] Killed query with PID ${pid}`);
     return result[0]?.pg_terminate_backend ?? false;
@@ -183,9 +193,9 @@ export class QueryProtectionService implements OnModuleInit {
    * Get connection count
    */
   async getConnectionCount(): Promise<number> {
-    const result = (await this.dataSource.query(
+    const result: Array<{ count: string }> = await this.dataSource.query(
       'SELECT count(*) as count FROM pg_stat_activity',
-    )) as Array<{ count: string }>;
+    );
 
     return Number.parseInt(result[0]?.count ?? '0', 10);
   }
@@ -194,13 +204,13 @@ export class QueryProtectionService implements OnModuleInit {
    * Kill idle connections
    */
   async killIdleConnections(idleMinutes = 30): Promise<number> {
-    const result = (await this.dataSource.query(`
+    const result: Array<{ pg_terminate_backend: boolean }> = await this.dataSource.query(`
       SELECT pg_terminate_backend(pid)
       FROM pg_stat_activity
       WHERE state = 'idle'
         AND (now() - state_change) > interval '${idleMinutes} minutes'
         AND pid <> pg_backend_pid()
-    `)) as Array<any>;
+    `);
 
     const killedCount = result.length;
 
