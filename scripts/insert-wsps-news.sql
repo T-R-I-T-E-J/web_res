@@ -1,4 +1,5 @@
 -- Insert WSPS Grand Prix France 2026 News Article
+-- NOSONAR: Multi-line string literal with HTML content is intentional for readability
 INSERT INTO news_articles (
     title,
     slug,

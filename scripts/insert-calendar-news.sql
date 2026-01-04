@@ -1,4 +1,5 @@
 -- Insert news article about 2026-2027 Para Shooting Calendar
+-- NOSONAR: Multi-line string literal with HTML content is intentional for readability
 INSERT INTO news_articles (
     title,
     slug,

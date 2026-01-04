@@ -1,4 +1,5 @@
 -- Add embedded PDF preview to the calendar news article
+-- NOSONAR: Multi-line string literal is intentional for HTML content readability
 UPDATE news_articles
 SET content = content || '
 

@@ -1,5 +1,6 @@
 -- Insert 2026-2027 Para Shooting Calendar Events
 -- This script populates the events table with all domestic and international competitions
+-- NOSONAR: String literal duplication in INSERT statements is required for data values
 INSERT INTO events (
         title,
         slug,

@@ -1,6 +1,25 @@
 -- Auto-generated Master Database Initialization Script
 -- Generated: 2025-12-28
 -- Source: docs/database/*.md and 02-refinements.sql
+--
+-- NOSONAR SUPPRESSIONS:
+-- This file contains PostgreSQL DDL (Data Definition Language) for schema initialization.
+-- The following SonarQube rules are suppressed as they are designed for PL/SQL procedural
+-- code and do not apply to PostgreSQL DDL/DML:
+--
+-- plsql:S1192 - String literal duplication
+--   - ENUM type definitions must explicitly list values; no constant sharing is possible
+--   - INSERT statements must use actual data values
+--   - Table/column names are referenced multiple times by design (foreign keys, indexes)
+--
+-- plsql:StringLiteralDuplication - Duplicate string literals
+--   - Same rationale as S1192
+--
+-- plsql:IllegalCharacterInLiteral - Newline characters in string literals
+--   - Multi-line text content in INSERT statements is intentional for readability
+--   - PostgreSQL supports multi-line string literals
+--
+-- These patterns are correct and follow PostgreSQL best practices.
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
