@@ -9,6 +9,64 @@ SET client_min_messages = warning;
 SET row_security = off;
 -- Create ENUM types to avoid duplicated string literals
 create type public.event_type_enum as enum ('RIFLE', 'PISTOL', 'BOTH');
+create type public.competition_status_enum as enum (
+    'draft',
+    'upcoming',
+    'registration_open',
+    'registration_closed',
+    'ongoing',
+    'completed',
+    'cancelled'
+);
+create type public.competition_event_status_enum as enum (
+    'scheduled',
+    'ongoing',
+    'qualification_complete',
+    'final_ongoing',
+    'completed',
+    'cancelled'
+);
+create type public.entry_status_enum as enum (
+    'pending',
+    'confirmed',
+    'waitlisted',
+    'withdrawn',
+    'disqualified',
+    'dns',
+    'dnf'
+);
+create type public.payment_status_enum as enum ('pending', 'paid', 'waived', 'refunded');
+create type public.classification_status_enum as enum ('NEW', 'REVIEW', 'CONFIRMED', 'FIXED');
+create type public.news_status_enum as enum (
+    'draft',
+    'pending_review',
+    'published',
+    'archived'
+);
+create type public.contact_status_enum as enum (
+    'new',
+    'in_progress',
+    'responded',
+    'closed',
+    'spam'
+);
+create type public.membership_status_enum as enum (
+    'pending',
+    'active',
+    'expired',
+    'cancelled',
+    'suspended'
+);
+create type public.transaction_status_enum as enum (
+    'pending',
+    'processing',
+    'completed',
+    'failed',
+    'cancelled',
+    'refunded',
+    'partially_refunded'
+);
+create type public.refund_status_enum as enum ('pending', 'processing', 'completed', 'failed');
 -- Block 1 ========================================
 create table public.users (
     id bigint generated always as identity primary key,
@@ -131,9 +189,7 @@ create table public.shooter_classifications (
     id bigint generated always as identity primary key,
     shooter_id bigint not null references public.shooters(id),
     disability_category_id bigint not null references public.disability_categories(id),
-    classification_status varchar(20) not null check (
-        classification_status in ('NEW', 'REVIEW', 'CONFIRMED', 'FIXED')
-    ),
+    classification_status public.classification_status_enum not null,
     classification_date date not null,
     valid_until date,
     classifier_name varchar(200),
@@ -236,17 +292,7 @@ create table public.competitions (
     description text,
     rules_document_url text,
     schedule_document_url text,
-    status varchar(20) not null default 'draft' check (
-        status in (
-            'draft',
-            'upcoming',
-            'registration_open',
-            'registration_closed',
-            'ongoing',
-            'completed',
-            'cancelled'
-        )
-    ),
+    status public.competition_status_enum not null default 'draft',
     is_wsps_ranked boolean not null default false,
     is_record_eligible boolean not null default true,
     organizer_name varchar(200),
@@ -269,16 +315,7 @@ create table public.competition_events (
     final_time time,
     max_entries integer,
     entry_fee_override decimal(10, 2),
-    status varchar(20) not null default 'scheduled' check (
-        status in (
-            'scheduled',
-            'ongoing',
-            'qualification_complete',
-            'final_ongoing',
-            'completed',
-            'cancelled'
-        )
-    ),
+    status public.competition_event_status_enum not null default 'scheduled',
     results_finalized_at timestamptz,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now(),
@@ -307,20 +344,8 @@ create table public.competition_entries (
     shooter_id bigint not null references public.shooters(id),
     bib_number varchar(10),
     firing_point varchar(10),
-    entry_status varchar(20) not null default 'pending' check (
-        entry_status in (
-            'pending',
-            'confirmed',
-            'waitlisted',
-            'withdrawn',
-            'disqualified',
-            'dns',
-            'dnf'
-        )
-    ),
-    payment_status varchar(20) not null default 'pending' check (
-        payment_status in ('pending', 'paid', 'waived', 'refunded')
-    ),
+    entry_status public.entry_status_enum not null default 'pending',
+    payment_status public.payment_status_enum not null default 'pending',
     payment_id bigint,
     entry_fee_paid decimal(10, 2),
     registered_at timestamptz not null default now(),
@@ -411,15 +436,7 @@ create table public.memberships (
     membership_number varchar(30) unique,
     start_date date not null,
     end_date date,
-    status varchar(20) not null default 'pending' check (
-        status in (
-            'pending',
-            'active',
-            'expired',
-            'cancelled',
-            'suspended'
-        )
-    ),
+    status public.membership_status_enum not null default 'pending',
     amount_paid decimal(10, 2) not null,
     payment_id bigint,
     approved_by bigint references public.users(id),
@@ -445,17 +462,7 @@ create table public.payments (
     ),
     amount decimal(10, 2) not null check (amount > 0),
     currency varchar(3) not null default 'INR',
-    status varchar(20) not null default 'pending' check (
-        status in (
-            'pending',
-            'processing',
-            'completed',
-            'failed',
-            'cancelled',
-            'refunded',
-            'partially_refunded'
-        )
-    ),
+    status public.transaction_status_enum not null default 'pending',
     razorpay_order_id varchar(50) unique,
     razorpay_payment_id varchar(50) unique,
     razorpay_signature text,
@@ -476,9 +483,7 @@ create table public.refunds (
     id bigint generated always as identity primary key,
     payment_id bigint not null references public.payments(id),
     amount decimal(10, 2) not null check (amount > 0),
-    status varchar(20) not null default 'pending' check (
-        status in ('pending', 'processing', 'completed', 'failed')
-    ),
+    status public.refund_status_enum not null default 'pending',
     razorpay_refund_id varchar(50) unique,
     reason text not null,
     initiated_by bigint not null references public.users(id),
@@ -509,14 +514,7 @@ create table public.news_articles (
     ),
     tags jsonb default '[]',
     author_id bigint not null references public.users(id),
-    status varchar(20) not null default 'draft' check (
-        status in (
-            'draft',
-            'pending_review',
-            'published',
-            'archived'
-        )
-    ),
+    status public.news_status_enum not null default 'draft',
     is_featured boolean default false,
     is_pinned boolean default false,
     view_count integer default 0,
@@ -592,15 +590,7 @@ create table public.contact_messages (
     subject varchar(255) not null,
     message text not null,
     category varchar(50),
-    status varchar(20) default 'new' check (
-        status in (
-            'new',
-            'in_progress',
-            'responded',
-            'closed',
-            'spam'
-        )
-    ),
+    status public.contact_status_enum default 'new',
     assigned_to bigint references public.users(id),
     response text,
     responded_at timestamptz,
