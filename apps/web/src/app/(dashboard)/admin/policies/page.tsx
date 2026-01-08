@@ -125,6 +125,7 @@ const AdminPoliciesPage = () => {
                   <tr>
                     <th className="text-left py-3 px-4 font-semibold text-neutral-600 text-sm">Title</th>
                     <th className="text-left py-3 px-4 font-semibold text-neutral-600 text-sm">Category</th>
+                    <th className="text-left py-3 px-4 font-semibold text-neutral-600 text-sm">Status</th>
                     <th className="text-left py-3 px-4 font-semibold text-neutral-600 text-sm">Type</th>
                     <th className="text-left py-3 px-4 font-semibold text-neutral-600 text-sm">Created</th>
                     <th className="text-right py-3 px-4 font-semibold text-neutral-600 text-sm">Actions</th>
@@ -147,6 +148,18 @@ const AdminPoliciesPage = () => {
                       <td className="py-3 px-4">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-700 capitalize">
                           {item.category}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span
+                          className={clsx(
+                            'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize',
+                            item.isActive
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-yellow-100 text-yellow-800'
+                          )}
+                        >
+                          {item.isActive ? 'Published' : 'Draft'}
                         </span>
                       </td>
                       <td className="py-3 px-4">
