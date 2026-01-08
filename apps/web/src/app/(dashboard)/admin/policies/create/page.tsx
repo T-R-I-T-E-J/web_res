@@ -24,6 +24,7 @@ export default function CreatePolicyPage() {
     fileType: 'PDF',
     size: '',
     href: '',
+    status: 'published',
   })
   
   const [isCustomCategory, setIsCustomCategory] = useState(false)
@@ -126,7 +127,7 @@ export default function CreatePolicyPage() {
       const payload = {
         ...formData,
         href: finalHref,
-        isActive: true
+        isActive: formData.status === 'published'
       }
 
       const res = await fetch(`${apiUrl}/downloads`, {
@@ -285,6 +286,22 @@ export default function CreatePolicyPage() {
                   className="input w-full uppercase"
                   placeholder="e.g. PDF, DOCX"
                 />
+              </div>
+
+              {/* Status */}
+              <div>
+                <label className="label" htmlFor="status">Status</label>
+                <select
+                  id="status"
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  className="input w-full"
+                >
+                  <option value="published">Published</option>
+                  <option value="draft">Draft</option>
+                  <option value="review">Final Review</option>
+                </select>
               </div>
             </div>
 

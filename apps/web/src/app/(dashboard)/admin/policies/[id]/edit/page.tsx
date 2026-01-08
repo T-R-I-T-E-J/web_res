@@ -28,6 +28,7 @@ export default function EditPolicyPage() {
     fileType: 'PDF',
     size: '',
     href: '',
+    status: 'published',
   })
   
   const [isCustomCategory, setIsCustomCategory] = useState(false)
@@ -61,6 +62,7 @@ export default function EditPolicyPage() {
                     fileType: data.fileType || 'PDF',
                     size: data.size || '',
                     href: data.href || '',
+                    status: data.isActive ? 'published' : 'draft',
                 })
                 
                 if (data.href && data.href.startsWith('http')) {
@@ -150,6 +152,7 @@ export default function EditPolicyPage() {
       const payload = {
         ...formData,
         href: finalHref,
+        isActive: formData.status === 'published'
       }
 
       const res = await fetch(`${apiUrl}/downloads/${id}`, {
@@ -306,6 +309,22 @@ export default function EditPolicyPage() {
                   onChange={handleChange}
                   className="input w-full uppercase"
                 />
+              </div>
+
+              {/* Status */}
+              <div>
+                <label className="label" htmlFor="status">Status</label>
+                <select
+                  id="status"
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  className="input w-full"
+                >
+                  <option value="published">Published</option>
+                  <option value="draft">Draft</option>
+                  <option value="review">Final Review</option>
+                </select>
               </div>
             </div>
 
