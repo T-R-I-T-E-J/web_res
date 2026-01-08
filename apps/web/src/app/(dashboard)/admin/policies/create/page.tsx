@@ -26,6 +26,8 @@ export default function CreatePolicyPage() {
     href: '',
   })
   
+  const [isCustomCategory, setIsCustomCategory] = useState(false)
+  
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -223,24 +225,51 @@ export default function CreatePolicyPage() {
               {/* Category */}
               <div>
                 <label className="label" htmlFor="category">Category</label>
-                <input
-                  list="category-list"
-                  id="category"
-                  name="category"
-                  value={formData.category} 
-                  onChange={handleChange}
-                  className="input w-full"
-                  placeholder="Select or type a category"
-                  autoComplete="off"
-                />
-                <datalist id="category-list">
-                  {existingCategories.map((c: string) => (
-                    <option key={c} value={c} />
-                  ))}
-                </datalist>
-                <p className="text-xs text-neutral-500 mt-1">
-                   Type a new category name or select from existing.
-                </p>
+                <div className="space-y-3">
+                  <select
+                    id="category"
+                    name="category"
+                    value={isCustomCategory ? 'other' : formData.category}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      if (val === 'other') {
+                        setIsCustomCategory(true)
+                        setFormData(prev => ({ ...prev, category: '' }))
+                      } else {
+                        setIsCustomCategory(false)
+                        setFormData(prev => ({ ...prev, category: val }))
+                      }
+                    }}
+                    className="input w-full"
+                    required
+                  >
+                    <option value="">Select a category</option>
+                    {existingCategories.map((c) => (
+                      <option key={c} value={c}>
+                        {c.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                      </option>
+                    ))}
+                    <option value="other">Other (Custom)</option>
+                  </select>
+
+                  {isCustomCategory && (
+                    <div className="animate-in fade-in slide-in-from-top-2 duration-200">
+                      <input
+                        type="text"
+                        name="category"
+                        value={formData.category}
+                        onChange={handleChange}
+                        placeholder="Type custom category name..."
+                        className="input w-full"
+                        required={isCustomCategory}
+                        autoFocus
+                      />
+                      <p className="text-xs text-neutral-500 mt-1">
+                        Enter a new category name for this document.
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* File Type */}
