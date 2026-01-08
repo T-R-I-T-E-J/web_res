@@ -47,7 +47,9 @@ const adminNavItems = [
       { label: 'Policies', href: '/admin/policies' },
       { label: 'Classification', href: '/admin/classification' },
       { label: 'News & Updates', href: '/admin/news' },
+      { label: 'Results', href: '/admin/scores' },
       { label: 'Gallery', href: '/admin/gallery' },
+      { label: 'Categories', href: '/admin/categories' },
     ]
   },
   { label: 'Audit Logs', href: '/admin/audit', icon: Activity },

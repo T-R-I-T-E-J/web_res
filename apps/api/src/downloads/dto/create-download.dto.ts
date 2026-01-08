@@ -25,6 +25,10 @@ export class CreateDownloadDto {
   @IsOptional()
   category?: string;
 
+  @IsString()
+  @IsOptional()
+  categoryId?: string;
+
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;

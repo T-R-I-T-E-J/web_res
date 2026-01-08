@@ -1,196 +1,167 @@
+'use client'
 
-import type { Metadata } from 'next'
-import { FileText, Download, BookOpen, Calendar, Trophy, ClipboardList } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { FileText, Download, Calendar, Loader2 } from 'lucide-react'
+import Link from 'next/link'
 
-export const metadata: Metadata = {
-  title: 'Policies',
-  description: 'Download official rules, guidelines, and selection policies for para shooting in India.',
+type Category = {
+  id: string
+  name: string
+  slug: string
 }
 
-const categories = [
-  { label: 'Rules & Guidelines', icon: BookOpen, id: 'rules' },
-  { label: 'Selection Policies', icon: Trophy, id: 'selection' },
-  { label: 'Match Documents', icon: ClipboardList, id: 'match' },
-]
-
-interface DownloadItem {
+type Document = {
   id: string
   title: string
   description: string
   fileType: string
-  size?: string
+  size: string
   href: string
-  category: string
-  createdAt?: string
-  date?: string // Some items might have explicit date if we added that field, but for now createdAt
+  categoryId: string | null
+  category?: string // Legacy field
+  updatedAt: string
 }
 
-async function getDownloads(): Promise<DownloadItem[]> {
-  try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
-    console.log(`Fetching downloads from: ${apiUrl}/downloads`);
-    
-    const res = await fetch(`${apiUrl}/downloads`, {
-      cache: 'no-store',
-    })
-    
-    if (!res.ok) {
-       console.error('Failed to fetch downloads:', res.status, await res.text())
-       return []
+export default function PoliciesPage() {
+  const [categories, setCategories] = useState<Category[]>([])
+  const [documents, setDocuments] = useState<Document[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
+        
+        // 1. Fetch Categories
+        const catRes = await fetch(`${apiUrl}/categories?page=policies`, { credentials: 'include' })
+        const catsData = await catRes.json()
+        // Handle both wrapped ({data: []}) and unwrapped ([]) responses
+        const categoriesArray = Array.isArray(catsData) ? catsData : (catsData.data || [])
+        
+        // 2. Fetch All Downloads
+        const docRes = await fetch(`${apiUrl}/downloads`, { credentials: 'include' })
+        const docsData = await docRes.json()
+        // Handle both wrapped ({data: []}) and unwrapped ([]) responses
+        const documentsArray = Array.isArray(docsData) ? docsData : (docsData.data || [])
+
+        console.log('Categories fetched:', categoriesArray)
+        console.log('Documents fetched:', documentsArray)
+
+        setCategories(categoriesArray)
+        setDocuments(documentsArray)
+
+      } catch (error) {
+        console.error("Failed to load policy data", error)
+      } finally {
+        setLoading(false)
+      }
     }
 
-    const json = await res.json()
-    // Handle potential response wrapping (Standard NestJS interceptors might wrap in { data: ... })
-    const data = Array.isArray(json) ? json : (json.data || [])
-    return Array.isArray(data) ? data : []
-  } catch (error) {
-    console.error('Error fetching downloads:', error)
-    return []
+    fetchData()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    )
   }
-}
-
-const DownloadCard = ({
-  title,
-  description,
-  fileType,
-  size,
-  href,
-  date,
-}: {
-  title: string
-  description: string
-  fileType: string
-  size?: string
-  href: string
-  date?: string
-}) => (
-  <div className="card-hover group">
-    <div className="flex items-start gap-4">
-      <div className="w-12 h-12 bg-primary/10 rounded-card flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
-        <FileText className="w-6 h-6 text-primary" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <h3 className="font-semibold text-primary group-hover:text-interactive transition-colors">
-          {title}
-        </h3>
-        <p className="text-sm text-neutral-600 mt-1">{description}</p>
-        <div className="flex items-center gap-3 mt-2 text-xs text-neutral-400">
-          <span className="uppercase font-medium">{fileType}</span>
-          {size && <span>• {size}</span>}
-          {date && <span>• {new Date(date).toLocaleDateString()}</span>}
-        </div>
-      </div>
-    </div>
-    <div className="mt-4 pt-4 border-t border-neutral-100">
-      <a
-        href={href}
-        className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-accent transition-colors"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Download className="w-4 h-4" />
-        {fileType === 'Link' ? 'Open Link' : `Download ${fileType}`}
-      </a>
-    </div>
-  </div>
-)
-
-const DownloadsPage = async () => {
-  const downloads = await getDownloads();
-  
-  const rules = downloads.filter(d => d.category === 'rules');
-  const selection = downloads.filter(d => d.category === 'selection');
-  const match = downloads.filter(d => d.category === 'match');
 
   return (
-    <>
+    <div className="container-main py-12 space-y-12">
+      {/* Page Header */}
+      <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
+        <h1 className="text-4xl font-heading font-bold text-primary">
+          Rules, Regulations & Policies
+        </h1>
+        <p className="text-lg text-neutral-600">
+          Official documents, selection policies, and guidelines governing Para Shooting in India.
+        </p>
+      </div>
 
+      {/* Dynamic Categories */}
+      {categories.map((category) => {
+        // Filter documents for this category (check both new categoryId and legacy category slug)
+        const categoryDocs = documents.filter(doc => 
+          doc.categoryId === category.id || doc.category === category.slug
+        )
+        
+        if (categoryDocs.length === 0) return null // Hide empty categories
 
-      {/* Breadcrumb */}
-      <nav className="bg-neutral-100 py-3 text-sm" aria-label="Breadcrumb">
-        <div className="container-main">
-          <ol className="flex items-center gap-2">
-            <li><a href="/" className="text-interactive hover:text-primary">Home</a></li>
-            <li className="text-neutral-400">/</li>
-            <li className="text-neutral-600">Policies</li>
-          </ol>
-        </div>
-      </nav>
+        return (
+          <section key={category.id} className="scroll-mt-24" id={category.slug}>
+            <div className="flex items-center gap-4 mb-8 border-b border-neutral-200 pb-2">
+              <h2 className="text-2xl font-bold text-primary relative">
+                {category.name}
+                <span className="absolute -bottom-2.5 left-0 w-full h-1 bg-accent rounded-full"></span>
+              </h2>
+            </div>
 
-      {/* Quick Access Categories */}
-      <section className="py-8 bg-white border-b border-neutral-200">
-        <div className="container-main">
-          <div className="flex flex-wrap justify-center gap-4">
-            {categories.map((item) => (
-              <a
-                key={item.label}
-                href={`#${item.id}`}
-                className="flex items-center gap-2 px-6 py-3 bg-neutral-50 rounded-card hover:bg-primary/10 hover:text-primary transition-colors"
-              >
-                <item.icon className="w-5 h-5" />
-                <span className="font-medium">{item.label}</span>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {categoryDocs.map((doc) => (
+                <div 
+                  key={doc.id} 
+                  className="group bg-white rounded-card border border-neutral-200 p-5 hover:shadow-lg transition-all hover:border-primary/20"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                       {/* Icon based on file type */}
+                       <FileText className="w-5 h-5 text-primary" />
+                    </div>
+                    {doc.fileType && (
+                      <span className="text-xs font-bold px-2 py-1 rounded bg-neutral-100 text-neutral-600 uppercase">
+                        {doc.fileType}
+                      </span>
+                    )}
+                  </div>
 
-      {/* Rules & Guidelines Section */}
-      <section id="rules" className="section bg-white">
-        <div className="container-main">
-          <h2 className="section-title">Rules & Guidelines</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {rules.length > 0 ? rules.map((rule) => (
-              <DownloadCard 
-                key={rule.id} 
-                {...rule} 
-                date={rule.createdAt} 
-              />
-            )) : (
-              <p className="text-neutral-500">No documents found.</p>
-            )}
-          </div>
-        </div>
-      </section>
+                  <h3 className="font-semibold text-neutral-800 mb-2 group-hover:text-primary transition-colors line-clamp-2 min-h-[3rem]">
+                    {doc.title}
+                  </h3>
+                  
+                  {doc.description && (
+                     <p className="text-sm text-neutral-500 mb-4 line-clamp-2 min-h-[2.5rem]">
+                       {doc.description}
+                     </p>
+                  )}
 
-      {/* Selection Policies Section */}
-      <section id="selection" className="section bg-neutral-50">
-        <div className="container-main">
-          <h2 className="section-title">Selection Policies</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {selection.length > 0 ? selection.map((policy) => (
-              <DownloadCard 
-                key={policy.id} 
-                {...policy} 
-                date={policy.createdAt}
-              />
-            )) : (
-              <p className="text-neutral-500">No documents found.</p>
-            )}
-          </div>
-        </div>
-      </section>
-
-
-      {/* Match Documents Section */}
-      <section id="match" className="section bg-neutral-50">
-        <div className="container-main">
-          <h2 className="section-title">Match Documents</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {match.length > 0 ? match.map((doc) => (
-              <DownloadCard 
-                key={doc.id} 
-                {...doc} 
-                date={doc.createdAt}
-              />
-            )) : (
-              <p className="text-neutral-500">No documents found.</p>
-            )}
-          </div>
-        </div>
-      </section>
-    </>
+                  <div className="flex items-center justify-between pt-4 border-t border-neutral-100 mt-auto">
+                    <span className="text-xs text-neutral-400">
+                       {doc.size || 'N/A'} • {new Date(doc.updatedAt).toLocaleDateString()}
+                    </span>
+                    
+                    {doc.href.startsWith('http') ? (
+                       <a 
+                         href={doc.href} 
+                         target="_blank" 
+                         rel="noopener noreferrer"
+                         className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80"
+                       >
+                         Open <Download className="w-3.5 h-3.5" />
+                       </a>
+                    ) : (
+                       <a 
+                         href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}${doc.href}`} 
+                         download
+                         className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80"
+                       >
+                         Download <Download className="w-3.5 h-3.5" />
+                       </a>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )
+      })}
+      
+      {categories.length === 0 && (
+         <div className="text-center py-12 text-neutral-500">
+           No categories found. Please contact the administrator.
+         </div>
+      )}
+    </div>
   )
 }
-
-export default DownloadsPage

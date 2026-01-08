@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { DashboardHeader } from '@/components/dashboard'
@@ -8,11 +8,7 @@ import { ArrowLeft, Loader2, Upload as UploadIcon, Link as LinkIcon, FileText } 
 import Cookies from 'js-cookie'
 import clsx from 'clsx'
 
-const categories = [
-  { label: 'Medical Classification', value: 'medical_classification' },
-  { label: 'IPC License Formals', value: 'ipc_license' },
-  { label: 'National Rule Classification', value: 'national_classification' },
-]
+
 
 export default function CreateClassificationPage() {
   const router = useRouter()
@@ -20,14 +16,33 @@ export default function CreateClassificationPage() {
   const [uploadType, setUploadType] = useState<'file' | 'url'>('file')
   const [file, setFile] = useState<File | null>(null)
   
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([])
+  
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: 'medical_classification',
+    categoryId: '',
     fileType: 'PDF',
     size: '',
     href: '',
   })
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
+        const res = await fetch(`${apiUrl}/categories?page=classification`, { credentials: 'include' })
+        if (res.ok) {
+          const data = await res.json()
+          const categoriesArray = Array.isArray(data) ? data : (data.data || [])
+          setCategories(categoriesArray)
+        }
+      } catch (e) {
+        console.error("Failed to fetch categories", e)
+      }
+    }
+    fetchCategories()
+  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -213,16 +228,18 @@ export default function CreateClassificationPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Category */}
               <div>
-                <label className="label" htmlFor="category">Category</label>
+                <label className="label" htmlFor="categoryId">Category</label>
                 <select
-                  id="category"
-                  name="category"
-                  value={formData.category}
+                  id="categoryId"
+                  name="categoryId"
+                  value={formData.categoryId}
                   onChange={handleChange}
                   className="input w-full"
+                  required
                 >
+                  <option value="">Select a category</option>
                   {categories.map(c => (
-                    <option key={c.value} value={c.value}>{c.label}</option>
+                    <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </select>
               </div>

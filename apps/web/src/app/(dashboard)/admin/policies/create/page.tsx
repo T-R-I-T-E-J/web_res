@@ -13,32 +13,28 @@ export default function CreatePolicyPage() {
   const [uploadType, setUploadType] = useState<'file' | 'url'>('file')
   const [file, setFile] = useState<File | null>(null)
   
-  const [existingCategories, setExistingCategories] = useState<string[]>([
-    'rules', 'selection', 'calendar', 'match', 'medical_classification', 'ipc_license', 'national_classification'
-  ])
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([])
 
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: '',
+    categoryId: '',
     fileType: 'PDF',
     size: '',
     href: '',
     status: 'published',
   })
   
-  const [isCustomCategory, setIsCustomCategory] = useState(false)
-  
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
-        const res = await fetch(`${apiUrl}/downloads/categories`, { credentials: 'include' })
+        const res = await fetch(`${apiUrl}/categories?page=policies`, { credentials: 'include' })
         if (res.ok) {
-          const cats = await res.json()
-          if (Array.isArray(cats) && cats.length > 0) {
-            setExistingCategories(prev => Array.from(new Set([...prev, ...cats])))
-          }
+          const data = await res.json()
+          // Handle both wrapped ({data: []}) and unwrapped ([]) responses
+          const categoriesArray = Array.isArray(data) ? data : (data.data || [])
+          setCategories(categoriesArray)
         }
       } catch (e) {
         console.error("Failed to fetch categories", e)
@@ -126,9 +122,13 @@ export default function CreatePolicyPage() {
   const createDownloadEntry = async (finalHref: string, apiUrl: string) => {
       const { status, ...rest } = formData
       const payload = {
-        ...rest,
+        title: formData.title,
+        description: formData.description,
+        fileType: formData.fileType,
+        size: formData.size,
         href: finalHref,
-        isActive: status === 'published'
+        categoryId: formData.categoryId,
+        isActive: formData.status === 'published'
       }
 
       const res = await fetch(`${apiUrl}/downloads`, {
@@ -226,51 +226,23 @@ export default function CreatePolicyPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Category */}
               <div>
-                <label className="label" htmlFor="category">Category</label>
+                <label className="label" htmlFor="categoryId">Category</label>
                 <div className="space-y-3">
                   <select
-                    id="category"
-                    name="category"
-                    value={isCustomCategory ? 'other' : formData.category}
-                    onChange={(e) => {
-                      const val = e.target.value
-                      if (val === 'other') {
-                        setIsCustomCategory(true)
-                        setFormData(prev => ({ ...prev, category: '' }))
-                      } else {
-                        setIsCustomCategory(false)
-                        setFormData(prev => ({ ...prev, category: val }))
-                      }
-                    }}
+                    id="categoryId"
+                    name="categoryId"
+                    value={formData.categoryId}
+                    onChange={handleChange}
                     className="input w-full"
                     required
                   >
                     <option value="">Select a category</option>
-                    {existingCategories.map((c) => (
-                      <option key={c} value={c}>
-                        {c.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
                       </option>
                     ))}
-                    <option value="other">Other (Custom)</option>
                   </select>
-
-                  {isCustomCategory && (
-                    <div className="animate-in fade-in slide-in-from-top-2 duration-200">
-                      <input
-                        type="text"
-                        name="category"
-                        value={formData.category}
-                        onChange={handleChange}
-                        placeholder="Type custom category name..."
-                        className="input w-full"
-                        required={isCustomCategory}
-                        autoFocus
-                      />
-                      <p className="text-xs text-neutral-500 mt-1">
-                        Enter a new category name for this document.
-                      </p>
-                    </div>
-                  )}
                 </div>
               </div>
 

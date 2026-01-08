@@ -7,40 +7,35 @@ export const metadata: Metadata = {
   description: 'View results from para shooting competitions - national and international events.',
 }
 
-const resultFiles = [
-  {
-    title: 'Complete Result of 6th NPSC 2025',
-    fileName: 'Complete Result of 6th NPSC 2025.pdf',
-    date: '2025',
-  },
-  {
-    title: 'Complete Results of 5th NPSC 2024 Revised',
-    fileName: 'Complete Results of 5th NPSC 2024 Revised.pdf',
-    date: '2024',
-  },
-  {
-    title: 'Complete Sign Scan Result of 4th NPSC (1st to 5th Nov 2023)',
-    fileName: 'Complete Sign Scan Result of 4th NPSC (1st to 5th Nov 2023).pdf',
-    date: '2023',
-  },
-  {
-    title: 'Complete Final Results',
-    fileName: 'Complete-Final-Results.pdf',
-    date: 'Recent',
-  },
-  {
-    title: 'FINAL RESULT SCAN Results 3rd Zonal Para Shooting Championship',
-    fileName: 'FINAL RESULT SCAN Results-3rd-Zonal-Para-Shooting-Championship.pdf',
-    date: 'Archive',
-  },
-  {
-    title: 'Full Results 3rd National Para Shooting Championship at Mhow MP',
-    fileName: 'Full Results-3rd-National-Para-Shooting-Championship-at-Mhow-MP.pdf',
-    date: 'Archive',
-  },
-]
+export const dynamic = 'force-dynamic'
 
-const ResultsPage = () => {
+const getResults = async () => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'}/results`, {
+      cache: 'no-store',
+    })
+    
+    if (!res.ok) {
+       return []
+    }
+
+    const json = await res.json()
+    const data = json.data || json
+    return Array.isArray(data) ? data : []
+  } catch (error) {
+    console.error('Error fetching results:', error)
+    return []
+  }
+}
+
+const ResultsPage = async () => {
+  const results = await getResults()
+
+  // Map API data to UI format if needed, or use directly if variable names match
+  // API returns: { id, title, date, fileName, url, ... }
+  // UI expects: { title, date, fileName (for display/link?) }
+  // We need to adapt the link to use 'url' from API
+
   return (
     <>
 
@@ -76,8 +71,13 @@ const ResultsPage = () => {
       <section className="section bg-neutral-50">
         <div className="container-main">
           <h2 className="section-title">Official Result Sheets</h2>
+          {results.length === 0 ? (
+             <div className="text-center py-12 text-neutral-500">
+               No results found.
+             </div>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {resultFiles.map((file, i) => (
+            {results.map((file: any, i: number) => (
               <div key={i} className="card-hover group">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-primary/10 rounded-card flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
@@ -92,7 +92,7 @@ const ResultsPage = () => {
                     </p>
                     <div className="mt-4">
                       <a
-                        href={`/results/${file.fileName}`}
+                        href={file.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 text-sm font-bold text-accent hover:text-accent-dark transition-colors"
@@ -105,6 +105,7 @@ const ResultsPage = () => {
               </div>
             ))}
           </div>
+          )}
         </div>
       </section>
 

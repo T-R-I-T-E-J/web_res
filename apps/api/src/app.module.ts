@@ -20,6 +20,7 @@ import { UploadModule } from './upload/upload.module.js';
 import { EventsModule } from './events/events.module.js';
 import { MediaModule } from './media/media.module.js';
 import { DownloadsModule } from './downloads/downloads.module';
+import { CategoriesModule } from './categories/categories.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from './auth/guards/roles.guard.js';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
@@ -86,6 +87,7 @@ import { envValidationSchema } from './config/env.validation';
     EventsModule,
     MediaModule,
     DownloadsModule,
+    CategoriesModule,
 
     // Serve Static Files (Frontend) - Disabled for Dev Split Mode
     // ServeStaticModule.forRoot({

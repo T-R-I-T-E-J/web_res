@@ -1,6 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+
+import { useState, useEffect, useRef } from 'react'
 import { DashboardHeader } from '@/components/dashboard'
 import { Upload, Trash2, FileText, Download } from 'lucide-react'
 import clsx from 'clsx'
@@ -18,6 +20,8 @@ interface Result {
 }
 
 const AdminScoresPage = () => {
+  const router = useRouter()
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [results, setResults] = useState<Result[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isUploading, setIsUploading] = useState(false)
@@ -33,7 +37,7 @@ const AdminScoresPage = () => {
   const fetchResults = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082'}/api/v1/results`)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'}/results`)
       if (!response.ok) throw new Error('Failed to fetch results')
       const responseData = await response.json()
       setResults(responseData.data || [])
@@ -72,17 +76,17 @@ const AdminScoresPage = () => {
       formData.append('date', year)
       if (description) formData.append('description', description)
 
-      const token = localStorage.getItem('access_token') // Simple auth for Phase 4
-      
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082'}/api/v1/results/upload`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'}/results/upload`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
+        credentials: 'include',
         body: formData
       })
 
       if (!response.ok) {
+        if (response.status === 401) {
+          router.push('/login')
+          throw new Error('Session expired. Please login again.')
+        }
         const errorData = await response.json()
         throw new Error(errorData.message || 'Upload failed')
       }
@@ -94,6 +98,9 @@ const AdminScoresPage = () => {
       setYear(new Date().getFullYear().toString())
       setDescription('')
       setFile(null)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
       
       // Refresh list
       fetchResults()
@@ -111,15 +118,18 @@ const AdminScoresPage = () => {
     if (!confirm(`Are you sure you want to delete "${resultTitle}"?`)) return
 
     try {
-      const token = localStorage.getItem('access_token')
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082'}/api/v1/results/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'}/results/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include'
       })
 
-      if (!response.ok) throw new Error('Delete failed')
+      if (!response.ok) {
+        if (response.status === 401) {
+          router.push('/login')
+          return
+        }
+        throw new Error('Delete failed')
+      }
 
       setResults(results.filter(r => r.id !== id))
       alert('Result deleted successfully')
@@ -193,6 +203,7 @@ const AdminScoresPage = () => {
                 Result File (PDF) *
               </label>
               <input
+                ref={fileInputRef}
                 type="file"
                 required
                 accept=".pdf"

@@ -9,7 +9,6 @@ import {
   UploadedFile,
   HttpCode,
   HttpStatus,
-  Request,
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -18,6 +17,12 @@ import { UploadResultDto } from './dto/upload-result.dto';
 import { ResultResponseDto } from './dto/result-response.dto';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Public } from '../auth/decorators/public.decorator';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+
+interface AuthenticatedUser {
+  id: number;
+  email: string;
+}
 
 /**
  * Results Controller
@@ -79,10 +84,9 @@ export class ResultsController {
   async uploadResult(
     @UploadedFile() file: Express.Multer.File,
     @Body() uploadDto: UploadResultDto,
-    @Request() req: { user: { userId: number } },
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<ResultResponseDto> {
-    const userId = req.user.userId;
-    return this.resultsService.uploadResult(file, uploadDto, userId);
+    return this.resultsService.uploadResult(file, uploadDto, user.id);
   }
 
   /**
@@ -154,10 +158,9 @@ export class ResultsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteResult(
     @Param('id', ParseUUIDPipe) id: string,
-    @Request() req: { user: { userId: number } },
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<void> {
-    const userId = req.user.userId;
-    return this.resultsService.deleteResult(id, userId);
+    return this.resultsService.deleteResult(id, user.id);
   }
 }
 

@@ -240,15 +240,9 @@ export default function CreateNewsPage() {
               
               <div className="space-y-2 md:col-span-2">
                 <label className="text-sm font-medium text-neutral-700">Preview Image (Thumbnail)</label>
-                <div className="flex flex-col gap-2">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handlePreviewImageUpload(e.target.files?.[0])}
-                    className="input w-full p-2"
-                  />
-                  {formData.preview_image_url && (
-                    <div className="relative mt-2 h-40 w-full md:w-1/2 overflow-hidden rounded-md border border-neutral-200 bg-neutral-50">
+                <div className="flex flex-col gap-3">
+                  {formData.preview_image_url ? (
+                    <div className="relative mt-2 h-48 w-full md:w-1/2 overflow-hidden rounded-md border border-neutral-200 bg-neutral-50">
                       <img
                         src={formData.preview_image_url}
                         alt="Preview Thumbnail"
@@ -257,11 +251,25 @@ export default function CreateNewsPage() {
                       <button
                         type="button"
                         onClick={() => setFormData(prev => ({ ...prev, preview_image_url: '' }))}
-                        className="absolute top-2 right-2 bg-white/80 p-1 rounded-full text-error hover:bg-white"
+                        className="absolute top-2 right-2 bg-white/80 p-1 rounded-full text-error hover:bg-white transition-colors"
                       >
-                       <X className="w-4 h-4" />
+                        <X className="w-4 h-4" />
                       </button>
                     </div>
+                  ) : (
+                    <label className="btn-secondary inline-flex items-center gap-2 cursor-pointer w-fit">
+                      <Plus className="w-4 h-4" />
+                      <span>Upload Thumbnail</span>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={(e) => {
+                          handlePreviewImageUpload(e.target.files?.[0]);
+                          e.target.value = ''; // Reset input
+                        }}
+                      />
+                    </label>
                   )}
                   <p className="text-xs text-neutral-500">
                     This image will be displayed on the card in news lists. If not provided, the featured image will be used.
@@ -269,30 +277,39 @@ export default function CreateNewsPage() {
                 </div>
               </div>
               
+              
               <div className="space-y-2 md:col-span-2">
                 <label className="text-sm font-medium text-neutral-700">Featured Image (Banner)</label>
-                <div className="flex flex-col gap-2">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFeaturedImageUpload(e.target.files?.[0])}
-                    className="input w-full p-2"
-                  />
-                  {formData.featured_image_url && (
-                    <div className="relative mt-2 h-40 w-full overflow-hidden rounded-md border border-neutral-200 bg-neutral-50">
+                <div className="flex flex-col gap-3">
+                  {formData.featured_image_url ? (
+                    <div className="relative mt-2 h-48 w-full overflow-hidden rounded-md border border-neutral-200 bg-neutral-50">
                       <img
                         src={formData.featured_image_url}
                         alt="Featured Banner"
                         className="h-full w-full object-cover"
                       />
-                       <button
+                      <button
                         type="button"
                         onClick={() => setFormData(prev => ({ ...prev, featured_image_url: '' }))}
-                        className="absolute top-2 right-2 bg-white/80 p-1 rounded-full text-error hover:bg-white"
+                        className="absolute top-2 right-2 bg-white/80 p-1 rounded-full text-error hover:bg-white transition-colors"
                       >
-                       <X className="w-4 h-4" />
+                        <X className="w-4 h-4" />
                       </button>
                     </div>
+                  ) : (
+                    <label className="btn-secondary inline-flex items-center gap-2 cursor-pointer w-fit">
+                      <Plus className="w-4 h-4" />
+                      <span>Upload Banner</span>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={(e) => {
+                          handleFeaturedImageUpload(e.target.files?.[0]);
+                          e.target.value = ''; // Reset input
+                        }}
+                      />
+                    </label>
                   )}
                   <p className="text-xs text-neutral-500">
                     This is the main image shown at the top of the article.

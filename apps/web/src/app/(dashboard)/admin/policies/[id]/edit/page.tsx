@@ -16,64 +16,64 @@ export default function EditPolicyPage() {
   const [dataLoading, setDataLoading] = useState(true)
   const [uploadType, setUploadType] = useState<'file' | 'url'>('file')
   const [file, setFile] = useState<File | null>(null)
+  const [dataLoaded, setDataLoaded] = useState(false)
   
-  const [existingCategories, setExistingCategories] = useState<string[]>([
-    'rules', 'selection', 'calendar', 'match', 'medical_classification', 'ipc_license', 'national_classification'
-  ])
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([])
 
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: '',
+    categoryId: '',
     fileType: 'PDF',
     size: '',
     href: '',
     status: 'published',
   })
   
-  const [isCustomCategory, setIsCustomCategory] = useState(false)
-  
   useEffect(() => {
+    // Prevent re-running if data has already been loaded
+    if (dataLoaded || !id) return
+    
     const init = async () => {
       setDataLoading(true)
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
       
       try {
         // 1. Fetch Categories
-        const catRes = await fetch(`${apiUrl}/downloads/categories`, { credentials: 'include' })
-        let currentCats: string[] = []
+        const catRes = await fetch(`${apiUrl}/categories?page=policies`, { credentials: 'include' })
         if (catRes.ok) {
-          const cats = await catRes.json()
-          if (Array.isArray(cats) && cats.length > 0) {
-            currentCats = Array.from(new Set([...existingCategories, ...cats]))
-            setExistingCategories(currentCats)
-          }
+          const data = await catRes.json()
+          // Handle both wrapped ({data: []}) and unwrapped ([]) responses
+          const categoriesArray = Array.isArray(data) ? data : (data.data || [])
+          setCategories(categoriesArray)
         }
         
         // 2. Fetch Document
-        if (id) {
-            const res = await fetch(`${apiUrl}/downloads/${id}`, { credentials: 'include' })
-            if (res.ok) {
-                const data = await res.json()
-                setFormData({
-                    title: data.title || '',
-                    description: data.description || '',
-                    category: data.category || '',
-                    fileType: data.fileType || 'PDF',
-                    size: data.size || '',
-                    href: data.href || '',
-                    status: data.isActive ? 'published' : 'draft',
-                })
-                
-                if (data.href && data.href.startsWith('http')) {
-                    setUploadType('url')
-                } else {
-                    setUploadType('file')
-                }
-            } else {
-                alert("Failed to load document")
-                router.push('/admin/policies')
-            }
+        const res = await fetch(`${apiUrl}/downloads/${id}`, { credentials: 'include' })
+        if (res.ok) {
+          const response = await res.json()
+          const data = response.data || response // Handle wrapped response
+          
+          setFormData({
+            title: data.title || '',
+            description: data.description || '',
+            categoryId: data.categoryId || '', // Use categoryId
+            fileType: data.fileType || 'PDF',
+            size: data.size || '',
+            href: data.href || '',
+            status: data.isActive ? 'published' : 'draft',
+          })
+          
+          if (data.href && data.href.startsWith('http')) {
+            setUploadType('url')
+          } else {
+            setUploadType('file')
+          }
+          
+          setDataLoaded(true)
+        } else {
+          alert("Failed to load document")
+          router.push('/admin/policies')
         }
       } catch (e) {
         console.error("Initialization error", e)
@@ -82,19 +82,8 @@ export default function EditPolicyPage() {
       }
     }
     
-    if (id) init()
-  }, [id, router]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Sync isCustomCategory logic
-  useEffect(() => {
-     if (formData.category && existingCategories.length > 0 && !dataLoading) {
-        if (!existingCategories.includes(formData.category)) {
-            setIsCustomCategory(true)
-        } else {
-            setIsCustomCategory(false)
-        }
-     }
-  }, [formData.category, existingCategories, dataLoading])
+    init()
+  }, [id, router, dataLoaded])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -149,11 +138,15 @@ export default function EditPolicyPage() {
   }
 
   const updateDownloadEntry = async (finalHref: string, apiUrl: string) => {
-      const { status, ...rest } = formData
+      // payload
       const payload = {
-        ...rest,
+        title: formData.title,
+        description: formData.description,
+        fileType: formData.fileType,
+        size: formData.size,
         href: finalHref,
-        isActive: status === 'published'
+        categoryId: formData.categoryId,
+        isActive: formData.status === 'published'
       }
 
       const res = await fetch(`${apiUrl}/downloads/${id}`, {
@@ -253,48 +246,23 @@ export default function EditPolicyPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Category */}
               <div>
-                <label className="label" htmlFor="category">Category</label>
+                <label className="label" htmlFor="categoryId">Category</label>
                 <div className="space-y-3">
                   <select
-                    id="category"
-                    name="category"
-                    value={isCustomCategory ? 'other' : formData.category}
-                    onChange={(e) => {
-                      const val = e.target.value
-                      if (val === 'other') {
-                        setIsCustomCategory(true)
-                        setFormData(prev => ({ ...prev, category: '' }))
-                      } else {
-                        setIsCustomCategory(false)
-                        setFormData(prev => ({ ...prev, category: val }))
-                      }
-                    }}
+                    id="categoryId"
+                    name="categoryId"
+                    value={formData.categoryId}
+                    onChange={handleChange}
                     className="input w-full"
                     required
                   >
                     <option value="">Select a category</option>
-                    {existingCategories.map((c) => (
-                      <option key={c} value={c}>
-                         {c.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
                       </option>
                     ))}
-                    <option value="other">Other (Custom)</option>
                   </select>
-
-                  {isCustomCategory && (
-                    <div className="animate-in fade-in slide-in-from-top-2 duration-200">
-                      <input
-                        type="text"
-                        name="category"
-                        value={formData.category}
-                        onChange={handleChange}
-                        placeholder="Type custom category name..."
-                        className="input w-full"
-                        required={isCustomCategory}
-                        autoFocus
-                      />
-                    </div>
-                  )}
                 </div>
               </div>
 

@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Download, DownloadCategory } from './entities/download.entity';
 import { CreateDownloadDto } from './dto/create-download.dto';
 import { UpdateDownloadDto } from './dto/update-download.dto';
+import { CategoriesService } from '../categories/categories.service';
 
 @Injectable()
 export class DownloadsService implements OnModuleInit {
@@ -12,6 +13,7 @@ export class DownloadsService implements OnModuleInit {
   constructor(
     @InjectRepository(Download)
     private downloadRepository: Repository<Download>,
+    private categoriesService: CategoriesService,
   ) {}
 
   async onModuleInit() {
@@ -20,6 +22,14 @@ export class DownloadsService implements OnModuleInit {
 
   async create(createDownloadDto: CreateDownloadDto): Promise<Download> {
     const download = this.downloadRepository.create(createDownloadDto);
+
+    if (createDownloadDto.categoryId) {
+      const category = await this.categoriesService.findOne(createDownloadDto.categoryId);
+      if (category) {
+        download.category = category.slug;
+      }
+    }
+
     return this.downloadRepository.save(download);
   }
 
@@ -28,6 +38,19 @@ export class DownloadsService implements OnModuleInit {
     updateDownloadDto: UpdateDownloadDto,
   ): Promise<Download> {
     const download = await this.findOne(id);
+
+    if (
+      updateDownloadDto.categoryId &&
+      updateDownloadDto.categoryId !== download.categoryId
+    ) {
+      const category = await this.categoriesService.findOne(
+        updateDownloadDto.categoryId,
+      );
+      if (category) {
+        updateDownloadDto.category = category.slug;
+      }
+    }
+
     const updated = this.downloadRepository.merge(download, updateDownloadDto);
     return this.downloadRepository.save(updated);
   }
@@ -58,11 +81,8 @@ export class DownloadsService implements OnModuleInit {
   }
 
   async getCategories(): Promise<string[]> {
-    const result = await this.downloadRepository
-      .createQueryBuilder('download')
-      .select('DISTINCT download.category', 'category')
-      .getRawMany<{ category: string }>();
-    return result.map((r) => r.category).filter(Boolean);
+    const categories = await this.categoriesService.findAll();
+    return categories.map((c) => c.slug);
   }
 
   async remove(id: string): Promise<{ message: string }> {
@@ -233,6 +253,9 @@ export class DownloadsService implements OnModuleInit {
       },
     ];
 
+    const categories = await this.categoriesService.findAll();
+    const categoryMap = new Map(categories.map((c) => [c.slug, c.id]));
+
     const allDownloads = [
       ...rules,
       ...selectionPolicies,
@@ -241,7 +264,11 @@ export class DownloadsService implements OnModuleInit {
     ];
 
     for (const item of allDownloads) {
-      await this.downloadRepository.save(item);
+      const categoryId = categoryMap.get(item.category);
+      await this.downloadRepository.save({
+        ...item,
+        categoryId: categoryId || null,
+      });
     }
 
     this.logger.log(`Seeded ${allDownloads.length} download items.`);

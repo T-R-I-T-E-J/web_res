@@ -40,12 +40,16 @@ function generateCSPHeader(nonce: string): string {
   const connectSrc = isDevelopment
     ? `'self' http://localhost:* https: ws: wss: chrome-extension:`
     : `'self' https:`
+
+  const imgSrc = isDevelopment
+    ? `'self' blob: data: https: http://localhost:*`
+    : `'self' blob: data: https:`
   
   const cspHeader = `
     default-src 'self';
     script-src ${scriptSrc}; 
     style-src 'self' 'unsafe-inline';
-    img-src 'self' blob: data: https:;
+    img-src ${imgSrc};
     font-src 'self' data: https:;
     object-src 'none';
     base-uri 'self';

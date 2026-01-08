@@ -4,7 +4,10 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { Category } from '../../categories/entities/category.entity';
 
 export enum DownloadCategory {
   RULES = 'rules',
@@ -41,6 +44,13 @@ export class Download {
     default: 'rules',
   })
   category: string;
+
+  @Column({ name: 'category_id', nullable: true })
+  categoryId: string | null;
+
+  @ManyToOne(() => Category, { nullable: true })
+  @JoinColumn({ name: 'category_id' })
+  categoryRel: Category;
 
   @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive: boolean;
