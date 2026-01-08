@@ -168,6 +168,13 @@ const AdminPoliciesPage = () => {
                           >
                             <Download className="w-4 h-4" />
                           </a>
+                          <Link
+                            href={`/admin/policies/${item.id}/edit`}
+                            className="p-1.5 text-neutral-500 hover:text-primary transition-colors rounded-md hover:bg-neutral-100"
+                            title="Edit"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Link>
                           <button
                             type="button"
                             onClick={(e) => handleDeleteClick(e, item.id)}

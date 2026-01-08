@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Download, DownloadCategory } from './entities/download.entity';
 import { CreateDownloadDto } from './dto/create-download.dto';
+import { UpdateDownloadDto } from './dto/update-download.dto';
 
 @Injectable()
 export class DownloadsService implements OnModuleInit {
@@ -20,6 +21,15 @@ export class DownloadsService implements OnModuleInit {
   async create(createDownloadDto: CreateDownloadDto): Promise<Download> {
     const download = this.downloadRepository.create(createDownloadDto);
     return this.downloadRepository.save(download);
+  }
+
+  async update(
+    id: string,
+    updateDownloadDto: UpdateDownloadDto,
+  ): Promise<Download> {
+    const download = await this.findOne(id);
+    const updated = this.downloadRepository.merge(download, updateDownloadDto);
+    return this.downloadRepository.save(updated);
   }
 
   async findAll(category?: string): Promise<Download[]> {

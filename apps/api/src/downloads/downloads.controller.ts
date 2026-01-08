@@ -6,9 +6,11 @@ import {
   Param,
   Delete,
   Query,
+  Patch,
 } from '@nestjs/common';
 import { DownloadsService } from './downloads.service';
 import { CreateDownloadDto } from './dto/create-download.dto';
+import { UpdateDownloadDto } from './dto/update-download.dto';
 import { Public } from '../auth/decorators/public.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 
@@ -44,5 +46,14 @@ export class DownloadsController {
   @Roles('admin', 'super_admin')
   remove(@Param('id') id: string) {
     return this.downloadsService.remove(id);
+  }
+
+  @Patch(':id')
+  @Roles('admin', 'super_admin')
+  update(
+    @Param('id') id: string,
+    @Body() updateDownloadDto: UpdateDownloadDto,
+  ) {
+    return this.downloadsService.update(id, updateDownloadDto);
   }
 }
