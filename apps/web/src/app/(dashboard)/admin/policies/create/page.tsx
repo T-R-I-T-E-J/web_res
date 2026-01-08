@@ -14,13 +14,13 @@ export default function CreatePolicyPage() {
   const [file, setFile] = useState<File | null>(null)
   
   const [existingCategories, setExistingCategories] = useState<string[]>([
-    'rules', 'selection', 'calendar', 'match'
+    'rules', 'selection', 'calendar', 'match', 'medical_classification', 'ipc_license', 'national_classification'
   ])
 
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: 'rules',
+    category: '',
     fileType: 'PDF',
     size: '',
     href: '',
