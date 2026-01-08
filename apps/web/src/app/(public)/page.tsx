@@ -173,7 +173,7 @@ const HomePage = () => {
 
 
       {/* Latest News & Updates Section */}
-      <section className="section bg-white">
+      <section className="section bg-white pb-2 md:pb-4">
         <div className="container-main">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
             <h2 className="section-title">Latest News & Updates</h2>
@@ -214,7 +214,7 @@ const HomePage = () => {
       </section>
 
       {/* Upcoming Events Section */}
-      <section className="section bg-neutral-50">
+      <section className="section bg-neutral-50 pb-2 md:pb-4">
         <div className="container-main">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
             <h2 className="section-title">Upcoming Events</h2>
@@ -260,7 +260,7 @@ const HomePage = () => {
       </section>
 
       {/* Highlights & Achievements Gallery */}
-       <section className="section bg-white">
+       <section className="section bg-white pb-2 md:pb-4">
         <div className="container-main">
           <div className="flex justify-between items-center mb-12">
              <h2 className="section-title mb-0">Highlights & Achievements</h2>
