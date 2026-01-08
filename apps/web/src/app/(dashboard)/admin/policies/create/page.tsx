@@ -124,10 +124,11 @@ export default function CreatePolicyPage() {
   }
 
   const createDownloadEntry = async (finalHref: string, apiUrl: string) => {
+      const { status, ...rest } = formData
       const payload = {
-        ...formData,
+        ...rest,
         href: finalHref,
-        isActive: formData.status === 'published'
+        isActive: status === 'published'
       }
 
       const res = await fetch(`${apiUrl}/downloads`, {
