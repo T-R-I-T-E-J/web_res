@@ -39,6 +39,7 @@ const LoginPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Enable cookies for cross-origin requests
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,

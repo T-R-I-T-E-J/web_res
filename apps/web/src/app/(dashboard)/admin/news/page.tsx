@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { DashboardHeader } from '@/components/dashboard'
 import { Plus, Edit, Trash, FileText, Loader2 } from 'lucide-react'
-import Cookies from 'js-cookie'
 import clsx from 'clsx'
 
 type NewsItem = {
@@ -19,6 +18,8 @@ type NewsItem = {
 const AdminNewsPage = () => {
   const [news, setNews] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [itemToDelete, setItemToDelete] = useState<number | null>(null)
   const [deletingId, setDeletingId] = useState<number | null>(null)
 
   useEffect(() => {
@@ -27,11 +28,8 @@ const AdminNewsPage = () => {
 
   const fetchNews = async () => {
     try {
-      const token = Cookies.get('auth_token')
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/news`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: 'include',
       })
       if (res.ok) {
         const json = await res.json()
@@ -51,39 +49,32 @@ const AdminNewsPage = () => {
     }
   }
 
-  const handleDelete = async (event: React.MouseEvent, id: number) => {
-    console.log('🔴 DELETE BUTTON CLICKED! ID:', id)
-    
+  const handleDeleteClick = (event: React.MouseEvent, id: number) => {
     event.preventDefault()
     event.stopPropagation()
-    
-    if (!confirm('Are you sure you want to delete this news article?')) {
-      console.log('❌ User cancelled deletion')
-      return
-    }
+    setItemToDelete(id)
+    setDeleteModalOpen(true)
+  }
 
-    setDeletingId(id)
+  const confirmDelete = async () => {
+    if (!itemToDelete) return
+
+    setDeletingId(itemToDelete)
+    setDeleteModalOpen(false) 
     
     try {
-      const token = Cookies.get('auth_token')
-      console.log('🗑️ Attempting to delete news ID:', id)
-      console.log('🔑 Auth token:', token ? 'Present' : 'Missing')
-      console.log('🌐 API URL:', `${process.env.NEXT_PUBLIC_API_URL}/news/${id}`)
-      
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/news/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/news/${itemToDelete}`, {
         method: 'DELETE',
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       })
       
-      console.log('📊 Delete response status:', res.status)
-      console.log('✅ Delete response ok:', res.ok)
-      
       if (res.ok) {
-        setNews(news.filter(n => n.id !== id))
-        alert('✅ News article deleted successfully')
+        setNews((prev) => prev.filter(n => n.id !== itemToDelete))
+        // Alert removed in favor of UI update, but kept if user prefers
+        // alert('✅ News article deleted successfully')
       } else {
         const errorText = await res.text()
         console.error('❌ Delete failed:', res.status, errorText)
@@ -94,6 +85,7 @@ const AdminNewsPage = () => {
       alert(`💥 Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setDeletingId(null)
+      setItemToDelete(null)
     }
   }
 
@@ -172,25 +164,15 @@ const AdminNewsPage = () => {
                           
                           <button
                             type="button"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              e.preventDefault()
-                              handleDelete(e, item.id)
-                            }}
+                            onClick={(e) => handleDeleteClick(e, item.id)}
                             disabled={deletingId === item.id}
                             className="p-1.5 text-neutral-500 hover:text-error transition-colors rounded-md hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Delete"
-                            style={{
-                              position: 'relative',
-                              zIndex: 9999,
-                              pointerEvents: 'auto',
-                              cursor: 'pointer'
-                            }}
                           >
                             {deletingId === item.id ? (
                               <Loader2 className="w-4 h-4 animate-spin" />
                             ) : (
-                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" style={{ pointerEvents: 'none' }}><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                              <Trash className="w-4 h-4" />
                             )}
                           </button>
                         </div>
@@ -203,6 +185,32 @@ const AdminNewsPage = () => {
           )}
         </div>
       </div>
+
+      {/* Custom Delete Confirmation Modal */}
+      {deleteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 transform scale-100 animate-in zoom-in-95 duration-200">
+            <h3 className="text-lg font-bold text-neutral-900 mb-2">Delete News Article?</h3>
+            <p className="text-neutral-600 mb-6">
+              Are you sure you want to delete this news article? This action cannot be undone and will remove it from the public site.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteModalOpen(false)}
+                className="px-4 py-2 text-sm font-medium text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded-md transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors shadow-sm"
+              >
+                Delete Article
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

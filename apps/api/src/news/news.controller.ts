@@ -26,7 +26,7 @@ export class NewsController {
   @Post()
   @UseGuards(RolesGuard)
   @Roles('admin', 'system_admin')
-  create(@Body() createNewsDto: CreateNewsDto, @Request() req: any) {
+  async create(@Body() createNewsDto: CreateNewsDto, @Request() req: any) {
     const authorId = req.user?.id ? Number(req.user.id) : 2;
     return this.newsService.create(createNewsDto, authorId);
   }

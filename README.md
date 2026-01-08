@@ -6,16 +6,26 @@ Welcome to the official source code repository for the Para Shooting Committee o
 
 ### Current Running Services
 
-- **Frontend:** http://localhost:3000 (Next.js 16 + React 19)
-- **Backend API:** http://localhost:8080/api/v1 (NestJS 11 + TypeScript)
+- **Frontend:** http://localhost:3000 (Next.js 14 + React 18)
+- **Backend API:** http://localhost:4000/api/v1 (NestJS 11 + TypeScript)
 - **Database:** localhost:5432 (PostgreSQL 16)
+- **Redis:** localhost:6379 (Redis 7)
 - **pgAdmin:** http://localhost:8081 (admin@psci.in / admin123)
+
+### First Time Setup
+
+For detailed setup instructions and default admin credentials, see:
+**[📖 Setup Guide](./docs/SETUP_GUIDE.md)**
 
 ### Start Development
 
 ```bash
 # Start database
 docker-compose up -d
+
+# Start backend (in one terminal)
+cd apps/api
+npm run start:dev
 
 # Start frontend (in another terminal)
 cd apps/web

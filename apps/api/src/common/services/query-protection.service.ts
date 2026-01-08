@@ -126,7 +126,8 @@ export class QueryProtectionService implements OnModuleInit {
     // Explicitly type the result as an array of any (or specific shape if known)
     // pg_terminate_backend usually returns boolean, but here we select it from a table?
     // The query selects pg_terminate_backend(pid), so it returns rows [{ pg_terminate_backend: boolean }]
-    const result: Array<{ pg_terminate_backend: boolean }> = await this.dataSource.query(`
+    const result: Array<{ pg_terminate_backend: boolean }> = await this
+      .dataSource.query(`
       SELECT pg_terminate_backend(pid)
       FROM pg_stat_activity
       WHERE state = 'active'
@@ -180,10 +181,8 @@ export class QueryProtectionService implements OnModuleInit {
    * Kill specific query by PID
    */
   async killQuery(pid: number): Promise<boolean> {
-    const result: Array<{ pg_terminate_backend: boolean }> = await this.dataSource.query(
-      'SELECT pg_terminate_backend($1)',
-      [pid],
-    );
+    const result: Array<{ pg_terminate_backend: boolean }> =
+      await this.dataSource.query('SELECT pg_terminate_backend($1)', [pid]);
 
     console.warn(`[SECURITY] Killed query with PID ${pid}`);
     return result[0]?.pg_terminate_backend ?? false;
@@ -204,7 +203,8 @@ export class QueryProtectionService implements OnModuleInit {
    * Kill idle connections
    */
   async killIdleConnections(idleMinutes = 30): Promise<number> {
-    const result: Array<{ pg_terminate_backend: boolean }> = await this.dataSource.query(`
+    const result: Array<{ pg_terminate_backend: boolean }> = await this
+      .dataSource.query(`
       SELECT pg_terminate_backend(pid)
       FROM pg_stat_activity
       WHERE state = 'idle'

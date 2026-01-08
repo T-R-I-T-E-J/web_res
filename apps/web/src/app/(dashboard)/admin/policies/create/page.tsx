@@ -1,19 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { DashboardHeader } from '@/components/dashboard'
 import { ArrowLeft, Loader2, Upload as UploadIcon, Link as LinkIcon, FileText } from 'lucide-react'
-import Cookies from 'js-cookie'
 import clsx from 'clsx'
-
-const categories = [
-  { label: 'Rules & Guidelines', value: 'rules' },
-  { label: 'Selection Policies', value: 'selection' },
-  { label: 'Event Calendar', value: 'calendar' },
-  { label: 'Match Documents', value: 'match' },
-]
 
 export default function CreatePolicyPage() {
   const router = useRouter()
@@ -21,6 +13,10 @@ export default function CreatePolicyPage() {
   const [uploadType, setUploadType] = useState<'file' | 'url'>('file')
   const [file, setFile] = useState<File | null>(null)
   
+  const [existingCategories, setExistingCategories] = useState<string[]>([
+    'rules', 'selection', 'calendar', 'match'
+  ])
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -29,6 +25,24 @@ export default function CreatePolicyPage() {
     size: '',
     href: '',
   })
+  
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
+        const res = await fetch(`${apiUrl}/downloads/categories`, { credentials: 'include' })
+        if (res.ok) {
+          const cats = await res.json()
+          if (Array.isArray(cats) && cats.length > 0) {
+            setExistingCategories(prev => Array.from(new Set([...prev, ...cats])))
+          }
+        }
+      } catch (e) {
+        console.error("Failed to fetch categories", e)
+      }
+    }
+    fetchCategories()
+  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -66,7 +80,7 @@ export default function CreatePolicyPage() {
     return ext === 'DOCX' || ext === 'DOC' ? 'DOC' : ext
   }
 
-  const uploadDocument = async (token: string, apiUrl: string) => {
+  const uploadDocument = async (apiUrl: string) => {
     if (!file) return null;
     
     const uploadFormData = new FormData()
@@ -74,9 +88,7 @@ export default function CreatePolicyPage() {
 
     const uploadRes = await fetch(`${apiUrl}/upload/document`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      },
+      credentials: 'include', // Send cookies with request
       body: uploadFormData
     })
 
@@ -108,7 +120,7 @@ export default function CreatePolicyPage() {
     return `/uploads/documents/${filename}`;
   }
 
-  const createDownloadEntry = async (finalHref: string, token: string, apiUrl: string) => {
+  const createDownloadEntry = async (finalHref: string, apiUrl: string) => {
       const payload = {
         ...formData,
         href: finalHref,
@@ -119,8 +131,8 @@ export default function CreatePolicyPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
         },
+        credentials: 'include', // Send cookies with request
         body: JSON.stringify(payload)
       })
 
@@ -138,21 +150,18 @@ export default function CreatePolicyPage() {
     setLoading(true)
 
     try {
-      const token = Cookies.get('auth_token')
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
-      
-      if (!token) throw new Error('Authentication token missing');
 
       let finalHref = formData.href
 
       // 1. Upload File if selected
       if (uploadType === 'file' && file) {
-        const uploadedPath = await uploadDocument(token, apiUrl);
+        const uploadedPath = await uploadDocument(apiUrl);
         if (uploadedPath) finalHref = uploadedPath;
       }
 
       // 2. Create Download Entry
-      await createDownloadEntry(finalHref, token, apiUrl);
+      await createDownloadEntry(finalHref, apiUrl);
 
     } catch (error) {
       console.error('Error creating document:', error)
@@ -214,17 +223,24 @@ export default function CreatePolicyPage() {
               {/* Category */}
               <div>
                 <label className="label" htmlFor="category">Category</label>
-                <select
+                <input
+                  list="category-list"
                   id="category"
                   name="category"
-                  value={formData.category}
+                  value={formData.category} 
                   onChange={handleChange}
                   className="input w-full"
-                >
-                  {categories.map(c => (
-                    <option key={c.value} value={c.value}>{c.label}</option>
+                  placeholder="Select or type a category"
+                  autoComplete="off"
+                />
+                <datalist id="category-list">
+                  {existingCategories.map((c: string) => (
+                    <option key={c} value={c} />
                   ))}
-                </select>
+                </datalist>
+                <p className="text-xs text-neutral-500 mt-1">
+                   Type a new category name or select from existing.
+                </p>
               </div>
 
               {/* File Type */}

@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { DashboardHeader } from '@/components/dashboard'
 import { ArrowLeft, Loader2, Save, Plus, X, FileText } from 'lucide-react'
-import Cookies from 'js-cookie'
 
 export default function EditNewsPage({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -29,11 +28,8 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        const token = Cookies.get('auth_token')
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/news/${params.id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          credentials: 'include',
         })
 
         if (res.ok) {
@@ -86,13 +82,12 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
     if (!file) return;
 
     try {
-      const token = Cookies.get('auth_token');
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/file`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
         body: uploadFormData,
       });
 
@@ -116,13 +111,12 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
     if (!file) return;
 
     try {
-      const token = Cookies.get('auth_token');
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/file`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
         body: uploadFormData,
       });
 
@@ -155,13 +149,12 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
     if (!file) return;
 
     try {
-      const token = Cookies.get('auth_token');
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/file`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
         body: uploadFormData,
       });
 
@@ -187,13 +180,12 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
     if (!file) return;
 
     try {
-      const token = Cookies.get('auth_token');
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/file`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
         body: uploadFormData,
       });
 
@@ -225,7 +217,6 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
     setLoading(true)
 
     try {
-      const token = Cookies.get('auth_token')
       const payload = {
         ...formData,
         tags: formData.tags.split(',').map((t) => t.trim()).filter(Boolean),
@@ -236,9 +227,9 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/news/${params.id}`, {
         method: 'PATCH',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       })

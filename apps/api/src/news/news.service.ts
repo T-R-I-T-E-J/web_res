@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NewsArticle, NewsStatus } from './entities/news.entity.js';
@@ -22,10 +18,19 @@ export class NewsService {
   ): Promise<NewsArticle> {
     let slug = this.generateSlug(createNewsDto.title);
 
-    // Check slug uniqueness
-    const existing = await this.newsRepository.findOne({ where: { slug } });
-    if (existing) {
-      slug = `${slug}-${Date.now()}`; // Simple unique suffix
+    // Check slug uniqueness and ensure it is unique
+    let existing = await this.newsRepository.findOne({
+      where: { slug },
+      withDeleted: true,
+    });
+    let counter = 1;
+    while (existing) {
+      slug = `${this.generateSlug(createNewsDto.title)}-${Date.now()}-${counter}`;
+      existing = await this.newsRepository.findOne({
+        where: { slug },
+        withDeleted: true,
+      });
+      counter++;
     }
 
     const news = this.newsRepository.create({

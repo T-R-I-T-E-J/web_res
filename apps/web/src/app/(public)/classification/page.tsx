@@ -1,18 +1,11 @@
 
 import type { Metadata } from 'next'
-import { FileText, Download, Award, Users, Target, BookOpen } from 'lucide-react'
+import { FileText, Download } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Classification',
   description: 'Shooter classification system, categories, and guidelines for para shooting in India.',
 }
-
-const categories = [
-  { label: 'Classification System', icon: Award, id: 'system' },
-  { label: 'Shooter Categories', icon: Users, id: 'categories' },
-  { label: 'Assessment Guidelines', icon: Target, id: 'assessment' },
-  { label: 'Classification Documents', icon: BookOpen, id: 'documents' },
-]
 
 interface ClassificationItem {
   id: string
@@ -29,23 +22,28 @@ interface ClassificationItem {
 async function getClassificationDocuments(): Promise<ClassificationItem[]> {
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
-    console.log(`Fetching classification documents from: ${apiUrl}/downloads`);
     
+    // Fetch all downloads and filter manually since we have multiple categories
     const res = await fetch(`${apiUrl}/downloads`, {
       cache: 'no-store',
     })
     
     if (!res.ok) {
-       console.error('Failed to fetch classification documents:', res.status, await res.text())
+       console.error('Failed to fetch classification documents:', res.status)
        return []
     }
 
     const json = await res.json()
     const data = Array.isArray(json) ? json : (json.data || [])
     
-    // Filter for classification-related documents
-    // You can add a specific category filter here if needed
-    return Array.isArray(data) ? data : []
+    const classificationCategories = [
+      'classification', 
+      'medical_classification', 
+      'ipc_license', 
+      'national_classification'
+    ];
+
+    return data.filter((item: ClassificationItem) => classificationCategories.includes(item.category));
   } catch (error) {
     console.error('Error fetching classification documents:', error)
     return []
@@ -100,16 +98,20 @@ const ClassificationCard = ({
 
 const ClassificationPage = async () => {
   const documents = await getClassificationDocuments();
-  
-  // Filter documents by category
-  const systemDocs = documents.filter(d => d.category === 'system' || d.category === 'rules');
-  const categoryDocs = documents.filter(d => d.category === 'categories' || d.category === 'selection');
-  const assessmentDocs = documents.filter(d => d.category === 'assessment' || d.category === 'calendar');
-  const generalDocs = documents.filter(d => d.category === 'documents' || d.category === 'match');
+
+  const medicalDocs = documents.filter(d => d.category === 'medical_classification');
+  const ipcDocs = documents.filter(d => d.category === 'ipc_license');
+  const nationalDocs = documents.filter(d => d.category === 'national_classification');
+  const otherDocs = documents.filter(d => d.category === 'classification');
+
+  const sections = [
+    { id: 'medical', label: 'Medical Classification', count: medicalDocs.length },
+    { id: 'ipc', label: 'IPC License Formals', count: ipcDocs.length },
+    { id: 'national', label: 'National Rule Classification', count: nationalDocs.length },
+  ];
 
   return (
     <>
-      {/* Breadcrumb */}
       <nav className="bg-neutral-100 py-3 text-sm" aria-label="Breadcrumb">
         <div className="container-main">
           <ol className="flex items-center gap-2">
@@ -120,99 +122,90 @@ const ClassificationPage = async () => {
         </div>
       </nav>
 
-
-
-      {/* Quick Access Categories */}
-      <section className="py-8 bg-white border-b border-neutral-200">
-        <div className="container-main">
-          <div className="flex flex-wrap justify-center gap-4">
-            {categories.map((item) => (
+      <section className="py-12 bg-white border-b border-neutral-200">
+        <div className="container-main text-center">
+          <h1 className="text-3xl md:text-4xl font-bold text-primary mb-4">Classification</h1>
+          <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
+            Find all relevant documents, guidelines, and forms regarding Para Shooting classification in India.
+          </p>
+          
+          {/* Quick Links */}
+          <div className="flex flex-wrap justify-center gap-4 mt-8">
+            {sections.map((section) => (
               <a
-                key={item.id}
-                href={`#${item.id}`}
-                className="flex items-center gap-2 px-6 py-3 bg-neutral-50 rounded-card hover:bg-primary/10 hover:text-primary transition-colors"
+                key={section.id}
+                href={`#${section.id}`}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-50 hover:bg-primary/5 border border-neutral-200 rounded-full transition-colors text-sm font-medium text-neutral-700 hover:text-primary"
               >
-                <item.icon className="w-5 h-5" />
-                <span className="font-medium">{item.label}</span>
+                {section.label}
+                {section.count > 0 && (
+                  <span className="bg-neutral-200 text-neutral-700 text-xs px-2 py-0.5 rounded-full">
+                    {section.count}
+                  </span>
+                )}
               </a>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Classification System Section */}
-      <section id="system" className="section bg-white">
-        <div className="container-main">
-          <h2 className="section-title">Classification System</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {systemDocs.length > 0 ? systemDocs.map((doc) => (
-              <ClassificationCard 
-                key={doc.id} 
-                {...doc} 
-                date={doc.createdAt} 
-              />
-            )) : (
-              <p className="text-neutral-500">No documents found.</p>
-            )}
-          </div>
-        </div>
-      </section>
+      <div className="bg-neutral-50 min-h-[50vh] py-12 space-y-12">
+        
+        {/* Medical Classification Section */}
+        <section id="medical" className="container-main">
+          <h2 className="text-3xl font-heading font-bold text-primary mb-6 pb-2 border-b-4 border-accent inline-block">
+            Medical Classification
+          </h2>
+          {medicalDocs.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {medicalDocs.map(doc => <ClassificationCard key={doc.id} {...doc} date={doc.createdAt} />)}
+            </div>
+          ) : (
+            <p className="text-neutral-500 italic">No Medical Classification documents available.</p>
+          )}
+        </section>
 
-      {/* Shooter Categories Section */}
-      <section id="categories" className="section bg-neutral-50">
-        <div className="container-main">
-          <h2 className="section-title">Shooter Categories</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categoryDocs.length > 0 ? categoryDocs.map((doc) => (
-              <ClassificationCard 
-                key={doc.id} 
-                {...doc} 
-                date={doc.createdAt}
-              />
-            )) : (
-              <p className="text-neutral-500">No documents found.</p>
-            )}
-          </div>
-        </div>
-      </section>
+        {/* IPC License Formals Section */}
+        <section id="ipc" className="container-main">
+          <h2 className="text-3xl font-heading font-bold text-primary mb-6 pb-2 border-b-4 border-accent inline-block">
+            IPC License Formals
+          </h2>
+          {ipcDocs.length > 0 ? (
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {ipcDocs.map(doc => <ClassificationCard key={doc.id} {...doc} date={doc.createdAt} />)}
+            </div>
+          ) : (
+             <p className="text-neutral-500 italic">No IPC License documents available.</p>
+          )}
+        </section>
 
-      {/* Assessment Guidelines Section */}
-      <section id="assessment" className="section bg-white">
-        <div className="container-main">
-          <h2 className="section-title">Assessment Guidelines</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {assessmentDocs.length > 0 ? assessmentDocs.map((doc) => (
-              <ClassificationCard 
-                key={doc.id} 
-                {...doc} 
-                date={doc.createdAt}
-              />
-            )) : (
-              <p className="text-neutral-500">No documents found.</p>
-            )}
-          </div>
-        </div>
-      </section>
+        {/* National Rule Classification Section */}
+        <section id="national" className="container-main">
+          <h2 className="text-3xl font-heading font-bold text-primary mb-6 pb-2 border-b-4 border-accent inline-block">
+            National Rule Classification
+          </h2>
+          {nationalDocs.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {nationalDocs.map(doc => <ClassificationCard key={doc.id} {...doc} date={doc.createdAt} />)}
+            </div>
+          ) : (
+            <p className="text-neutral-500 italic">No National Rule documents available.</p>
+          )}
+        </section>
 
-      {/* Classification Documents Section */}
-      <section id="documents" className="section bg-neutral-50">
-        <div className="container-main">
-          <h2 className="section-title">Classification Documents</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {generalDocs.length > 0 ? generalDocs.map((doc) => (
-              <ClassificationCard 
-                key={doc.id} 
-                {...doc} 
-                date={doc.createdAt}
-              />
-            )) : (
-              <p className="text-neutral-500">No documents found.</p>
-            )}
-          </div>
-        </div>
-      </section>
+        {/* Other Classification Documents Section */}
+        {otherDocs.length > 0 && (
+          <section className="container-main">
+            <h2 className="text-2xl font-bold text-neutral-800 mb-6 border-b pb-2 border-neutral-200">
+              Other Documents
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {otherDocs.map(doc => <ClassificationCard key={doc.id} {...doc} date={doc.createdAt} />)}
+            </div>
+          </section>
+        )}
+      </div>
     </>
   )
 }
-
 export default ClassificationPage

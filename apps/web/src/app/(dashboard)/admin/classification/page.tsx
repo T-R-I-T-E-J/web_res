@@ -29,16 +29,17 @@ const AdminClassificationPage = () => {
 
   const fetchClassification = async () => {
     try {
-      const token = Cookies.get('auth_token')
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/downloads`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: 'include', // Use HttpOnly cookie
       })
       if (res.ok) {
         const json = await res.json()
         const data = Array.isArray(json) ? json : (json.data || [])
-        setItems(data)
+        // Filter for any classification related category
+        const classItems = data.filter((item: ClassificationItem) => 
+          ['classification', 'medical_classification', 'ipc_license', 'national_classification'].includes(item.category)
+        )
+        setItems(classItems)
       }
     } catch (error) {
       console.error('Failed to fetch classification:', error)
@@ -48,34 +49,34 @@ const AdminClassificationPage = () => {
   }
 
   const handleDelete = async (event: React.MouseEvent, id: string) => {
-    event.preventDefault()
     event.stopPropagation()
     
     if (!id) {
-      console.error('Delete failed: Missing ID')
+      alert('Error: Missing ID')
       return
     }
 
-    if (!confirm('Are you sure you want to delete this document?')) {
+    if (typeof window !== 'undefined' && !window.confirm('Are you sure you want to delete this document?')) {
       return
     }
 
     setDeletingId(id)
     
     try {
-      const token = Cookies.get('auth_token')
-      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/downloads/${id}`;
+      // Ensure URL is valid
+      const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1').replace(/\/$/, '')
+      const apiUrl = `${baseUrl}/downloads/${id}`
       
       const res = await fetch(apiUrl, {
         method: 'DELETE',
+        credentials: 'include', // Send cookies with request
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       })
       
       if (res.ok) {
-        setItems(items.filter(item => item.id !== id))
+        setItems((prev) => prev.filter(item => item.id !== id))
         alert('Document deleted successfully')
       } else {
         const errorText = await res.text()

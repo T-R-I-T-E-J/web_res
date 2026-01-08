@@ -10,6 +10,10 @@ export enum DownloadCategory {
   RULES = 'rules',
   SELECTION = 'selection',
   CALENDAR = 'calendar',
+  CLASSIFICATION = 'classification', // Keeping for backward compat if needed
+  MEDICAL_CLASSIFICATION = 'medical_classification',
+  IPC_LICENSE = 'ipc_license',
+  NATIONAL_CLASSIFICATION = 'national_classification',
   MATCH = 'match',
 }
 
@@ -34,11 +38,9 @@ export class Download {
   href: string;
 
   @Column({
-    type: 'enum',
-    enum: DownloadCategory,
-    default: DownloadCategory.RULES,
+    default: 'rules',
   })
-  category: DownloadCategory;
+  category: string;
 
   @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive: boolean;

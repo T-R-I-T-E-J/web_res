@@ -1,11 +1,4 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsOptional,
-  IsEnum,
-  IsBoolean,
-} from 'class-validator';
-import { DownloadCategory } from '../entities/download.entity';
+import { IsString, IsNotEmpty, IsOptional, IsBoolean } from 'class-validator';
 
 export class CreateDownloadDto {
   @IsString()
@@ -28,9 +21,9 @@ export class CreateDownloadDto {
   @IsNotEmpty()
   href: string;
 
-  @IsEnum(DownloadCategory)
+  @IsString()
   @IsOptional()
-  category?: DownloadCategory;
+  category?: string;
 
   @IsBoolean()
   @IsOptional()

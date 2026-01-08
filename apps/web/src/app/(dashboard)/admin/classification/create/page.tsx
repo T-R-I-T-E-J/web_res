@@ -9,10 +9,9 @@ import Cookies from 'js-cookie'
 import clsx from 'clsx'
 
 const categories = [
-  { label: 'Rules & Guidelines', value: 'rules' },
-  { label: 'Selection Policies', value: 'selection' },
-  { label: 'Event Calendar', value: 'calendar' },
-  { label: 'Match Documents', value: 'match' },
+  { label: 'Medical Classification', value: 'medical_classification' },
+  { label: 'IPC License Formals', value: 'ipc_license' },
+  { label: 'National Rule Classification', value: 'national_classification' },
 ]
 
 export default function CreateClassificationPage() {
@@ -24,7 +23,7 @@ export default function CreateClassificationPage() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: 'rules',
+    category: 'medical_classification',
     fileType: 'PDF',
     size: '',
     href: '',
@@ -66,7 +65,7 @@ export default function CreateClassificationPage() {
     return ext === 'DOCX' || ext === 'DOC' ? 'DOC' : ext
   }
 
-  const uploadDocument = async (token: string, apiUrl: string) => {
+  const uploadDocument = async (apiUrl: string) => {
     if (!file) return null;
     
     const uploadFormData = new FormData()
@@ -75,8 +74,9 @@ export default function CreateClassificationPage() {
     const uploadRes = await fetch(`${apiUrl}/upload/document`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`
+        // No Authorization header needed, using cookie
       },
+      credentials: 'include',
       body: uploadFormData
     })
 
@@ -108,7 +108,7 @@ export default function CreateClassificationPage() {
     return `/uploads/documents/${filename}`;
   }
 
-  const createDownloadEntry = async (finalHref: string, token: string, apiUrl: string) => {
+  const createDownloadEntry = async (finalHref: string, apiUrl: string) => {
       const payload = {
         ...formData,
         href: finalHref,
@@ -119,8 +119,9 @@ export default function CreateClassificationPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          // No Authorization header needed
         },
+        credentials: 'include', // Send cookies with request
         body: JSON.stringify(payload)
       })
 
@@ -138,21 +139,20 @@ export default function CreateClassificationPage() {
     setLoading(true)
 
     try {
-      const token = Cookies.get('auth_token')
+      // Cookies are HttpOnly, so we can't read them via JS.
+      // We rely on the browser sending them via credentials: 'include'.
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
       
-      if (!token) throw new Error('Authentication token missing');
-
       let finalHref = formData.href
 
       // 1. Upload File if selected
       if (uploadType === 'file' && file) {
-        const uploadedPath = await uploadDocument(token, apiUrl);
+        const uploadedPath = await uploadDocument(apiUrl);
         if (uploadedPath) finalHref = uploadedPath;
       }
 
       // 2. Create Download Entry
-      await createDownloadEntry(finalHref, token, apiUrl);
+      await createDownloadEntry(finalHref, apiUrl);
 
     } catch (error) {
       console.error('Error creating document:', error)

@@ -41,8 +41,10 @@ const Sidebar = ({ items, user }: SidebarProps) => {
   const handleLogout = async () => {
     try {
       // Call backend to clear HttpOnly cookie
-      await fetch('/api/v1/auth/logout', { 
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+      await fetch(`${API_URL}/auth/logout`, { 
         method: 'POST',
+        credentials: 'include', // Send cookies with request
       });
     } catch (error) {
       console.error('Logout failed', error);

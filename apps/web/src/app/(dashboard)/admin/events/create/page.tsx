@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { DashboardHeader } from '@/components/dashboard'
 import { ArrowLeft, Loader2, Save, Plus, X } from 'lucide-react'
-import Cookies from 'js-cookie'
 
 export default function CreateEventPage() {
   const router = useRouter()
@@ -78,7 +77,6 @@ export default function CreateEventPage() {
     setLoading(true)
 
     try {
-      const token = Cookies.get('auth_token')
       
       // Transform the form data to match API requirements
       const payload: any = {
@@ -109,9 +107,9 @@ export default function CreateEventPage() {
       
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       })

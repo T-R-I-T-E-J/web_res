@@ -6,14 +6,11 @@ import {
   Param,
   Delete,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import { DownloadsService } from './downloads.service';
 import { CreateDownloadDto } from './dto/create-download.dto';
-import { DownloadCategory } from './entities/download.entity';
 import { Public } from '../auth/decorators/public.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from '../auth/entities/user-role.entity';
 
 @Controller('downloads')
 export class DownloadsController {
@@ -26,8 +23,14 @@ export class DownloadsController {
   }
 
   @Public()
+  @Get('categories')
+  getCategories() {
+    return this.downloadsService.getCategories();
+  }
+
+  @Public()
   @Get()
-  findAll(@Query('category') category?: DownloadCategory) {
+  findAll(@Query('category') category?: string) {
     return this.downloadsService.findAll(category);
   }
 

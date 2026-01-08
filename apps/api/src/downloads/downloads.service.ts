@@ -22,7 +22,7 @@ export class DownloadsService implements OnModuleInit {
     return this.downloadRepository.save(download);
   }
 
-  async findAll(category?: DownloadCategory): Promise<Download[]> {
+  async findAll(category?: string): Promise<Download[]> {
     if (category) {
       return this.downloadRepository.find({
         where: { category, isActive: true },
@@ -45,6 +45,14 @@ export class DownloadsService implements OnModuleInit {
       throw new NotFoundException(`Download with ID "${id}" not found`);
     }
     return download;
+  }
+
+  async getCategories(): Promise<string[]> {
+    const result = await this.downloadRepository
+      .createQueryBuilder('download')
+      .select('DISTINCT download.category', 'category')
+      .getRawMany<{ category: string }>();
+    return result.map((r) => r.category).filter(Boolean);
   }
 
   async remove(id: string): Promise<{ message: string }> {

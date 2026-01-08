@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { DashboardHeader } from '@/components/dashboard'
 import { Plus, Edit, Trash, FileText, Loader2, Download } from 'lucide-react'
-import Cookies from 'js-cookie'
 import clsx from 'clsx'
 
 type PolicyItem = {
@@ -21,6 +20,8 @@ type PolicyItem = {
 const AdminPoliciesPage = () => {
   const [items, setItems] = useState<PolicyItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -29,16 +30,17 @@ const AdminPoliciesPage = () => {
 
   const fetchPolicies = async () => {
     try {
-      const token = Cookies.get('auth_token')
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/downloads`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: 'include', // Send cookies with request
       })
       if (res.ok) {
         const json = await res.json()
         const data = Array.isArray(json) ? json : (json.data || [])
-        setItems(data)
+        // Filter OUT any classification related category
+        const policies = data.filter((item: PolicyItem) => 
+          !['classification', 'medical_classification', 'ipc_license', 'national_classification'].includes(item.category)
+        )
+        setItems(policies)
       }
     } catch (error) {
       console.error('Failed to fetch policies:', error)
@@ -47,36 +49,34 @@ const AdminPoliciesPage = () => {
     }
   }
 
-  const handleDelete = async (event: React.MouseEvent, id: string) => {
+  const handleDeleteClick = (event: React.MouseEvent, id: string) => {
     event.preventDefault()
     event.stopPropagation()
-    
-    if (!id) {
-      console.error('Delete failed: Missing ID')
-      return
-    }
+    setItemToDelete(id)
+    setDeleteModalOpen(true)
+  }
 
-    if (!confirm('Are you sure you want to delete this document?')) {
-      return
-    }
+  const confirmDelete = async () => {
+    if (!itemToDelete) return
 
-    setDeletingId(id)
+    setDeletingId(itemToDelete)
+    setDeleteModalOpen(false) // Close modal immediately to show loading state on row
     
     try {
-      const token = Cookies.get('auth_token')
-      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/downloads/${id}`;
+      const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1').replace(/\/$/, '')
+      const apiUrl = `${baseUrl}/downloads/${itemToDelete}`
       
       const res = await fetch(apiUrl, {
         method: 'DELETE',
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       })
       
       if (res.ok) {
-        setItems(items.filter(item => item.id !== id))
-        alert('Document deleted successfully')
+        setItems((currentItems) => currentItems.filter(item => item.id !== itemToDelete))
+        // Success toast could go here
       } else {
         const errorText = await res.text()
         console.error('Delete failed:', res.status, errorText)
@@ -84,9 +84,10 @@ const AdminPoliciesPage = () => {
       }
     } catch (error) {
       console.error('Delete error:', error)
-      alert('An error occurred while deleting')
+      alert(`An error occurred: ${(error as Error).message}`)
     } finally {
       setDeletingId(null)
+      setItemToDelete(null)
     }
   }
 
@@ -169,15 +170,15 @@ const AdminPoliciesPage = () => {
                           </a>
                           <button
                             type="button"
-                            onClick={(e) => handleDelete(e, item.id)}
+                            onClick={(e) => handleDeleteClick(e, item.id)}
                             disabled={deletingId === item.id}
                             className="p-1.5 text-neutral-500 hover:text-red-600 transition-colors rounded-md hover:bg-neutral-100 disabled:opacity-50"
                             title="Delete"
                           >
                             {deletingId === item.id ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
+                              <Loader2 className="w-4 h-4 animate-spin pointer-events-none" />
                             ) : (
-                              <Trash className="w-4 h-4" />
+                              <Trash className="w-4 h-4 pointer-events-none" />
                             )}
                           </button>
                         </div>
@@ -190,6 +191,32 @@ const AdminPoliciesPage = () => {
           )}
         </div>
       </div>
+
+      {/* Custom Delete Confirmation Modal */}
+      {deleteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 transform scale-100 animate-in zoom-in-95 duration-200">
+            <h3 className="text-lg font-bold text-neutral-900 mb-2">Delete Policy Document?</h3>
+            <p className="text-neutral-600 mb-6">
+              Are you sure you want to delete this document? This action cannot be undone and will remove it from the public site.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteModalOpen(false)}
+                className="px-4 py-2 text-sm font-medium text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded-md transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors shadow-sm"
+              >
+                Delete Document
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

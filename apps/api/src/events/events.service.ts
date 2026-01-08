@@ -22,7 +22,12 @@ export class EventsService {
     // Ensure uniqueness
     let slug = baseSlug;
     let counter = 1;
-    while (await this.eventsRepository.findOne({ where: { slug } })) {
+    while (
+      await this.eventsRepository.findOne({
+        where: { slug },
+        withDeleted: true,
+      })
+    ) {
       slug = `${baseSlug}-${counter}`;
       counter++;
     }

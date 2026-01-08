@@ -35,7 +35,7 @@ export const getDatabaseConfig = (
     password: dbConfig.password,
     database: dbConfig.database,
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-    synchronize: false, // NEVER use true in production - use migrations instead
+    synchronize: process.env.NODE_ENV !== 'production', // Use true for dev to auto-sync schema
     logging: process.env.NODE_ENV === 'development',
     ssl:
       process.env.NODE_ENV === 'production'

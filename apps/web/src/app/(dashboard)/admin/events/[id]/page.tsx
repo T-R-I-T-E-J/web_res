@@ -5,7 +5,6 @@ import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { DashboardHeader } from '@/components/dashboard'
 import { ArrowLeft, Loader2, Save, Plus, X } from 'lucide-react'
-import Cookies from 'js-cookie'
 
 export default function EditEventPage() {
   const router = useRouter()
@@ -33,11 +32,8 @@ export default function EditEventPage() {
 
   const fetchEvent = async () => {
     try {
-      const token = Cookies.get('auth_token')
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/${eventId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: 'include',
       })
       
       if (res.ok) {
@@ -130,7 +126,6 @@ export default function EditEventPage() {
     setSaving(true)
 
     try {
-      const token = Cookies.get('auth_token')
       
       // Transform the form data to match API requirements
       const payload: any = {
@@ -161,9 +156,9 @@ export default function EditEventPage() {
       
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/${eventId}`, {
         method: 'PATCH',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       })
