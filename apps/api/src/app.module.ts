@@ -48,17 +48,17 @@ import { envValidationSchema } from './config/env.validation';
       {
         name: 'short',
         ttl: 1000, // 1 second
-        limit: 10, // 10 requests per second (burst protection)
+        limit: 100, // Increased to 100 req/sec to prevent dev blockers
       },
       {
         name: 'medium',
         ttl: 60000, // 1 minute
-        limit: 100, // 100 requests per minute (standard protection)
+        limit: 1000, // Increased to 1000 req/min
       },
       {
         name: 'long',
         ttl: 900000, // 15 minutes
-        limit: 1000, // 1000 requests per 15 min (sustained load protection)
+        limit: 5000, // Increased to 5000 req/15min
       },
     ]),
 

@@ -39,7 +39,7 @@ async function bootstrap() {
   // IP-based rate limiting as additional protection
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 1000, // Increased limit: 1000 requests per 15 min per IP to prevent blocking admin actions
+    max: 5000, // Increased limit: 5000 requests per 15 min per IP to prevent blocking admin actions
     message: {
       statusCode: 429,
       message: 'Too many requests from this IP, please try again later.',
