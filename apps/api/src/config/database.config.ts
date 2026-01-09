@@ -35,10 +35,11 @@ export const getDatabaseConfig = (
     password: dbConfig.password,
     database: dbConfig.database,
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+    autoLoadEntities: true, // Required for Vercel/Webpack bundles where glob patterns fail
     synchronize: process.env.NODE_ENV !== 'production', // Use true for dev to auto-sync schema
     logging: process.env.NODE_ENV === 'development',
     ssl:
-      process.env.NODE_ENV === 'production'
+      process.env.NODE_ENV === 'production' || process.env.POSTGRES_URL
         ? { rejectUnauthorized: false }
         : false,
     extra: {

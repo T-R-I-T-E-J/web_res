@@ -9,19 +9,16 @@ export const envValidationSchema = Joi.object({
   API_PREFIX: Joi.string().default('api/v1'),
 
   // Database Configuration
-  DB_HOST: Joi.string().required().messages({
-    'any.required': 'DB_HOST is required. Set it in your .env file.',
-  }),
+  // On Vercel, these might be missing if using POSTGRES_URL
+  DB_HOST: Joi.string().optional(),
   DB_PORT: Joi.number().default(5432),
-  DB_USERNAME: Joi.string().required().messages({
-    'any.required': 'DB_USERNAME is required. Set it in your .env file.',
-  }),
-  DB_PASSWORD: Joi.string().required().messages({
-    'any.required': 'DB_PASSWORD is required. Set it in your .env file.',
-  }),
-  DB_DATABASE: Joi.string().required().messages({
-    'any.required': 'DB_DATABASE is required. Set it in your .env file.',
-  }),
+  DB_USERNAME: Joi.string().optional(),
+  DB_PASSWORD: Joi.string().optional(),
+  DB_DATABASE: Joi.string().optional(),
+
+  // Connection String (Vercel/Railway)
+  POSTGRES_URL: Joi.string().optional(),
+  DATABASE_URL: Joi.string().optional(),
 
   // JWT Configuration
   JWT_SECRET: Joi.string().min(16).required().messages({
