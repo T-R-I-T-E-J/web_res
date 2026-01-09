@@ -17,6 +17,20 @@ export const getDatabaseConfig = (
   const logger = new Logger('DatabaseConfig');
   if (process.env.NODE_ENV === 'production') {
     logger.debug('Database configuration hidden for security');
+    
+    // explicit check for missing production config
+    if (
+      !dbConfig.host &&
+      !process.env.POSTGRES_URL &&
+      !process.env.DATABASE_URL
+    ) {
+      logger.error(
+        '🚨 CRITICAL: No database configuration found! POSTGRES_URL, DATABASE_URL, or DB_HOST must be set.',
+      );
+      logger.error(
+        'If running on Vercel, make sure to "Connect Manual" or "Connect Store" in the Storage tab.',
+      );
+    }
   } else if (process.env.DEBUG === 'true') {
     logger.debug({
       host: dbConfig.host,
