@@ -1,33 +1,38 @@
-import { diskStorage } from 'multer';
+import { diskStorage, memoryStorage } from 'multer';
 import { extname, join } from 'path';
 import * as crypto from 'crypto';
 import { BadRequestException } from '@nestjs/common';
+
+const isProduction =
+  process.env.NODE_ENV === 'production' || process.env.VERCEL;
 
 /**
  * Multer configuration for secure file uploads
  */
 export const multerConfig = {
   // Storage configuration
-  storage: diskStorage({
-    // Destination folder (relative to project root)
-    destination: (req: any, file: any, cb: any) => {
-      // Store files outside web root for security
-      const uploadPath = join(process.cwd(), 'uploads');
-      cb(null, uploadPath);
-    },
+  storage: isProduction
+    ? memoryStorage()
+    : diskStorage({
+        // Destination folder (relative to project root)
+        destination: (req: any, file: any, cb: any) => {
+          // Store files outside web root for security
+          const uploadPath = join(process.cwd(), 'uploads');
+          cb(null, uploadPath);
+        },
 
-    // Filename configuration
-    filename: (req: any, file: any, cb: any) => {
-      // Generate cryptographically secure random filename
-      const randomName = crypto.randomBytes(16).toString('hex');
-      const ext = extname(file.originalname).toLowerCase();
-      const timestamp = Date.now();
+        // Filename configuration
+        filename: (req: any, file: any, cb: any) => {
+          // Generate cryptographically secure random filename
+          const randomName = crypto.randomBytes(16).toString('hex');
+          const ext = extname(file.originalname).toLowerCase();
+          const timestamp = Date.now();
 
-      // Format: timestamp_randomhash.ext
-      const filename = `${timestamp}_${randomName}${ext}`;
-      cb(null, filename);
-    },
-  }),
+          // Format: timestamp_randomhash.ext
+          const filename = `${timestamp}_${randomName}${ext}`;
+          cb(null, filename);
+        },
+      }),
 
   // File filter (whitelist allowed types)
   fileFilter: (req: any, file: any, cb: any) => {
@@ -98,14 +103,16 @@ export const multerConfig = {
  * Configuration for profile picture uploads (stricter)
  */
 export const profilePictureConfig = {
-  storage: diskStorage({
-    destination: join(process.cwd(), 'uploads', 'profiles'),
-    filename: (req: any, file: any, cb: any) => {
-      const randomName = crypto.randomBytes(16).toString('hex');
-      const ext = extname(file.originalname).toLowerCase();
-      cb(null, `profile_${randomName}${ext}`);
-    },
-  }),
+  storage: isProduction
+    ? memoryStorage()
+    : diskStorage({
+        destination: join(process.cwd(), 'uploads', 'profiles'),
+        filename: (req: any, file: any, cb: any) => {
+          const randomName = crypto.randomBytes(16).toString('hex');
+          const ext = extname(file.originalname).toLowerCase();
+          cb(null, `profile_${randomName}${ext}`);
+        },
+      }),
 
   fileFilter: (req: any, file: any, cb: any) => {
     // Only allow images for profile pictures
@@ -146,15 +153,17 @@ export const profilePictureConfig = {
  * Configuration for document uploads (PDF, Word, Excel)
  */
 export const documentConfig = {
-  storage: diskStorage({
-    destination: join(process.cwd(), 'uploads', 'documents'),
-    filename: (req: any, file: any, cb: any) => {
-      const randomName = crypto.randomBytes(16).toString('hex');
-      const ext = extname(file.originalname).toLowerCase();
-      const timestamp = Date.now();
-      cb(null, `doc_${timestamp}_${randomName}${ext}`);
-    },
-  }),
+  storage: isProduction
+    ? memoryStorage()
+    : diskStorage({
+        destination: join(process.cwd(), 'uploads', 'documents'),
+        filename: (req: any, file: any, cb: any) => {
+          const randomName = crypto.randomBytes(16).toString('hex');
+          const ext = extname(file.originalname).toLowerCase();
+          const timestamp = Date.now();
+          cb(null, `doc_${timestamp}_${randomName}${ext}`);
+        },
+      }),
 
   fileFilter: (req: any, file: any, cb: any) => {
     // Only allow documents
