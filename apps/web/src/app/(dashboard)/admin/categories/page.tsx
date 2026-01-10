@@ -34,8 +34,8 @@ export default function CategoriesPage() {
 
   const fetchCategories = async () => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
-      const res = await fetch(`${apiUrl}/categories`, { credentials: 'include' })
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
+      const res = await fetch(`${API_URL}/categories`, { credentials: 'include' })
       if (res.ok) {
         const data = await res.json()
         // Handle both wrapped ({data: []}) and unwrapped ([]) responses
@@ -53,8 +53,8 @@ export default function CategoriesPage() {
     if (!confirm('Are you sure? This might affect documents using this category.')) return
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
-      const res = await fetch(`${apiUrl}/categories/${id}`, {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
+      const res = await fetch(`${API_URL}/categories/${id}`, {
         method: 'DELETE',
         credentials: 'include'
       })
@@ -71,8 +71,8 @@ export default function CategoriesPage() {
     setSubmitting(true)
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
-      const url = editingId ? `${apiUrl}/categories/${editingId}` : `${apiUrl}/categories`
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
+      const url = editingId ? `${API_URL}/categories/${editingId}` : `${API_URL}/categories`
       const method = editingId ? 'PATCH' : 'POST'
       
       const payload = {

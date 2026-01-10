@@ -24,7 +24,9 @@ export class DownloadsService implements OnModuleInit {
     const download = this.downloadRepository.create(createDownloadDto);
 
     if (createDownloadDto.categoryId) {
-      const category = await this.categoriesService.findOne(createDownloadDto.categoryId);
+      const category = await this.categoriesService.findOne(
+        createDownloadDto.categoryId,
+      );
       if (category) {
         download.category = category.slug;
       }

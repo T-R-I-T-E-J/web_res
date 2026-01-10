@@ -12,33 +12,9 @@ export const getDatabaseConfig = (
     throw new Error('Database configuration is missing');
   }
 
-  // Conditional Debug logging
-
   const logger = new Logger('DatabaseConfig');
-  if (process.env.NODE_ENV === 'production') {
-    logger.debug('Database configuration hidden for security');
-    
-    // explicit check for missing production config
-    if (
-      !dbConfig.host &&
-      !process.env.POSTGRES_URL &&
-      !process.env.DATABASE_URL
-    ) {
-      logger.error(
-        '🚨 CRITICAL: No database configuration found! POSTGRES_URL, DATABASE_URL, or DB_HOST must be set.',
-      );
-      logger.error(
-        'If running on Vercel, make sure to "Connect Manual" or "Connect Store" in the Storage tab.',
-      );
-    }
-  } else if (process.env.DEBUG === 'true') {
-    logger.debug({
-      host: dbConfig.host,
-      port: dbConfig.port,
-      username: dbConfig.username,
-      database: dbConfig.database,
-      passwordSet: !!dbConfig.password,
-    });
+  if (process.env.DEBUG === 'true') {
+     logger.log('Database logging enabled for debugging');
   }
 
   return {
@@ -49,16 +25,18 @@ export const getDatabaseConfig = (
     password: dbConfig.password,
     database: dbConfig.database,
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-    autoLoadEntities: true, // Required for Vercel/Webpack bundles where glob patterns fail
-    synchronize: process.env.NODE_ENV !== 'production', // Use true for dev to auto-sync schema
-    logging: process.env.NODE_ENV === 'development',
+    autoLoadEntities: true,
+    synchronize: false, // EXPLICITLY DISABLED
+    migrationsRun: false, // EXPLICITLY DISABLED
+    dropSchema: false,
+    logging: true, // Keep logging to see what happens
     ssl:
       process.env.NODE_ENV === 'production' || process.env.POSTGRES_URL
         ? { rejectUnauthorized: false }
         : false,
     extra: {
-      max: 20, // Maximum number of connections in the pool
-      connectionTimeoutMillis: 30000, // Increased to 30 seconds for debugging
+      max: 20,
+      connectionTimeoutMillis: 30000,
     },
   };
 };

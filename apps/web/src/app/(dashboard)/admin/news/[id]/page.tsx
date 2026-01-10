@@ -7,6 +7,7 @@ import { DashboardHeader } from '@/components/dashboard'
 import { ArrowLeft, Loader2, Save, Plus, X, FileText } from 'lucide-react'
 
 export default function EditNewsPage({ params }: { params: { id: string } }) {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
@@ -28,7 +29,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/news/${params.id}`, {
+        const res = await fetch(`${API_URL}/news/${params.id}`, {
           credentials: 'include',
         })
 
@@ -85,7 +86,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/file`, {
+      const res = await fetch(`${API_URL}/upload/file`, {
         method: 'POST',
         credentials: 'include',
         body: uploadFormData,
@@ -97,7 +98,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
 
       if (!uploadedData?.file) throw new Error('Invalid server response');
       
-      const apiBaseUrl = new URL(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1').origin;
+      const apiBaseUrl = new URL(API_URL).origin;
       const fullUrl = `${apiBaseUrl}${uploadedData.file.url}`;
       
       setFormData((prev) => ({ ...prev, featured_image_url: fullUrl }));
@@ -114,7 +115,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/file`, {
+      const res = await fetch(`${API_URL}/upload/file`, {
         method: 'POST',
         credentials: 'include',
         body: uploadFormData,
@@ -126,7 +127,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
 
       if (!uploadedData?.file) throw new Error('Invalid server response');
       
-      const apiBaseUrl = new URL(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1').origin;
+      const apiBaseUrl = new URL(API_URL).origin;
       const fullUrl = `${apiBaseUrl}${uploadedData.file.url}`;
       
       setFormData((prev) => ({ 
@@ -152,7 +153,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/file`, {
+      const res = await fetch(`${API_URL}/upload/file`, {
         method: 'POST',
         credentials: 'include',
         body: uploadFormData,
@@ -164,7 +165,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
 
       if (!uploadedData?.file) throw new Error('Invalid server response');
       
-      const apiBaseUrl = new URL(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1').origin;
+      const apiBaseUrl = new URL(API_URL).origin;
       const fullUrl = `${apiBaseUrl}${uploadedData.file.url}`;
       
       const newImageUrls = [...formData.image_urls];
@@ -183,7 +184,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/file`, {
+      const res = await fetch(`${API_URL}/upload/file`, {
         method: 'POST',
         credentials: 'include',
         body: uploadFormData,
@@ -195,7 +196,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
 
       if (!uploadedData?.file) throw new Error('Invalid server response');
       
-      const apiBaseUrl = new URL(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1').origin;
+      const apiBaseUrl = new URL(API_URL).origin;
       const fullUrl = `${apiBaseUrl}${uploadedData.file.url}`;
       
       setFormData((prev) => ({ ...prev, preview_image_url: fullUrl }));
@@ -225,7 +226,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
         documents: formData.documents,
       }
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/news/${params.id}`, {
+      const res = await fetch(`${API_URL}/news/${params.id}`, {
         method: 'PATCH',
         credentials: 'include',
         headers: {

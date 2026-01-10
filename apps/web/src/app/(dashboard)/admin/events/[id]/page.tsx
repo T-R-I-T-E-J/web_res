@@ -7,6 +7,7 @@ import { DashboardHeader } from '@/components/dashboard'
 import { ArrowLeft, Loader2, Save, Plus, X } from 'lucide-react'
 
 export default function EditEventPage() {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
   const router = useRouter()
   const params = useParams()
   const eventId = params.id as string
@@ -32,7 +33,7 @@ export default function EditEventPage() {
 
   const fetchEvent = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/${eventId}`, {
+      const res = await fetch(`${API_URL}/events/${eventId}`, {
         credentials: 'include',
       })
       
@@ -154,7 +155,7 @@ export default function EditEventPage() {
 
       // console.log('Updating event payload:', payload)
       
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/${eventId}`, {
+      const res = await fetch(`${API_URL}/events/${eventId}`, {
         method: 'PATCH',
         credentials: 'include',
         headers: {

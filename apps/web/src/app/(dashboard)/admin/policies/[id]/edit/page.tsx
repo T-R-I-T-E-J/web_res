@@ -36,11 +36,11 @@ export default function EditPolicyPage() {
     
     const init = async () => {
       setDataLoading(true)
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
       
       try {
         // 1. Fetch Categories
-        const catRes = await fetch(`${apiUrl}/categories?page=policies`, { credentials: 'include' })
+        const catRes = await fetch(`${API_URL}/categories?page=policies`, { credentials: 'include' })
         if (catRes.ok) {
           const data = await catRes.json()
           // Handle both wrapped ({data: []}) and unwrapped ([]) responses
@@ -49,7 +49,7 @@ export default function EditPolicyPage() {
         }
         
         // 2. Fetch Document
-        const res = await fetch(`${apiUrl}/downloads/${id}`, { credentials: 'include' })
+        const res = await fetch(`${API_URL}/downloads/${id}`, { credentials: 'include' })
         if (res.ok) {
           const response = await res.json()
           const data = response.data || response // Handle wrapped response
@@ -170,16 +170,16 @@ export default function EditPolicyPage() {
     setLoading(true)
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
       let finalHref = formData.href
 
       // Upload if new file
       if (uploadType === 'file' && file) {
-        const uploadedPath = await uploadDocument(apiUrl);
+        const uploadedPath = await uploadDocument(API_URL);
         if (uploadedPath) finalHref = uploadedPath;
       }
 
-      await updateDownloadEntry(finalHref, apiUrl);
+      await updateDownloadEntry(finalHref, API_URL);
 
     } catch (error) {
       console.error('Error updating document:', error)

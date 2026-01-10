@@ -31,7 +31,8 @@ const EventsPage = () => {
   const fetchEvents = async () => {
     try {
       setLoading(true)
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events`)
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
+      const res = await fetch(`${API_URL}/events`)
       
       if (res.ok) {
         const json = await res.json()

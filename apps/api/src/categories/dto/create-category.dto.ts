@@ -1,5 +1,10 @@
-
-import { IsString, IsInt, IsBoolean, IsOptional, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsInt,
+  IsBoolean,
+  IsOptional,
+  IsEnum,
+} from 'class-validator';
 
 export class CreateCategoryDto {
   @IsString()

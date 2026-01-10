@@ -11,7 +11,10 @@ export const metadata = {
 
 async function getNews() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/news?status=published`, {
+    // Use server-side API_URL if available (for absolute URL), otherwise fallback to public
+    const apiUrl = process.env.API_URL ? `${process.env.API_URL}/api/v1` : 'http://localhost:4000/api/v1';
+    
+    const res = await fetch(`${apiUrl}/news?status=published`, {
       cache: 'no-store',
     })
     

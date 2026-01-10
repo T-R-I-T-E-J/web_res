@@ -34,7 +34,7 @@ const AdminUsersPage = () => {
     setLoading(true)
     try {
       const token = Cookies.get('auth_token')
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
       
       const params = new URLSearchParams()
       if (searchQuery) params.append('search', searchQuery)
@@ -43,7 +43,8 @@ const AdminUsersPage = () => {
       if (roleFilter !== 'all') params.append('role', roleFilter.toLowerCase())
       params.append('limit', '50') // Fetch reasonable amount
 
-      const res = await fetch(`${apiUrl}/users?${params.toString()}`, {
+      const res = await fetch(`${API_URL}/users?${params.toString()}`, {
+        credentials: 'include',
         headers: { Authorization: `Bearer ${token}` }
       })
 

@@ -28,8 +28,8 @@ export default function CreatePolicyPage() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
-        const res = await fetch(`${apiUrl}/categories?page=policies`, { credentials: 'include' })
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
+        const res = await fetch(`${API_URL}/categories?page=policies`, { credentials: 'include' })
         if (res.ok) {
           const data = await res.json()
           // Handle both wrapped ({data: []}) and unwrapped ([]) responses
@@ -154,18 +154,18 @@ export default function CreatePolicyPage() {
     setLoading(true)
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
 
       let finalHref = formData.href
 
       // 1. Upload File if selected
       if (uploadType === 'file' && file) {
-        const uploadedPath = await uploadDocument(apiUrl);
+        const uploadedPath = await uploadDocument(API_URL);
         if (uploadedPath) finalHref = uploadedPath;
       }
 
       // 2. Create Download Entry
-      await createDownloadEntry(finalHref, apiUrl);
+      await createDownloadEntry(finalHref, API_URL);
 
     } catch (error) {
       console.error('Error creating document:', error)

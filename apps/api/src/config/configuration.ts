@@ -22,7 +22,7 @@ function parseDatabaseUrl(url: string) {
 
 export default registerAs('config', (): Config => {
   // Parse DATABASE_URL if provided (Railway, Heroku, etc.)
-  const databaseUrl = process.env.DATABASE_URL;
+  const databaseUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
   const parsedDb = databaseUrl ? parseDatabaseUrl(databaseUrl) : null;
 
   return {

@@ -29,7 +29,8 @@ const AdminClassificationPage = () => {
 
   const fetchClassification = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/downloads`, {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
+      const res = await fetch(`${baseUrl}/downloads`, {
         credentials: 'include', // Use HttpOnly cookie
       })
       if (res.ok) {

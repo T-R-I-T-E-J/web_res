@@ -48,7 +48,7 @@ function generateCSPHeader(nonce: string): string {
   const cspHeader = `
     default-src 'self';
     script-src ${scriptSrc}; 
-    style-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src ${imgSrc};
     font-src 'self' data: https:;
     object-src 'none';
@@ -153,11 +153,16 @@ export async function middleware(request: NextRequest) {
   // 3. Handle login page access
   if (pathname === '/login') {
     const roles = await verifyToken(token)
+    console.log('[Middleware] Checking login access:', { token: !!token, roles });
     return handleLoginPageAccess(roles, request, cspHeader)
   }
 
   // 4. Check if route needs protection
   const { isAdmin, isShooter, needsProtection } = isProtectedRoute(pathname)
+
+  if (needsProtection) {
+    console.log('[Middleware] Protected route matched:', { pathname, isAdmin, isShooter });
+  }
 
   if (!needsProtection) {
     return makeResponse(NextResponse.next({ request: { headers: requestHeaders } }), cspHeader)
@@ -165,11 +170,13 @@ export async function middleware(request: NextRequest) {
 
   // 5. Check if user has valid token
   if (!token) {
+    console.log('[Middleware] No token found for protected route:', { pathname, cookie: request.cookies.get('auth_token') });
     return handleUnauthorizedAccess(pathname, request, cspHeader)
   }
 
   // 6. Verify token and get roles
   const roles = await verifyToken(token)
+  console.log('[Middleware] Token verification result:', { roles, pathname });
   
   if (!roles) {
     return redirectWithCSP(new URL('/login', request.url), cspHeader)

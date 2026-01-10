@@ -9,7 +9,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { SkipThrottle } from '@nestjs/throttler';
+
 import { AuthService } from './auth.service.js';
 import { LoginDto } from './dto/login.dto.js';
 import { RegisterDto } from './dto/register.dto.js';
@@ -23,7 +23,6 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
-  @SkipThrottle()
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   async register(
@@ -47,7 +46,6 @@ export class AuthController {
   }
 
   @Public()
-  @SkipThrottle()
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(

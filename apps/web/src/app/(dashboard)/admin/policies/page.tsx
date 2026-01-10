@@ -30,7 +30,8 @@ const AdminPoliciesPage = () => {
 
   const fetchPolicies = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/downloads`, {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
+      const res = await fetch(`${API_URL}/downloads`, {
         credentials: 'include', // Send cookies with request
       })
       if (res.ok) {
@@ -63,10 +64,8 @@ const AdminPoliciesPage = () => {
     setDeleteModalOpen(false) // Close modal immediately to show loading state on row
     
     try {
-      const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1').replace(/\/$/, '')
-      const apiUrl = `${baseUrl}/downloads/${itemToDelete}`
-      
-      const res = await fetch(apiUrl, {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
+      const res = await fetch(`${API_URL}/downloads/${itemToDelete}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {

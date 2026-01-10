@@ -172,6 +172,7 @@ const Sidebar = ({ items, user }: SidebarProps) => {
                 width={collapsed ? 30 : 45}
                 height={collapsed ? 28 : 42}
                 className="object-contain flex-shrink-0"
+                style={{ width: 'auto', height: 'auto' }}
               />
 
             </Link>

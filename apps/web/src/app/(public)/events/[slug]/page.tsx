@@ -37,7 +37,8 @@ export default function EventDetailPage() {
       setLoading(true)
       setError(null)
       
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/${slug}`)
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
+      const res = await fetch(`${API_URL}/events/${slug}`)
       
       if (res.ok) {
         const json = await res.json()

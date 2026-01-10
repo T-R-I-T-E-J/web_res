@@ -6,9 +6,11 @@ import { useRouter } from 'next/navigation'
 import { Mail, Lock, Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react'
 
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1'
+const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
+const API_URL = baseUrl.startsWith('http') ? baseUrl : (baseUrl.startsWith('/') ? baseUrl : `/${baseUrl}`)
 
 const LoginPage = () => {
+  console.log('LoginPage rendered, API_URL:', API_URL);
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -30,6 +32,7 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log('Form submitted, preventing default');
     setIsLoading(true)
     setError('')
 

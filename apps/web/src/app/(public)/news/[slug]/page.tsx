@@ -7,7 +7,8 @@ export const dynamic = 'force-dynamic'
 
 async function getArticle(slug: string) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/news/${slug}`, {
+    const API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+    const res = await fetch(`${API_URL}/news/${slug}`, {
       cache: 'no-store'
     })
     if (!res.ok) return null
@@ -21,7 +22,8 @@ async function getArticle(slug: string) {
 
 async function getRelatedArticles(currentId: number) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/news?limit=4`, {
+    const API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+    const res = await fetch(`${API_URL}/news?limit=4`, {
        next: { revalidate: 3600 } 
     })
     if (!res.ok) return []

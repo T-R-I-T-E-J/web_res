@@ -57,6 +57,8 @@ type EventItem = {
 }
 
 const HomePage = () => {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
+  console.log('Current API URL:', API_URL);
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
   const [latestNews, setLatestNews] = useState<NewsItem[]>([])
   const [loadingNews, setLoadingNews] = useState(true)
@@ -66,7 +68,7 @@ const HomePage = () => {
   useEffect(() => {
     const fetchLatestNews = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/news?status=published&limit=3`)
+        const res = await fetch(`${API_URL}/news?status=published&limit=3`)
         if (res.ok) {
           const json = await res.json()
           const data = json.data || json
@@ -83,7 +85,7 @@ const HomePage = () => {
 
     const fetchUpcomingEvents = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events`)
+        const res = await fetch(`${API_URL}/events`)
         if (res.ok) {
           const json = await res.json()
           const data = json.data || json

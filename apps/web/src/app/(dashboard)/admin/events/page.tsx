@@ -18,6 +18,7 @@ type EventItem = {
 }
 
 const AdminEventsPage = () => {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
   const [events, setEvents] = useState<EventItem[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -28,7 +29,8 @@ const AdminEventsPage = () => {
   const fetchEvents = async () => {
     try {
       const token = Cookies.get('auth_token')
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events`, {
+      const res = await fetch(`${API_URL}/events`, {
+        credentials: 'include',
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -55,8 +57,9 @@ const AdminEventsPage = () => {
 
     try {
       const token = Cookies.get('auth_token')
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/${id}`, {
+      const res = await fetch(`${API_URL}/events/${id}`, {
         method: 'DELETE',
+        credentials: 'include',
         headers: {
           Authorization: `Bearer ${token}`,
         },

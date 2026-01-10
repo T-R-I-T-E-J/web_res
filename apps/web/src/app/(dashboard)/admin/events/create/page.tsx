@@ -7,6 +7,7 @@ import { DashboardHeader } from '@/components/dashboard'
 import { ArrowLeft, Loader2, Save, Plus, X } from 'lucide-react'
 
 export default function CreateEventPage() {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -105,7 +106,7 @@ export default function CreateEventPage() {
 
       // console.log('Submitting event payload:', payload)
       
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events`, {
+      const res = await fetch(`${API_URL}/events`, {
         method: 'POST',
         credentials: 'include',
         headers: {

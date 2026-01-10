@@ -28,7 +28,8 @@ const AdminNewsPage = () => {
 
   const fetchNews = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/news`, {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
+      const res = await fetch(`${baseUrl}/news`, {
         credentials: 'include',
       })
       if (res.ok) {
@@ -63,7 +64,7 @@ const AdminNewsPage = () => {
     setDeleteModalOpen(false) 
     
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/news/${itemToDelete}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'}/news/${itemToDelete}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {
