@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation'
 import { Mail, Lock, Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react'
 
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
-const API_URL = baseUrl.startsWith('http') ? baseUrl : (baseUrl.startsWith('/') ? baseUrl : `/${baseUrl}`)
+// Use Next.js proxy to avoid cross-origin cookie issues
+const API_URL = '/api/v1'
 
 const LoginPage = () => {
   console.log('LoginPage rendered, API_URL:', API_URL);
@@ -15,6 +15,7 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -35,6 +36,7 @@ const LoginPage = () => {
     console.log('Form submitted, preventing default');
     setIsLoading(true)
     setError('')
+    setSuccessMessage('')
 
     try {
       const res = await fetch(`${API_URL}/auth/login`, {
@@ -55,6 +57,9 @@ const LoginPage = () => {
         throw new Error(responseData.message || 'Login failed')
       }
 
+      // Login Successful
+      setSuccessMessage('Login successful! Redirecting...')
+      
       // Login Successful - Backend wraps response in { success, data }
       // Login Successful - Backend sets HttpOnly cookie
       const { user } = responseData.data || responseData
@@ -69,20 +74,24 @@ const LoginPage = () => {
       // Redirect based on role
       const roles = user.roles || []
       
-      if (roles.includes('admin')) {
-        router.push('/admin')
-      } else if (roles.includes('shooter')) {
-        router.push('/shooter')
-      } else {
+      // Use window.location.href instead of router.push to ensure cookie is set
+      // before navigating (forces full page reload)
         // Fallback for other roles (viewer, etc) or default
-        router.push('/')
-      }
+        setTimeout(() => {
+          if (roles.includes('admin')) {
+             window.location.href = '/admin'
+           } else if (roles.includes('shooter')) {
+             window.location.href = '/shooter'
+           } else {
+             window.location.href = '/'
+           }
+        }, 1500)
 
     } catch (err: any) {
       console.error('Login error:', err)
       setError(err.message || 'An unexpected error occurred. Please try again.')
     } finally {
-      setIsLoading(false)
+      if(!successMessage) setIsLoading(false)
     }
   }
 
@@ -98,6 +107,14 @@ const LoginPage = () => {
             Sign in to access your portal
           </p>
         </div>
+
+        {/* Success Alert */}
+        {successMessage && (
+          <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 rounded-card flex items-start gap-3">
+             <AlertCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+             <p className="text-sm text-green-600 font-medium">{successMessage}</p>
+          </div>
+        )}
 
         {/* Error Alert */}
         {error && (
@@ -188,7 +205,7 @@ const LoginPage = () => {
             {isLoading ? (
               <>
                 <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                Signing in...
+                {successMessage ? 'Redirecting...' : 'Signing in...'}
               </>
             ) : (
               <>

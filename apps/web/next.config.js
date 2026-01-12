@@ -8,10 +8,10 @@ const nextConfig = {
     // Remove trailing slash and /api/v1 suffix to avoid duplication in rewrites
     backendUrl = backendUrl.replace(/\/$/, '').replace(/\/api\/v1$/, '');
     return [
-      {
-        source: '/api/v1/:path*',
-        destination: `${backendUrl}/api/v1/:path*`,
-      },
+      // {
+      //   source: '/api/v1/:path*',
+      //   destination: `${backendUrl}/api/v1/:path*`,
+      // },
       {
         source: '/uploads/:path*',
         destination: `${backendUrl}/uploads/:path*`,

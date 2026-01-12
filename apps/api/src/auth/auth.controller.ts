@@ -34,7 +34,7 @@ export class AuthController {
     res.cookie('auth_token', data.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax', // Use Lax for top-level navigation compatibility if needed, but Strict is better if possible. Sticking to Strict as requested.
+      sameSite: 'lax',
       path: '/',
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
@@ -57,7 +57,7 @@ export class AuthController {
     res.cookie('auth_token', data.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax', // Lax is safer for usability across subdomains/ports sometimes, but Strict is requested. Let's use Lax to ensure redirects work well. The prompt said "Strict (or Lax only if technically required)".
+      sameSite: 'lax',
       path: '/',
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });

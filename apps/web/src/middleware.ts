@@ -147,8 +147,14 @@ export async function middleware(request: NextRequest) {
   requestHeaders.set('x-nonce', nonce)
   requestHeaders.set('Content-Security-Policy', cspHeader)
 
-  const token = request.cookies.get('auth_token')?.value
   const { pathname } = request.nextUrl
+
+  // DEBUG: Log all cookies
+  // DEBUG: Log all cookies
+  // console.log('[Middleware] Visiting:', pathname);
+  // console.log('[Middleware] All cookies:', request.cookies.getAll().map(c => `${c.name}=${c.value.substring(0, 10)}...`));
+  
+  const token = request.cookies.get('auth_token')?.value
   
   // 3. Handle login page access
   if (pathname === '/login') {
