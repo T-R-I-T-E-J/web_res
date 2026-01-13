@@ -104,10 +104,15 @@ export class DownloadsService implements OnModuleInit {
   }
 
   private async seedInitialData() {
-    const count = await this.downloadRepository.count();
-    if (count > 0) return;
+    try {
+      const count = await this.downloadRepository.count();
+      if (count > 0) return;
 
-    this.logger.log('Seeding initial downloads data...');
+      this.logger.log('Seeding initial downloads data...');
+    } catch (error) {
+      this.logger.warn(`Skipping seeding: ${error.message}`);
+      return;
+    }
 
     const rules = [
       {
