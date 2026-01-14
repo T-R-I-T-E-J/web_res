@@ -1,5 +1,4 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 
 interface LoginAttempt {
   count: number;
@@ -19,7 +18,7 @@ export class BruteForceProtectionService {
   private readonly BLOCK_DURATION_MS = 60 * 60 * 1000; // 1 hour
   private readonly PERMANENT_BLOCK_THRESHOLD = 20; // Permanent block after 20 attempts
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor() {}
 
   /**
    * Check if IP/user is allowed to attempt login

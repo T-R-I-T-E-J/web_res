@@ -6,7 +6,6 @@ import { UsersService } from './../src/users/users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { UserRole } from './../src/auth/entities/user-role.entity';
 import { Role } from './../src/auth/entities/role.entity';
-import { JwtAuthGuard } from './../src/auth/guards/jwt-auth.guard';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;

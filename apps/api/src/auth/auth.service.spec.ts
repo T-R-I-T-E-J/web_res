@@ -25,18 +25,6 @@ describe('AuthService', () => {
     updated_at: new Date(),
   };
 
-  const mockAuthResponse = {
-    access_token: 'mock_token',
-    user: {
-      id: 1,
-      public_id: 'uuid',
-      email: 'test@example.com',
-      first_name: 'Test',
-      last_name: 'User',
-      roles: ['viewer'],
-    },
-  };
-
   beforeEach(async () => {
     // Mock repositories and services
     usersService = {
