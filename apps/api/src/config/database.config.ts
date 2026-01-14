@@ -14,7 +14,7 @@ export const getDatabaseConfig = (
 
   const logger = new Logger('DatabaseConfig');
   if (process.env.DEBUG === 'true') {
-     logger.log('Database logging enabled for debugging');
+    logger.log('Database logging enabled for debuging');
   }
 
   return {
@@ -26,8 +26,8 @@ export const getDatabaseConfig = (
     database: dbConfig.database,
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
     autoLoadEntities: true,
-    synchronize: false, // EXPLICITLY DISABLED
-    migrationsRun: false, // EXPLICITLY DISABLED
+    synchronize: process.env.DB_SYNCHRONIZE === 'true', // Controlled by env var
+    migrationsRun: process.env.RUN_MIGRATIONS === 'true', // Controlled by env var
     dropSchema: false,
     logging: true, // Keep logging to see what happens
     ssl:

@@ -24,7 +24,8 @@ async function verifyToken(token: string | undefined): Promise<UserRoles> {
   try {
     const { payload } = await jwtVerify(token, SECRET_KEY)
     return (payload.roles as string[]) || []
-  } catch {
+  } catch (error) {
+    console.error('[Middleware] Token verification failed:', error)
     return null
   }
 }

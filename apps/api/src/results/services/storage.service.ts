@@ -31,13 +31,15 @@ export class StorageService implements OnModuleInit {
 
   constructor(private readonly configService: ConfigService) {
     // Get upload directory from config or use default
+    // We use 'uploads/results' inside the app directory to match ServeStaticModule in app.module.ts
     this.uploadDir =
       this.configService.get<string>('UPLOAD_DIR') ||
-      path.join(process.cwd(), '../../results');
+      path.join(process.cwd(), 'uploads', 'results');
 
     // Get base URL for serving files
+    const port = this.configService.get<number>('config.app.port') || 4000;
     this.baseUrl =
-      this.configService.get<string>('APP_URL') || 'http://localhost:8080';
+      this.configService.get<string>('APP_URL') || `http://localhost:${port}`;
   }
 
   async onModuleInit() {

@@ -33,6 +33,7 @@ import { UserRole } from './auth/entities/user-role.entity.js';
 import configuration from './config/configuration';
 import { getDatabaseConfig } from './config/database.config';
 import { envValidationSchema } from './config/env.validation';
+import { LoggerModule } from './common/logger/logger.module';
 
 @Module({
   imports: [
@@ -88,6 +89,7 @@ import { envValidationSchema } from './config/env.validation';
     MediaModule,
     DownloadsModule,
     CategoriesModule,
+    LoggerModule,
 
     // Serve Static Files (Frontend) - Disabled for Dev Split Mode
     // ServeStaticModule.forRoot({

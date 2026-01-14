@@ -77,7 +77,12 @@ const ResultsPage = async () => {
              </div>
           ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {results.map((file: any, i: number) => (
+            {results.map((file: any, i: number) => {
+              // Fix for legacy localhost:8080 URLs in dev environment
+              // This ensures existing records pointing to 8080 work with the local 4000 server
+              const fileUrl = file.url?.replace('http://localhost:8080', 'http://localhost:4000');
+
+              return (
               <div key={i} className="card-hover group">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-primary/10 rounded-card flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
@@ -92,7 +97,7 @@ const ResultsPage = async () => {
                     </p>
                     <div className="mt-4">
                       <a
-                        href={file.url}
+                        href={fileUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 text-sm font-bold text-accent hover:text-accent-dark transition-colors"
@@ -103,7 +108,7 @@ const ResultsPage = async () => {
                   </div>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
           )}
         </div>

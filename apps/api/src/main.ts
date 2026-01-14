@@ -3,8 +3,11 @@ import { Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { configureApp } from './setup';
 
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   const logger = new Logger('Bootstrap');
 
   const { port, apiPrefix, corsOrigin, environment } = configureApp(app);
