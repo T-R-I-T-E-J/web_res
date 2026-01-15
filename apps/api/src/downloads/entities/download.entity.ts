@@ -31,13 +31,13 @@ export class Download {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ name: 'file_type' })
+  @Column({ name: 'file_type', default: 'document' })
   fileType: string;
 
   @Column({ nullable: true })
   size: string;
 
-  @Column()
+  @Column({ default: '#' })
   href: string;
 
   @Column({
