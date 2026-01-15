@@ -19,14 +19,15 @@ async function bootstrap() {
     logger.log('🔐 Trust proxy enabled for production');
   }
 
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 
   logger.log(
-    `🚀 Para Shooting Committee API is running on: http://localhost:${port}/${apiPrefix}`,
+    `🚀 Para Shooting Committee API is running on: http://0.0.0.0:${port}/${apiPrefix}`,
   );
-  logger.log(`📊 Health check: http://localhost:${port}/${apiPrefix}/health`);
+  logger.log(`📊 Health check: http://0.0.0.0:${port}/${apiPrefix}/health`);
   logger.log(`🌍 Environment: ${environment}`);
   logger.log(`🔗 CORS enabled for: ${corsOrigin}`);
+  logger.log(`📁 Uploads directory: ${process.cwd()}/uploads`);
 }
 
 void bootstrap();
