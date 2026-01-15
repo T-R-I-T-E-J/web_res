@@ -25,7 +25,7 @@ export class Download {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 255, default: 'Untitled Document' })
   title: string;
 
   @Column({ type: 'text', nullable: true })
