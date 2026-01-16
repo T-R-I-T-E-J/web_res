@@ -38,6 +38,11 @@ const LoginPage = () => {
     setError('')
     setSuccessMessage('')
 
+    // DEBUG: Log the password length and value
+    console.log('Password length:', formData.password.length);
+    console.log('Password value:', formData.password);
+    console.log('Full form data:', formData);
+
     try {
       const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
