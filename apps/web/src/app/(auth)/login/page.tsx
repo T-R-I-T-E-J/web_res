@@ -90,18 +90,30 @@ const LoginPage = () => {
       
       console.log('About to redirect with roles:', roles);
       
-      // Use window.location.replace() to force full page reload
-      // This ensures the auth_token cookie is properly set before navigation
+      // Determine redirect path
+      let redirectPath = '/';
       if (roles.includes('admin')) {
         console.log('Redirecting to /admin');
-        window.location.replace('/admin')
+        redirectPath = '/admin';
       } else if (roles.includes('shooter')) {
         console.log('Redirecting to /shooter');
-        window.location.replace('/shooter')
+        redirectPath = '/shooter';
       } else {
         console.log('Redirecting to /');
-        window.location.replace('/')
       }
+      
+      // Use router.push with window.location as fallback
+      console.log('Attempting redirect to:', redirectPath);
+      
+      // Method 1: Try Next.js router first
+      router.push(redirectPath);
+      router.refresh();
+      
+      // Method 2: Fallback to window.location after a short delay
+      setTimeout(() => {
+        console.log('Fallback redirect executing...');
+        window.location.href = redirectPath;
+      }, 500);
 
     } catch (err: any) {
       console.error('Login error:', err)
