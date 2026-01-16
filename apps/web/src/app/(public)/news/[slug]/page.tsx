@@ -55,36 +55,41 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 }
 
 export default async function NewsArticlePage({ params }: { params: Params }) {
-  const { slug } = await params
-  const article = await getArticle(slug)
-  
-  if (!article) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="font-heading text-4xl font-bold text-primary mb-4">Article Not Found</h1>
-          <p className="text-neutral-600 mb-8">The article you're looking for doesn't exist.</p>
-          <Link href="/news" className="btn-primary">
-            Back to News
-          </Link>
+  try {
+    const { slug } = await params
+    const article = await getArticle(slug)
+    
+    if (!article) {
+      return (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="font-heading text-4xl font-bold text-primary mb-4">Article Not Found</h1>
+            <p className="text-neutral-600 mb-8">The article you're looking for doesn't exist.</p>
+            <Link href="/news" className="btn-primary">
+              Back to News
+            </Link>
+          </div>
         </div>
-      </div>
-    )
-  }
+      )
+    }
 
-  const relatedArticles = await getRelatedArticles(article.id)
-  
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  }
+    const relatedArticles = article.id ? await getRelatedArticles(article.id) : []
+    
+    const formatDate = (dateString: string) => {
+      try {
+        return new Date(dateString).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })
+      } catch {
+        return 'Date unavailable'
+      }
+    }
 
-  // Check if content contains HTML tags
-  const isHtmlContent = article.content && (article.content.includes('<') || article.content.includes('>'))
-  const contentParagraphs = !isHtmlContent && article.content ? article.content.split('\n').filter((p: string) => p.trim().length > 0) : []
+    // Check if content contains HTML tags
+    const isHtmlContent = article.content && (article.content.includes('<') || article.content.includes('>'))
+    const contentParagraphs = !isHtmlContent && article.content ? article.content.split('\n').filter((p: string) => p.trim().length > 0) : []
 
   return (
     <>
@@ -314,5 +319,19 @@ export default async function NewsArticlePage({ params }: { params: Params }) {
       </section>
     </>
   )
+  } catch (error) {
+    console.error('Error rendering news article:', error)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="font-heading text-4xl font-bold text-primary mb-4">Error Loading Article</h1>
+          <p className="text-neutral-600 mb-8">There was an error loading this article. Please try again later.</p>
+          <Link href="/news" className="btn-primary">
+            Back to News
+          </Link>
+        </div>
+      </div>
+    )
+  }
 }
 
