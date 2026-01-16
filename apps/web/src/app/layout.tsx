@@ -53,6 +53,14 @@ const RootLayout = ({ children }: RootLayoutProps) => {
   return (
     <html lang="en">
       <head>
+        {/* Google Fonts - Preconnect for performance */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link 
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700&family=Roboto+Mono:wght@400;500&display=swap" 
+          rel="stylesheet" 
+        />
+        
         {/* CookieYes - GDPR/DPDP Consent Management */}
         {/* TODO: Configure NEXT_PUBLIC_COOKIEYES_ID in production environment */}
         {/* Uncomment and replace YOUR_COOKIEYES_ID with actual CookieYes account ID */}
@@ -64,7 +72,11 @@ const RootLayout = ({ children }: RootLayoutProps) => {
         />
         */}
         
-        {/* Security headers are set via middleware.ts */}
+        {/* Security: Content Security Policy */}
+        <meta
+          httpEquiv="Content-Security-Policy"
+          content="upgrade-insecure-requests"
+        />
       </head>
 
       <body className="min-h-screen bg-neutral-50 text-neutral-700 font-body">
