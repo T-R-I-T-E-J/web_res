@@ -34,26 +34,26 @@ async function verifyToken(token: string | undefined): Promise<UserRoles> {
 function generateCSPHeader(nonce: string): string {
   const isDevelopment = process.env.NODE_ENV === 'development'
   
-  // For Next.js to work properly, we need 'unsafe-eval' for webpack
-  // and 'unsafe-inline' as fallback for older browsers
+  // Production: No nonce, rely on 'unsafe-inline' and 'unsafe-eval' for Next.js
+  // Development: Use nonce for better security during dev
   const scriptSrc = isDevelopment
     ? `'self' 'nonce-${nonce}' 'unsafe-eval' 'unsafe-inline' chrome-extension:`
-    : `'self' 'nonce-${nonce}' 'unsafe-eval' 'unsafe-inline' https: http:`
+    : `'self' 'unsafe-eval' 'unsafe-inline'`
   
   const connectSrc = isDevelopment
     ? `'self' http://localhost:* https: ws: wss: chrome-extension:`
-    : `'self' https: http: https://web-res.onrender.com https://*.vercel.app wss: ws:`
+    : `'self' https: https://web-res.onrender.com https://*.vercel.app wss: ws:`
 
   const imgSrc = isDevelopment
     ? `'self' blob: data: https: http://localhost:*`
-    : `'self' blob: data: https: http:`
+    : `'self' blob: data: https:`
   
   const cspHeader = `
     default-src 'self';
     script-src ${scriptSrc}; 
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src ${imgSrc};
-    font-src 'self' data: https: http:;
+    font-src 'self' data: https:;
     object-src 'none';
     base-uri 'self';
     form-action 'self';
