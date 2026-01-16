@@ -36,7 +36,7 @@ function generateCSPHeader(nonce: string): string {
   
   const scriptSrc = isDevelopment
     ? `'self' 'nonce-${nonce}' 'unsafe-eval' 'unsafe-inline' chrome-extension:`
-    : `'self' 'nonce-${nonce}' 'strict-dynamic' https: 'unsafe-inline'`
+    : `'self' 'nonce-${nonce}' 'unsafe-inline' https://web-res-api.vercel.app`
   
   const connectSrc = isDevelopment
     ? `'self' http://localhost:* https: ws: wss: chrome-extension:`

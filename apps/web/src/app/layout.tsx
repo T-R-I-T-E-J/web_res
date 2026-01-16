@@ -64,11 +64,7 @@ const RootLayout = ({ children }: RootLayoutProps) => {
         />
         */}
         
-        {/* Security: Content Security Policy */}
-        <meta
-          httpEquiv="Content-Security-Policy"
-          content="upgrade-insecure-requests"
-        />
+        {/* Security headers are set via middleware.ts */}
       </head>
 
       <body className="min-h-screen bg-neutral-50 text-neutral-700 font-body">
