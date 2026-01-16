@@ -74,18 +74,14 @@ const LoginPage = () => {
       // Redirect based on role
       const roles = user.roles || []
       
-      // Use window.location.href instead of router.push to ensure cookie is set
-      // before navigating (forces full page reload)
-        // Fallback for other roles (viewer, etc) or default
-        setTimeout(() => {
-          if (roles.includes('admin')) {
-             window.location.href = '/admin'
-           } else if (roles.includes('shooter')) {
-             window.location.href = '/shooter'
-           } else {
-             window.location.href = '/'
-           }
-        }, 1500)
+      // Redirect immediately using router.push for client-side navigation
+      if (roles.includes('admin')) {
+        router.push('/admin')
+      } else if (roles.includes('shooter')) {
+        router.push('/shooter')
+      } else {
+        router.push('/')
+      }
 
     } catch (err: any) {
       console.error('Login error:', err)
