@@ -19,11 +19,27 @@ export async function POST(request: NextRequest) {
     // Create the Next.js response
     const nextResponse = NextResponse.json(data, { status: response.status });
 
-    // Forward all Set-Cookie headers from the backend
+    // Extract and parse Set-Cookie headers from backend
     const setCookieHeaders = response.headers.getSetCookie();
+    
     if (setCookieHeaders && setCookieHeaders.length > 0) {
-      setCookieHeaders.forEach((cookie) => {
-        nextResponse.headers.append('Set-Cookie', cookie);
+      setCookieHeaders.forEach((cookieString) => {
+        // Parse the cookie to extract name and value
+        const [nameValue, ...attributes] = cookieString.split(';');
+        const [name, value] = nameValue.split('=');
+        
+        if (name && value) {
+          // Set cookie using NextResponse.cookies API for better control
+          nextResponse.cookies.set({
+            name: name.trim(),
+            value: value.trim(),
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax', // Changed from 'none' since we're now same-domain
+            path: '/',
+            maxAge: 24 * 60 * 60, // 1 day
+          });
+        }
       });
     }
 

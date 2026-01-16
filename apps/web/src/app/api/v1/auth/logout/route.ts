@@ -21,13 +21,8 @@ export async function POST(request: NextRequest) {
     // Create the Next.js response
     const nextResponse = NextResponse.json(data, { status: response.status });
 
-    // Forward all Set-Cookie headers from the backend (to clear the cookie)
-    const setCookieHeaders = response.headers.getSetCookie();
-    if (setCookieHeaders && setCookieHeaders.length > 0) {
-      setCookieHeaders.forEach((cookie) => {
-        nextResponse.headers.append('Set-Cookie', cookie);
-      });
-    }
+    // Clear the auth_token cookie
+    nextResponse.cookies.delete('auth_token');
 
     return nextResponse;
   } catch (error) {
