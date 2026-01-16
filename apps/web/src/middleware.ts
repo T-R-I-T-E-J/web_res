@@ -20,12 +20,19 @@ type UserRoles = string[] | null
 
 // Helper to verify token
 async function verifyToken(token: string | undefined): Promise<UserRoles> {
-  if (!token) return null
+  if (!token) {
+    console.log('[Middleware] No token provided');
+    return null;
+  }
   try {
+    console.log('[Middleware] Attempting to verify token:', token.substring(0, 20) + '...');
+    console.log('[Middleware] Using SECRET_KEY length:', SECRET_KEY.length);
     const { payload } = await jwtVerify(token, SECRET_KEY)
+    console.log('[Middleware] Token verified successfully, payload:', payload);
     return (payload.roles as string[]) || []
   } catch (error) {
     console.error('[Middleware] Token verification failed:', error)
+    console.error('[Middleware] Token that failed:', token.substring(0, 50) + '...');
     return null
   }
 }
