@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 
 async function getArticle(slug: string) {
   try {
-    const API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+    const API_URL = '/api/v1'; // Use frontend API route
     const res = await fetch(`${API_URL}/news/${slug}`, {
       cache: 'no-store'
     })
