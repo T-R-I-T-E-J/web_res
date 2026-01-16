@@ -34,31 +34,32 @@ async function verifyToken(token: string | undefined): Promise<UserRoles> {
 function generateCSPHeader(nonce: string): string {
   const isDevelopment = process.env.NODE_ENV === 'development'
   
+  // For Next.js to work properly, we need 'unsafe-eval' for webpack
+  // and 'unsafe-inline' as fallback for older browsers
   const scriptSrc = isDevelopment
     ? `'self' 'nonce-${nonce}' 'unsafe-eval' 'unsafe-inline' chrome-extension:`
-    : `'self' 'nonce-${nonce}' 'strict-dynamic' https: 'unsafe-inline'`
+    : `'self' 'nonce-${nonce}' 'unsafe-eval' 'unsafe-inline' https: http:`
   
   const connectSrc = isDevelopment
     ? `'self' http://localhost:* https: ws: wss: chrome-extension:`
-    : `'self' https: https://web-res.onrender.com https://*.vercel.app`
+    : `'self' https: http: https://web-res.onrender.com https://*.vercel.app wss: ws:`
 
   const imgSrc = isDevelopment
     ? `'self' blob: data: https: http://localhost:*`
-    : `'self' blob: data: https:`
+    : `'self' blob: data: https: http:`
   
   const cspHeader = `
     default-src 'self';
     script-src ${scriptSrc}; 
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src ${imgSrc};
-    font-src 'self' data: https:;
+    font-src 'self' data: https: http:;
     object-src 'none';
     base-uri 'self';
     form-action 'self';
     frame-ancestors 'none';
     frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com;
     connect-src ${connectSrc}; 
-    ${isDevelopment ? '' : 'upgrade-insecure-requests;'}
   `.replace(/\s{2,}/g, ' ').trim()
 
   return cspHeader
