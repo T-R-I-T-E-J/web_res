@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation'
 import { Mail, Lock, Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react'
 
 
-// Use Next.js proxy to avoid cross-origin cookie issues
-const API_URL = '/api/v1'
+// Use environment variable to point to Render backend
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://web-res.onrender.com/api/v1'
 
 const LoginPage = () => {
   console.log('LoginPage rendered, API_URL:', API_URL);
