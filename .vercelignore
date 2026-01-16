@@ -1,0 +1,29 @@
+# Exclude backend API from Vercel deployment
+apps/api
+api
+
+# Exclude all test files
+**/*.spec.ts
+**/*.test.ts
+**/*.e2e-spec.ts
+**/test/**
+**/tests/**
+
+# Exclude development files
+**/*.log
+.env.local
+.env.*.local
+
+# Exclude infrastructure
+infrastructure/
+scripts/
+migrations/
+
+# Exclude documentation
+docs/
+rules/
+
+# Exclude Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore

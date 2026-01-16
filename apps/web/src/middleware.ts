@@ -36,11 +36,11 @@ function generateCSPHeader(nonce: string): string {
   
   const scriptSrc = isDevelopment
     ? `'self' 'nonce-${nonce}' 'unsafe-eval' 'unsafe-inline' chrome-extension:`
-    : `'self' 'nonce-${nonce}' 'unsafe-inline' https://web-res-api.vercel.app`
+    : `'self' 'nonce-${nonce}' 'strict-dynamic' https: 'unsafe-inline'`
   
   const connectSrc = isDevelopment
     ? `'self' http://localhost:* https: ws: wss: chrome-extension:`
-    : `'self' https:`
+    : `'self' https: https://web-res.onrender.com https://*.vercel.app`
 
   const imgSrc = isDevelopment
     ? `'self' blob: data: https: http://localhost:*`
