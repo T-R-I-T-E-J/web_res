@@ -58,6 +58,10 @@ const LoginPage = () => {
 
       const responseData = await res.json()
 
+      // DEBUG: Log the full response
+      console.log('Response status:', res.status);
+      console.log('Response data:', responseData);
+
       if (!res.ok) {
         throw new Error(responseData.message || 'Login failed')
       }
@@ -69,7 +73,12 @@ const LoginPage = () => {
       // Login Successful - Backend sets HttpOnly cookie
       const { user } = responseData.data || responseData
       
+      // DEBUG: Log user extraction
+      console.log('Extracted user:', user);
+      console.log('User roles:', user?.roles);
+      
       if (!user) {
+        console.error('No user in response! Response structure:', responseData);
         throw new Error('Invalid response from server')
       }
 
@@ -79,13 +88,18 @@ const LoginPage = () => {
       // Redirect based on role
       const roles = user.roles || []
       
+      console.log('About to redirect with roles:', roles);
+      
       // Use window.location.replace() to force full page reload
       // This ensures the auth_token cookie is properly set before navigation
       if (roles.includes('admin')) {
+        console.log('Redirecting to /admin');
         window.location.replace('/admin')
       } else if (roles.includes('shooter')) {
+        console.log('Redirecting to /shooter');
         window.location.replace('/shooter')
       } else {
+        console.log('Redirecting to /');
         window.location.replace('/')
       }
 
