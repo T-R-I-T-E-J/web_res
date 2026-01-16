@@ -11,6 +11,12 @@ const nextConfig = {
     backendUrl = backendUrl.replace(/\/$/, '').replace(/\/api\/v1$/, '');
     
     return [
+      // Proxy ALL API calls to Render backend
+      // This ensures cookies are set on the Vercel domain
+      {
+        source: '/api/v1/:path*',
+        destination: `${backendUrl}/api/v1/:path*`,
+      },
       // Proxy uploads only (images, documents, etc.)
       {
         source: '/uploads/:path*',
