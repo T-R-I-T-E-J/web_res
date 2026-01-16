@@ -102,18 +102,9 @@ const LoginPage = () => {
         console.log('Redirecting to /');
       }
       
-      // Use router.push with window.location as fallback
-      console.log('Attempting redirect to:', redirectPath);
-      
-      // Method 1: Try Next.js router first
-      router.push(redirectPath);
-      router.refresh();
-      
-      // Method 2: Fallback to window.location after a short delay
-      setTimeout(() => {
-        console.log('Fallback redirect executing...');
-        window.location.href = redirectPath;
-      }, 500);
+      // Direct redirect - most reliable method
+      console.log('Executing redirect to:', redirectPath);
+      window.location.href = redirectPath;
 
     } catch (err: any) {
       console.error('Login error:', err)
