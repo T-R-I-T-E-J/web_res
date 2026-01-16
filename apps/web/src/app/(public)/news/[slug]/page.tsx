@@ -7,7 +7,9 @@ export const dynamic = 'force-dynamic'
 
 async function getArticle(slug: string) {
   try {
-    const API_URL = '/api/v1'; // Use frontend API route
+    // Server components need absolute URLs for fetch
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://web-res-api.vercel.app';
+    const API_URL = `${baseUrl}/api/v1`;
     const res = await fetch(`${API_URL}/news/${slug}`, {
       cache: 'no-store'
     })
@@ -22,7 +24,9 @@ async function getArticle(slug: string) {
 
 async function getRelatedArticles(currentId: number) {
   try {
-    const API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
+    // Server components need absolute URLs for fetch
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://web-res-api.vercel.app';
+    const API_URL = `${baseUrl}/api/v1`;
     const res = await fetch(`${API_URL}/news?limit=4`, {
        next: { revalidate: 3600 } 
     })
