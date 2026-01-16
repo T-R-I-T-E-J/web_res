@@ -74,13 +74,14 @@ const LoginPage = () => {
       // Redirect based on role
       const roles = user.roles || []
       
-      // Redirect immediately using router.push for client-side navigation
+      // Use window.location.replace() to force full page reload
+      // This ensures the auth_token cookie is properly set before navigation
       if (roles.includes('admin')) {
-        router.push('/admin')
+        window.location.replace('/admin')
       } else if (roles.includes('shooter')) {
-        router.push('/shooter')
+        window.location.replace('/shooter')
       } else {
-        router.push('/')
+        window.location.replace('/')
       }
 
     } catch (err: any) {
