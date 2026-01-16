@@ -23,9 +23,9 @@ export const developmentSecurityConfig: HelmetOptions = {
       imgSrc: ["'self'", 'data:', 'https:', 'http:', 'blob:'],
       connectSrc: ["'self'", 'http://localhost:*', 'ws://localhost:*'], // Allow local connections
       fontSrc: ["'self'", 'data:'],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
+      objectSrc: ["'self'", 'blob:'], // Allow PDF viewing
+      mediaSrc: ["'self'", 'blob:'],
+      frameSrc: ["'self'", 'blob:'], // Allow PDF iframe viewing
     },
   },
 
@@ -107,9 +107,9 @@ export const productionSecurityConfig: HelmetOptions = {
         'https://stats.g.doubleclick.net',
       ],
       fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
+      objectSrc: ["'self'", 'blob:'], // Allow PDF viewing
+      mediaSrc: ["'self'", 'blob:'],
+      frameSrc: ["'self'", 'blob:'], // Allow PDF iframe viewing
       baseUri: ["'self'"],
       formAction: ["'self'"],
       frameAncestors: ["'none'"], // Equivalent to X-Frame-Options: DENY

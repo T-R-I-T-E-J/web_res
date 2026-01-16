@@ -1,0 +1,16 @@
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "render-api-key",
+      "description": "Render API Key",
+      "default": "rnd_OE432G9TGcRdp0JRcMxdPEWSrVST"
+    }
+  ],
+  "servers": {
+    "fetch": {
+      "command": "python",
+      "args": ["-m", "uv", "tool", "run", "mcp-server-fetch"]
+    }
+  }
+}

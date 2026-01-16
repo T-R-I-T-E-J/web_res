@@ -30,7 +30,14 @@ UPDATE "downloads"
 SET "category_id" = c.id
 FROM "categories" c
 WHERE "downloads"."category" = c.slug;
--- Add Foreign Key
+-- Add Foreign Key (only if it doesn't exist)
+DO $$ BEGIN IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'FK_downloads_category_id'
+) THEN
 ALTER TABLE "downloads"
 ADD CONSTRAINT "FK_downloads_category_id" FOREIGN KEY ("category_id") REFERENCES "categories"("id") ON DELETE
 SET NULL;
+END IF;
+END $$;
