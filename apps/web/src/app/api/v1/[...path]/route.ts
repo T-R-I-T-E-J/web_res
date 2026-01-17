@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const BACKEND_URL = process.env.API_URL || 'http://localhost:4000'
+// Resolve the backend URL:
+// 1. API_URL (Server-side env var)
+// 2. NEXT_PUBLIC_API_URL (Client-side env var, stripped of /api/v1 suffix)
+// 3. Fallback to localhost:4000
+const getBackendUrl = () => {
+  if (process.env.API_URL) return process.env.API_URL;
+  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/v1\/?$/, '');
+  return 'http://localhost:4000';
+};
+
+const BACKEND_URL = getBackendUrl();
 
 export async function GET(
   request: NextRequest,
