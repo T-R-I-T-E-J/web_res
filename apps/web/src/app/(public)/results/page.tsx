@@ -11,8 +11,15 @@ export const dynamic = 'force-dynamic'
 
 const getResults = async () => {
   try {
-    // Use absolute URL for server-side rendering
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    // Dynamically determine the base URL
+    // In production (Vercel), use the deployment URL
+    // In development, use localhost
+    const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http'
+    const host = process.env.VERCEL_URL || process.env.NEXT_PUBLIC_SITE_URL?.replace(/^https?:\/\//, '') || 'localhost:3000'
+    const baseUrl = `${protocol}://${host}`
+    
+    console.log('Fetching results from:', `${baseUrl}/api/v1/results`)
+    
     const res = await fetch(`${baseUrl}/api/v1/results`, {
       cache: 'no-store',
     })
@@ -23,6 +30,7 @@ const getResults = async () => {
     }
 
     const json = await res.json()
+    console.log('Results fetched:', json)
     const data = json.data || json
     return Array.isArray(data) ? data : []
   } catch (error) {
