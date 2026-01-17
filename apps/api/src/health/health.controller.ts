@@ -13,6 +13,12 @@ export class HealthController {
   }
 
   @Public()
+  @Get('migrate')
+  async migrateDb() {
+    return this.healthService.runStoredFilesMigration();
+  }
+
+  @Public()
   @Get('db')
   checkDatabase() {
     return this.healthService.checkDatabase();

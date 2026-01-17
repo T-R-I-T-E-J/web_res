@@ -55,7 +55,10 @@ export default function CreateNewsPage() {
         body: uploadFormData,
       });
 
-      if (!res.ok) throw new Error('Upload failed');
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Upload failed: ${res.status} ${errorText}`);
+      }
       const responseJson = await res.json();
       const uploadedData = responseJson.data;
 
@@ -86,7 +89,10 @@ export default function CreateNewsPage() {
         body: uploadFormData,
       });
 
-      if (!res.ok) throw new Error('Upload failed');
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Upload failed: ${res.status} ${errorText}`);
+      }
       const responseJson = await res.json();
       const uploadedData = responseJson.data;
 
@@ -120,7 +126,10 @@ export default function CreateNewsPage() {
         body: uploadFormData,
       });
 
-      if (!res.ok) throw new Error('Upload failed');
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Upload failed: ${res.status} ${errorText}`);
+      }
       const responseJson = await res.json();
       const uploadedData = responseJson.data;
 
