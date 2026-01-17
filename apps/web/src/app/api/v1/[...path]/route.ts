@@ -78,7 +78,7 @@ async function proxyRequest(request: NextRequest, path: string[]) {
 
 
   // Get response body
-  const responseBody = await response.text()
+  const responseBody = await response.arrayBuffer()
 
   // Create response with same status
   const nextResponse = new NextResponse(responseBody, {
