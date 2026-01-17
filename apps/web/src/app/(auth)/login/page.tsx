@@ -38,15 +38,9 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Form submitted, preventing default');
     setIsLoading(true)
     setError('')
     setSuccessMessage('')
-
-    // DEBUG: Log the password length and value
-    console.log('Password length:', formData.password.length);
-    console.log('Password value:', formData.password);
-    console.log('Full form data:', formData);
 
     try {
       const res = await fetch(`${API_URL}/auth/login`, {
@@ -63,10 +57,6 @@ const LoginPage = () => {
 
       const responseData = await res.json()
 
-      // DEBUG: Log the full response
-      console.log('Response status:', res.status);
-      console.log('Response data:', responseData);
-
       if (!res.ok) {
         throw new Error(responseData.message || 'Login failed')
       }
@@ -78,12 +68,7 @@ const LoginPage = () => {
       // Login Successful - Backend sets HttpOnly cookie
       const { user } = responseData.data || responseData
 
-      // DEBUG: Log user extraction
-      console.log('Extracted user:', user);
-      console.log('User roles:', user?.roles);
-
       if (!user) {
-        console.error('No user in response! Response structure:', responseData);
         throw new Error('Invalid response from server')
       }
 
