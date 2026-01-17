@@ -1,0 +1,10 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE TABLE IF NOT EXISTS stored_files (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    filename VARCHAR NOT NULL,
+    "originalName" VARCHAR NOT NULL,
+    mimetype VARCHAR NOT NULL,
+    data BYTEA NOT NULL,
+    size INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
