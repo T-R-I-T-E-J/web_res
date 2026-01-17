@@ -61,7 +61,9 @@ export default function CreateNewsPage() {
 
       if (!uploadedData?.file) throw new Error('Invalid server response');
 
-      const apiBaseUrl = new URL(API_URL).origin;
+      const apiBaseUrl = API_URL.startsWith('/') && typeof window !== 'undefined'
+        ? window.location.origin
+        : new URL(API_URL).origin;
       const fullUrl = `${apiBaseUrl}${uploadedData.file.url}`;
 
       setFormData((prev) => ({ ...prev, featured_image_url: fullUrl }));
@@ -90,7 +92,9 @@ export default function CreateNewsPage() {
 
       if (!uploadedData?.file) throw new Error('Invalid server response');
 
-      const apiBaseUrl = new URL(API_URL).origin;
+      const apiBaseUrl = API_URL.startsWith('/') && typeof window !== 'undefined'
+        ? window.location.origin
+        : new URL(API_URL).origin;
       const fullUrl = `${apiBaseUrl}${uploadedData.file.url}`;
 
       setFormData((prev) => ({
@@ -122,7 +126,9 @@ export default function CreateNewsPage() {
 
       if (!uploadedData?.file) throw new Error('Invalid server response');
 
-      const apiBaseUrl = new URL(API_URL).origin;
+      const apiBaseUrl = API_URL.startsWith('/') && typeof window !== 'undefined'
+        ? window.location.origin
+        : new URL(API_URL).origin;
       const fullUrl = `${apiBaseUrl}${uploadedData.file.url}`;
 
       setFormData((prev) => ({ ...prev, preview_image_url: fullUrl }));
