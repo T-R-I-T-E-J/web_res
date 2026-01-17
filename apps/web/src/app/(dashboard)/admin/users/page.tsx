@@ -68,7 +68,7 @@ const AdminUsersPage = () => {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       fetchUsers()
-    }, 500) // Debounce search
+    }, 800) // Debounce search
     return () => clearTimeout(timeoutId)
   }, [searchQuery, statusFilter, roleFilter])
 

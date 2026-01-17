@@ -12,7 +12,6 @@ const API_URL = '/api/v1'
 import { useDebounce } from '@/hooks/use-debounce'
 
 const LoginPage = () => {
-  console.log('LoginPage rendered, API_URL:', API_URL);
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -24,14 +23,9 @@ const LoginPage = () => {
     rememberMe: false,
   })
 
-  // Debounce email and password to prevent excessive updates if these were driving expensive side effects
-  const debouncedEmail = useDebounce(formData.email, 500)
-  const debouncedPassword = useDebounce(formData.password, 500)
+  // Form state
+  // No debouncing needed for local state updates
 
-  // Example effect to show debounced values are ready for validation/api checks
-  // useEffect(() => {
-  //   console.log('Debounced Login State:', { email: debouncedEmail, password: debouncedPassword })
-  // }, [debouncedEmail, debouncedPassword])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
@@ -99,22 +93,15 @@ const LoginPage = () => {
       // Redirect based on role
       const roles = user.roles || []
 
-      console.log('About to redirect with roles:', roles);
-
       // Determine redirect path
       let redirectPath = '/';
       if (roles.includes('admin')) {
-        console.log('Redirecting to /admin');
         redirectPath = '/admin';
       } else if (roles.includes('shooter')) {
-        console.log('Redirecting to /shooter');
         redirectPath = '/shooter';
-      } else {
-        console.log('Redirecting to /');
       }
 
       // Direct redirect - most reliable method
-      console.log('Executing redirect to:', redirectPath);
       window.location.href = redirectPath;
 
     } catch (err: any) {

@@ -11,7 +11,6 @@ export const SearchBar = () => {
 
   useEffect(() => {
     if (debouncedQuery) {
-      console.log('Search:', debouncedQuery)
       // TODO: Implement actual search API call here
     }
   }, [debouncedQuery])
