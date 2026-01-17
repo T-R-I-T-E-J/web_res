@@ -20,7 +20,7 @@ export default tseslint.config(
       sourceType: 'commonjs',
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['migrate-encrypt-users.js'],
+          allowDefaultProject: ['migrate-encrypt-users.js', 'scripts/*.js'],
         },
         tsconfigRootDir: import.meta.dirname,
       },

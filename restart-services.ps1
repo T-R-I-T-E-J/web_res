@@ -55,10 +55,10 @@ $envContent | Out-File -FilePath "apps\web\.env.local" -Encoding utf8
 
 Write-Host "Starting Backend (API) on Port 4000..."
 # Start API with PORT=4000
-$apiProcess = Start-Process -FilePath "powershell" -ArgumentList "-NoExit", "-Command", "cd apps/api; `$env:PORT='4000'; npm run start:dev" -WorkingDirectory $PSScriptRoot -PassThru -WindowStyle Normal
+Start-Process -FilePath "powershell" -ArgumentList "-NoExit", "-Command", "cd apps/api; `$env:PORT='4000'; npm run start:dev" -WorkingDirectory $PSScriptRoot -WindowStyle Normal
 
 Write-Host "Starting Frontend (Web)..."
-$webProcess = Start-Process -FilePath "powershell" -ArgumentList "-NoExit", "-Command", "cd apps/web; npm run dev" -WorkingDirectory $PSScriptRoot -PassThru -WindowStyle Normal
+Start-Process -FilePath "powershell" -ArgumentList "-NoExit", "-Command", "cd apps/web; npm run dev" -WorkingDirectory $PSScriptRoot -WindowStyle Normal
 
 Write-Host "Services started!" -ForegroundColor Green
 Write-Host "API: http://localhost:4000/api/v1/health"

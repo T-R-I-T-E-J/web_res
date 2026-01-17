@@ -8,7 +8,10 @@ type ExpressInstance = (req: IncomingMessage, res: ServerResponse) => void;
 
 let cachedServer: ExpressInstance;
 
-export default async function handler(req: IncomingMessage, res: ServerResponse) {
+export default async function handler(
+  req: IncomingMessage,
+  res: ServerResponse,
+) {
   if (!cachedServer) {
     const app = await NestFactory.create(AppModule);
     configureApp(app);
