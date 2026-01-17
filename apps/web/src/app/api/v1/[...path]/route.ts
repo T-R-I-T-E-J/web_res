@@ -54,7 +54,8 @@ async function proxyRequest(request: NextRequest, path: string[]) {
   // Get request body if present
   let body: BodyInit | null | undefined
   if (request.method !== 'GET' && request.method !== 'HEAD') {
-    body = request.body
+    // Read as ArrayBuffer to safely handle binary data (files) without needing stream configuration
+    body = await request.arrayBuffer()
   }
 
   // Forward headers (excluding host and connection)
@@ -70,8 +71,6 @@ async function proxyRequest(request: NextRequest, path: string[]) {
     method: request.method,
     headers,
     body,
-    // @ts-ignore - duplex is required for streaming bodies in Node environments but not yet in TS types
-    duplex: 'half', 
   })
 
 
