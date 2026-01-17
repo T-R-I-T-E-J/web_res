@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { DashboardHeader } from '@/components/dashboard'
 import { ArrowLeft, Loader2, Save, Plus, X, FileText } from 'lucide-react'
+import { useDebounce } from '@/hooks/use-debounce'
 
 export default function CreateNewsPage() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
@@ -25,13 +26,16 @@ export default function CreateNewsPage() {
     is_pinned: false
   })
 
+  const debouncedTitle = useDebounce(formData.title, 500)
+  const debouncedTags = useDebounce(formData.tags, 500)
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value, type } = e.target
     // Handle checkboxes
     const val = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
-    
+
     setFormData((prev) => ({
       ...prev,
       [name]: val,
@@ -56,10 +60,10 @@ export default function CreateNewsPage() {
       const uploadedData = responseJson.data;
 
       if (!uploadedData?.file) throw new Error('Invalid server response');
-      
+
       const apiBaseUrl = new URL(API_URL).origin;
       const fullUrl = `${apiBaseUrl}${uploadedData.file.url}`;
-      
+
       setFormData((prev) => ({ ...prev, featured_image_url: fullUrl }));
     } catch (error) {
       console.error(error);
@@ -85,12 +89,12 @@ export default function CreateNewsPage() {
       const uploadedData = responseJson.data;
 
       if (!uploadedData?.file) throw new Error('Invalid server response');
-      
+
       const apiBaseUrl = new URL(API_URL).origin;
       const fullUrl = `${apiBaseUrl}${uploadedData.file.url}`;
-      
-      setFormData((prev) => ({ 
-        ...prev, 
+
+      setFormData((prev) => ({
+        ...prev,
         documents: [...prev.documents, { url: fullUrl, name: file.name }]
       }));
     } catch (error) {
@@ -117,10 +121,10 @@ export default function CreateNewsPage() {
       const uploadedData = responseJson.data;
 
       if (!uploadedData?.file) throw new Error('Invalid server response');
-      
+
       const apiBaseUrl = new URL(API_URL).origin;
       const fullUrl = `${apiBaseUrl}${uploadedData.file.url}`;
-      
+
       setFormData((prev) => ({ ...prev, preview_image_url: fullUrl }));
     } catch (error) {
       console.error(error);
@@ -184,7 +188,7 @@ export default function CreateNewsPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="card space-y-6">
             <h3 className="section-title text-lg border-b pb-2">Article Details</h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-neutral-700">Title <span className="text-error">*</span></label>
@@ -238,7 +242,7 @@ export default function CreateNewsPage() {
                   placeholder="Article content (Markdown supported)"
                 />
               </div>
-              
+
               <div className="space-y-2 md:col-span-2">
                 <label className="text-sm font-medium text-neutral-700">Preview Image (Thumbnail)</label>
                 <div className="flex flex-col gap-3">
@@ -277,8 +281,8 @@ export default function CreateNewsPage() {
                   </p>
                 </div>
               </div>
-              
-              
+
+
               <div className="space-y-2 md:col-span-2">
                 <label className="text-sm font-medium text-neutral-700">Featured Image (Banner)</label>
                 <div className="flex flex-col gap-3">
@@ -318,54 +322,54 @@ export default function CreateNewsPage() {
                 </div>
               </div>
 
-               <div className="space-y-2 md:col-span-2">
+              <div className="space-y-2 md:col-span-2">
                 <label className="text-sm font-medium text-neutral-700">Related Documents</label>
                 <div className="space-y-3">
-                   {formData.documents.map((doc, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg border border-neutral-200">
-                         <div className="flex items-center gap-3 overflow-hidden">
-                            <div className="w-10 h-10 bg-white rounded-md flex items-center justify-center border border-neutral-200 flex-shrink-0">
-                               <FileText className="w-5 h-5 text-primary" />
-                            </div>
-                            <div className="min-w-0">
-                               <p className="font-medium text-sm truncate text-neutral-900">{doc.name}</p>
-                               <a href={doc.url} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline truncate block">
-                                  View / Download
-                               </a>
-                            </div>
-                         </div>
-                         <button
-                           type="button"
-                           onClick={() => removeDocument(index)}
-                           className="text-neutral-400 hover:text-error p-1"
-                         >
-                           <X className="w-4 h-4" />
-                         </button>
+                  {formData.documents.map((doc, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg border border-neutral-200">
+                      <div className="flex items-center gap-3 overflow-hidden">
+                        <div className="w-10 h-10 bg-white rounded-md flex items-center justify-center border border-neutral-200 flex-shrink-0">
+                          <FileText className="w-5 h-5 text-primary" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-medium text-sm truncate text-neutral-900">{doc.name}</p>
+                          <a href={doc.url} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline truncate block">
+                            View / Download
+                          </a>
+                        </div>
                       </div>
-                   ))}
-                   
-                   <div className="flex items-center gap-2">
-                      <label className="btn-secondary flex items-center gap-2 cursor-pointer">
-                        <Plus className="w-4 h-4" />
-                        <span>Upload Document</span>
-                         <input
-                           type="file"
-                           className="hidden"
-                           accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.csv"
-                           onChange={(e) => {
-                             handleDocumentUpload(e.target.files?.[0]);
-                             e.target.value = ''; // Reset input
-                           }}
-                         />
-                      </label>
-                   </div>
+                      <button
+                        type="button"
+                        onClick={() => removeDocument(index)}
+                        className="text-neutral-400 hover:text-error p-1"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+
+                  <div className="flex items-center gap-2">
+                    <label className="btn-secondary flex items-center gap-2 cursor-pointer">
+                      <Plus className="w-4 h-4" />
+                      <span>Upload Document</span>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.csv"
+                        onChange={(e) => {
+                          handleDocumentUpload(e.target.files?.[0]);
+                          e.target.value = ''; // Reset input
+                        }}
+                      />
+                    </label>
+                  </div>
                 </div>
                 <p className="text-xs text-neutral-500 mt-1">
-                   Attach relevant files like PDF results, docx reports, etc.
+                  Attach relevant files like PDF results, docx reports, etc.
                 </p>
               </div>
 
-               <div className="space-y-2">
+              <div className="space-y-2">
                 <label className="text-sm font-medium text-neutral-700">Tags</label>
                 <input
                   type="text"
@@ -379,8 +383,8 @@ export default function CreateNewsPage() {
             </div>
 
             <h3 className="section-title text-lg border-b pb-2 pt-4">Publishing Settings</h3>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 <div className="space-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
                 <label className="text-sm font-medium text-neutral-700">Status</label>
                 <select
                   name="status"
@@ -394,39 +398,39 @@ export default function CreateNewsPage() {
                   <option value="archived">Archived</option>
                 </select>
               </div>
-               <div className="flex flex-col gap-4 mt-6">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                        type="checkbox"
-                        name="is_featured"
-                        checked={formData.is_featured}
-                        onChange={handleChange}
-                        className="w-4 h-4 text-primary rounded border-neutral-300 focus:ring-primary"
-                    />
-                    <span className="text-sm font-medium text-neutral-700">Mark as Featured</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                        type="checkbox"
-                        name="is_pinned"
-                        checked={formData.is_pinned}
-                        onChange={handleChange}
-                        className="w-4 h-4 text-primary rounded border-neutral-300 focus:ring-primary"
-                    />
-                    <span className="text-sm font-medium text-neutral-700">Pin to Top</span>
-                  </label>
-               </div>
-             </div>
+              <div className="flex flex-col gap-4 mt-6">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="is_featured"
+                    checked={formData.is_featured}
+                    onChange={handleChange}
+                    className="w-4 h-4 text-primary rounded border-neutral-300 focus:ring-primary"
+                  />
+                  <span className="text-sm font-medium text-neutral-700">Mark as Featured</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="is_pinned"
+                    checked={formData.is_pinned}
+                    onChange={handleChange}
+                    className="w-4 h-4 text-primary rounded border-neutral-300 focus:ring-primary"
+                  />
+                  <span className="text-sm font-medium text-neutral-700">Pin to Top</span>
+                </label>
+              </div>
+            </div>
           </div>
 
           <div className="flex justify-end gap-3">
-             <Link href="/admin/news" className="btn-secondary">
-               Cancel
-             </Link>
-             <button type="submit" disabled={loading} className="btn-primary flex items-center gap-2">
-               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-               Create News
-             </button>
+            <Link href="/admin/news" className="btn-secondary">
+              Cancel
+            </Link>
+            <button type="submit" disabled={loading} className="btn-primary flex items-center gap-2">
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Create News
+            </button>
           </div>
         </form>
       </div>

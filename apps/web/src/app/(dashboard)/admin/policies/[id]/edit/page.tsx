@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { DashboardHeader } from '@/components/dashboard'
 import { ArrowLeft, Loader2, Upload as UploadIcon, Link as LinkIcon, FileText } from 'lucide-react'
 import clsx from 'clsx'
+import { useDebounce } from '@/hooks/use-debounce'
 
 export default function EditPolicyPage() {
   const router = useRouter()
@@ -17,7 +18,7 @@ export default function EditPolicyPage() {
   const [uploadType, setUploadType] = useState<'file' | 'url'>('file')
   const [file, setFile] = useState<File | null>(null)
   const [dataLoaded, setDataLoaded] = useState(false)
-  
+
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([])
 
   const [formData, setFormData] = useState({
@@ -29,15 +30,17 @@ export default function EditPolicyPage() {
     href: '',
     status: 'published',
   })
-  
+
+  const debouncedTitle = useDebounce(formData.title, 500)
+
   useEffect(() => {
     // Prevent re-running if data has already been loaded
     if (dataLoaded || !id) return
-    
+
     const init = async () => {
       setDataLoading(true)
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
-      
+
       try {
         // 1. Fetch Categories
         const catRes = await fetch(`${API_URL}/categories?page=policies`, { credentials: 'include' })
@@ -47,13 +50,13 @@ export default function EditPolicyPage() {
           const categoriesArray = Array.isArray(data) ? data : (data.data || [])
           setCategories(categoriesArray)
         }
-        
+
         // 2. Fetch Document
         const res = await fetch(`${API_URL}/downloads/${id}`, { credentials: 'include' })
         if (res.ok) {
           const response = await res.json()
           const data = response.data || response // Handle wrapped response
-          
+
           setFormData({
             title: data.title || '',
             description: data.description || '',
@@ -63,13 +66,13 @@ export default function EditPolicyPage() {
             href: data.href || '',
             status: data.isActive ? 'published' : 'draft',
           })
-          
+
           if (data.href && data.href.startsWith('http')) {
             setUploadType('url')
           } else {
             setUploadType('file')
           }
-          
+
           setDataLoaded(true)
         } else {
           alert("Failed to load document")
@@ -81,7 +84,7 @@ export default function EditPolicyPage() {
         setDataLoading(false)
       }
     }
-    
+
     init()
   }, [id, router, dataLoaded])
 
@@ -118,7 +121,7 @@ export default function EditPolicyPage() {
 
   const uploadDocument = async (apiUrl: string) => {
     if (!file) return null;
-    
+
     const uploadFormData = new FormData()
     uploadFormData.append('document', file)
 
@@ -129,40 +132,40 @@ export default function EditPolicyPage() {
     })
 
     if (!uploadRes.ok) throw new Error('File upload failed')
-    
+
     const uploadJson = await uploadRes.json()
     let filename: string | undefined = uploadJson.data?.file?.filename || uploadJson.file?.filename
-    
+
     if (!filename) throw new Error('Upload successful but filename missing')
     return `/uploads/documents/${filename}`;
   }
 
   const updateDownloadEntry = async (finalHref: string, apiUrl: string) => {
-      // payload
-      const payload = {
-        title: formData.title,
-        description: formData.description,
-        fileType: formData.fileType,
-        size: formData.size,
-        href: finalHref,
-        categoryId: formData.categoryId,
-        isActive: formData.status === 'published'
-      }
+    // payload
+    const payload = {
+      title: formData.title,
+      description: formData.description,
+      fileType: formData.fileType,
+      size: formData.size,
+      href: finalHref,
+      categoryId: formData.categoryId,
+      isActive: formData.status === 'published'
+    }
 
-      const res = await fetch(`${apiUrl}/downloads/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(payload)
-      })
+    const res = await fetch(`${apiUrl}/downloads/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(payload)
+    })
 
-      if (res.ok) {
-        alert('Document updated successfully!')
-        router.push('/admin/policies')
-      } else {
-        const error = await res.text()
-        alert(`Failed to update: ${error}`)
-      }
+    if (res.ok) {
+      alert('Document updated successfully!')
+      router.push('/admin/policies')
+    } else {
+      const error = await res.text()
+      alert(`Failed to update: ${error}`)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -190,11 +193,11 @@ export default function EditPolicyPage() {
   }
 
   if (dataLoading) {
-      return (
-          <div className="flex items-center justify-center min-h-[400px]">
-              <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          </div>
-      )
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    )
   }
 
   return (
@@ -215,7 +218,7 @@ export default function EditPolicyPage() {
 
         <div className="card">
           <form onSubmit={handleSubmit} className="space-y-6">
-            
+
             {/* Title */}
             <div>
               <label className="label" htmlFor="title">Document Title</label>
@@ -331,12 +334,12 @@ export default function EditPolicyPage() {
 
               {uploadType === 'file' ? (
                 <div>
-                   {formData.href && !file && !formData.href.startsWith('http') && (
-                        <div className="mb-2 text-sm text-neutral-600 flex items-center gap-2">
-                            <FileText className="w-4 h-4"/>
-                            Current File: {formData.href.split('/').pop()}
-                        </div>
-                   )}
+                  {formData.href && !file && !formData.href.startsWith('http') && (
+                    <div className="mb-2 text-sm text-neutral-600 flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      Current File: {formData.href.split('/').pop()}
+                    </div>
+                  )}
                   <input
                     type="file"
                     onChange={handleFileChange}
@@ -344,7 +347,7 @@ export default function EditPolicyPage() {
                     accept=".pdf,.doc,.docx,.xls,.xlsx"
                   />
                   <p className="text-xs text-neutral-500 mt-1">
-                     {file ? 'New file selected' : 'Leave empty to keep current file'} (Max 10MB)
+                    {file ? 'New file selected' : 'Leave empty to keep current file'} (Max 10MB)
                   </p>
                 </div>
               ) : (

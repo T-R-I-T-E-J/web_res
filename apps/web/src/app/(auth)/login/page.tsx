@@ -9,6 +9,8 @@ import { Mail, Lock, Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react'
 // Use Next.js proxy to ensure cookies are set on the same domain
 const API_URL = '/api/v1'
 
+import { useDebounce } from '@/hooks/use-debounce'
+
 const LoginPage = () => {
   console.log('LoginPage rendered, API_URL:', API_URL);
   const router = useRouter()
@@ -21,6 +23,15 @@ const LoginPage = () => {
     password: '',
     rememberMe: false,
   })
+
+  // Debounce email and password to prevent excessive updates if these were driving expensive side effects
+  const debouncedEmail = useDebounce(formData.email, 500)
+  const debouncedPassword = useDebounce(formData.password, 500)
+
+  // Example effect to show debounced values are ready for validation/api checks
+  // useEffect(() => {
+  //   console.log('Debounced Login State:', { email: debouncedEmail, password: debouncedPassword })
+  // }, [debouncedEmail, debouncedPassword])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
@@ -68,15 +79,15 @@ const LoginPage = () => {
 
       // Login Successful
       setSuccessMessage('Login successful! Redirecting...')
-      
+
       // Login Successful - Backend wraps response in { success, data }
       // Login Successful - Backend sets HttpOnly cookie
       const { user } = responseData.data || responseData
-      
+
       // DEBUG: Log user extraction
       console.log('Extracted user:', user);
       console.log('User roles:', user?.roles);
-      
+
       if (!user) {
         console.error('No user in response! Response structure:', responseData);
         throw new Error('Invalid response from server')
@@ -87,9 +98,9 @@ const LoginPage = () => {
 
       // Redirect based on role
       const roles = user.roles || []
-      
+
       console.log('About to redirect with roles:', roles);
-      
+
       // Determine redirect path
       let redirectPath = '/';
       if (roles.includes('admin')) {
@@ -101,7 +112,7 @@ const LoginPage = () => {
       } else {
         console.log('Redirecting to /');
       }
-      
+
       // Direct redirect - most reliable method
       console.log('Executing redirect to:', redirectPath);
       window.location.href = redirectPath;
@@ -110,7 +121,7 @@ const LoginPage = () => {
       console.error('Login error:', err)
       setError(err.message || 'An unexpected error occurred. Please try again.')
     } finally {
-      if(!successMessage) setIsLoading(false)
+      if (!successMessage) setIsLoading(false)
     }
   }
 
@@ -130,8 +141,8 @@ const LoginPage = () => {
         {/* Success Alert */}
         {successMessage && (
           <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 rounded-card flex items-start gap-3">
-             <AlertCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-             <p className="text-sm text-green-600 font-medium">{successMessage}</p>
+            <AlertCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-green-600 font-medium">{successMessage}</p>
           </div>
         )}
 
@@ -256,11 +267,11 @@ const LoginPage = () => {
           </Link>
         </p>
       </div>
-      
+
       {/* Demo Credentials Removed - Use real accounts */
-      /* <div className="mt-6 p-4 bg-neutral-100 rounded-card text-center text-sm">
-         ...
-      </div> */
+        /* <div className="mt-6 p-4 bg-neutral-100 rounded-card text-center text-sm">
+           ...
+        </div> */
       }
     </div>
   )

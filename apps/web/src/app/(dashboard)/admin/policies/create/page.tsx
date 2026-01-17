@@ -6,13 +6,14 @@ import Link from 'next/link'
 import { DashboardHeader } from '@/components/dashboard'
 import { ArrowLeft, Loader2, Upload as UploadIcon, Link as LinkIcon, FileText } from 'lucide-react'
 import clsx from 'clsx'
+import { useDebounce } from '@/hooks/use-debounce'
 
 export default function CreatePolicyPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [uploadType, setUploadType] = useState<'file' | 'url'>('file')
   const [file, setFile] = useState<File | null>(null)
-  
+
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([])
 
   const [formData, setFormData] = useState({
@@ -24,7 +25,9 @@ export default function CreatePolicyPage() {
     href: '',
     status: 'published',
   })
-  
+
+  const debouncedTitle = useDebounce(formData.title, 500)
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -51,7 +54,7 @@ export default function CreatePolicyPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0]
-      
+
       // Client-side size validation (10MB)
       const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
       if (selectedFile.size > MAX_SIZE_BYTES) {
@@ -63,7 +66,7 @@ export default function CreatePolicyPage() {
       }
 
       setFile(selectedFile)
-      
+
       // Auto-fill details
       const sizeInMB = (selectedFile.size / (1024 * 1024)).toFixed(2)
       setFormData(prev => ({
@@ -81,7 +84,7 @@ export default function CreatePolicyPage() {
 
   const uploadDocument = async (apiUrl: string) => {
     if (!file) return null;
-    
+
     const uploadFormData = new FormData()
     uploadFormData.append('document', file)
 
@@ -96,10 +99,10 @@ export default function CreatePolicyPage() {
     }
 
     const uploadJson = await uploadRes.json();
-    
+
     // Defensive validation of response shape
     if (typeof uploadJson !== 'object' || !uploadJson) {
-       throw new Error('Invalid response from upload server');
+      throw new Error('Invalid response from upload server');
     }
 
     // Check for direct URL or nested file object
@@ -112,41 +115,41 @@ export default function CreatePolicyPage() {
     }
 
     if (!filename) {
-       console.error('Unexpected upload response:', uploadJson);
-       throw new Error('Upload successful but filename missing in response');
+      console.error('Unexpected upload response:', uploadJson);
+      throw new Error('Upload successful but filename missing in response');
     }
 
     return `/uploads/documents/${filename}`;
   }
 
   const createDownloadEntry = async (finalHref: string, apiUrl: string) => {
-      const { status, ...rest } = formData
-      const payload = {
-        title: formData.title,
-        description: formData.description,
-        fileType: formData.fileType,
-        size: formData.size,
-        href: finalHref,
-        categoryId: formData.categoryId,
-        isActive: formData.status === 'published'
-      }
+    const { status, ...rest } = formData
+    const payload = {
+      title: formData.title,
+      description: formData.description,
+      fileType: formData.fileType,
+      size: formData.size,
+      href: finalHref,
+      categoryId: formData.categoryId,
+      isActive: formData.status === 'published'
+    }
 
-      const res = await fetch(`${apiUrl}/downloads`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Send cookies with request
-        body: JSON.stringify(payload)
-      })
+    const res = await fetch(`${apiUrl}/downloads`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Send cookies with request
+      body: JSON.stringify(payload)
+    })
 
-      if (res.ok) {
-        alert('Document added successfully!')
-        router.push('/admin/policies')
-      } else {
-        const error = await res.text()
-        alert(`Failed to create: ${error}`)
-      }
+    if (res.ok) {
+      alert('Document added successfully!')
+      router.push('/admin/policies')
+    } else {
+      const error = await res.text()
+      alert(`Failed to create: ${error}`)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -193,7 +196,7 @@ export default function CreatePolicyPage() {
 
         <div className="card">
           <form onSubmit={handleSubmit} className="space-y-6">
-            
+
             {/* Title */}
             <div>
               <label className="label" htmlFor="title">Document Title</label>

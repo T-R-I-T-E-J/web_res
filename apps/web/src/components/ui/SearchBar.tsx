@@ -2,14 +2,24 @@
 
 import { useState } from 'react'
 import { Search } from 'lucide-react'
+import { useDebounce } from '@/hooks/use-debounce'
+import { useEffect } from 'react'
 
 export const SearchBar = () => {
   const [query, setQuery] = useState('')
+  const debouncedQuery = useDebounce(query, 500)
+
+  useEffect(() => {
+    if (debouncedQuery) {
+      console.log('Search:', debouncedQuery)
+      // TODO: Implement actual search API call here
+    }
+  }, [debouncedQuery])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: Implement search functionality
-    // console.log('Search:', query)
+    // Immediate search on submit
+    console.log('Search submit:', query)
   }
 
   return (
