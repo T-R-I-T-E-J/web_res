@@ -11,30 +11,38 @@ export const dynamic = 'force-dynamic'
 
 const getResults = async () => {
   try {
-    // Dynamically determine the base URL
-    // In production (Vercel), use the deployment URL
-    // In development, use localhost
-    const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http'
-    const host = process.env.VERCEL_URL || process.env.NEXT_PUBLIC_SITE_URL?.replace(/^https?:\/\//, '') || 'localhost:3000'
-    const baseUrl = `${protocol}://${host}`
+    // Construct absolute URL for SSR
+    let baseUrl: string
     
-    console.log('Fetching results from:', `${baseUrl}/api/v1/results`)
+    if (process.env.VERCEL_URL) {
+      // Vercel provides VERCEL_URL without protocol
+      baseUrl = `https://${process.env.VERCEL_URL}`
+    } else if (process.env.NEXT_PUBLIC_SITE_URL) {
+      // Use explicitly set site URL
+      baseUrl = process.env.NEXT_PUBLIC_SITE_URL
+    } else {
+      // Development fallback
+      baseUrl = 'http://localhost:3000'
+    }
     
-    const res = await fetch(`${baseUrl}/api/v1/results`, {
+    const url = `${baseUrl}/api/v1/results`
+    console.log('[Results Page] Fetching from:', url)
+    
+    const res = await fetch(url, {
       cache: 'no-store',
     })
     
     if (!res.ok) {
-       console.error('Failed to fetch results:', res.status, res.statusText)
+       console.error('[Results Page] Fetch failed:', res.status, res.statusText)
        return []
     }
 
     const json = await res.json()
-    console.log('Results fetched:', json)
+    console.log('[Results Page] Results count:', Array.isArray(json.data) ? json.data.length : 0)
     const data = json.data || json
     return Array.isArray(data) ? data : []
   } catch (error) {
-    console.error('Error fetching results:', error)
+    console.error('[Results Page] Error fetching results:', error)
     return []
   }
 }
