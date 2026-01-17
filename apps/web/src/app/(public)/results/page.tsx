@@ -97,9 +97,13 @@ const ResultsPage = async () => {
           ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {results.map((file: any, i: number) => {
-              // Fix for legacy localhost:8080 URLs in dev environment
-              // This ensures existing records pointing to 8080 work with the local 4000 server
-              const fileUrl = file.url?.replace('http://localhost:8080', 'http://localhost:4000');
+              // Fix for localhost URLs in production
+              // Replace all localhost variations with production backend URL
+              const backendUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') || 'https://web-res.onrender.com';
+              const fileUrl = file.url
+                ?.replace('http://localhost:8080', backendUrl)
+                ?.replace('http://localhost:4000', backendUrl)
+                ?.replace('http://localhost:10000', backendUrl);
 
               return (
               <div key={i} className="card-hover group">
