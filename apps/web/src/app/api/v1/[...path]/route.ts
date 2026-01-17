@@ -53,7 +53,9 @@ async function proxyRequest(request: NextRequest, path: string[]) {
   
   // Get request body if present
   let body: BodyInit | null | undefined
-  if (request.method !== 'GET' && request.method !== 'HEAD') {
+  const contentLength = request.headers.get('content-length')
+  
+  if (request.method !== 'GET' && request.method !== 'HEAD' && contentLength && parseInt(contentLength) > 0) {
     // Read as ArrayBuffer to safely handle binary data (files) without needing stream configuration
     body = await request.arrayBuffer()
   }
