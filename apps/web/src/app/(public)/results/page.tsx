@@ -16,18 +16,28 @@ const ResultsPage = () => {
   useEffect(() => {
     const fetchResults = async () => {
       try {
+        console.log('[Results] Starting fetch...')
         setLoading(true)
         const response = await fetch('/api/v1/results', {
           cache: 'no-store',
         })
 
+        console.log('[Results] Response status:', response.status)
         if (!response.ok) {
           throw new Error(`Failed to fetch: ${response.status}`)
         }
 
         const json = await response.json()
+        console.log('[Results] Raw JSON:', json)
+        console.log('[Results] json.data:', json.data)
+        console.log('[Results] Is json.data array?', Array.isArray(json.data))
+        
         const data = json.data || json
+        console.log('[Results] Extracted data:', data)
+        console.log('[Results] Data length:', Array.isArray(data) ? data.length : 'not an array')
+        
         setResults(Array.isArray(data) ? data : [])
+        console.log('[Results] State updated')
       } catch (err) {
         console.error('[Results Page] Error:', err)
         setError(err instanceof Error ? err.message : 'Failed to load results')
@@ -38,6 +48,8 @@ const ResultsPage = () => {
 
     fetchResults()
   }, [])
+
+  console.log('[Results] Rendering with results:', results, 'length:', results.length, 'loading:', loading)
 
   return (
     <>
