@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import DOMPurify from 'isomorphic-dompurify'
 import { Calendar, ArrowLeft, Share2, Facebook, Twitter, Linkedin, FileText, Download } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
