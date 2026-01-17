@@ -11,11 +11,14 @@ export const dynamic = 'force-dynamic'
 
 const getResults = async () => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'}/results`, {
+    // Use absolute URL for server-side rendering
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    const res = await fetch(`${baseUrl}/api/v1/results`, {
       cache: 'no-store',
     })
     
     if (!res.ok) {
+       console.error('Failed to fetch results:', res.status, res.statusText)
        return []
     }
 
