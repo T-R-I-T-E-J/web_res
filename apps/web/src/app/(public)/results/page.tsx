@@ -12,18 +12,10 @@ export const dynamic = 'force-dynamic'
 const getResults = async () => {
   try {
     // Construct absolute URL for SSR
-    let baseUrl: string
-    
-    if (process.env.VERCEL_URL) {
-      // Vercel provides VERCEL_URL without protocol
-      baseUrl = `https://${process.env.VERCEL_URL}`
-    } else if (process.env.NEXT_PUBLIC_SITE_URL) {
-      // Use explicitly set site URL
-      baseUrl = process.env.NEXT_PUBLIC_SITE_URL
-    } else {
-      // Development fallback
-      baseUrl = 'http://localhost:3000'
-    }
+    // Vercel automatically provides VERCEL_URL during deployment
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
     
     const url = `${baseUrl}/api/v1/results`
     console.log('[Results Page] Fetching from:', url)
