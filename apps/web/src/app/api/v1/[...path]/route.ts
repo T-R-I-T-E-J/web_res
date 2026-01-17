@@ -52,9 +52,9 @@ async function proxyRequest(request: NextRequest, path: string[]) {
   const url = `${BACKEND_URL}/api/v1/${pathString}`
   
   // Get request body if present
-  let body: string | undefined
+  let body: BodyInit | null | undefined
   if (request.method !== 'GET' && request.method !== 'HEAD') {
-    body = await request.text()
+    body = request.body
   }
 
   // Forward headers (excluding host and connection)
@@ -70,6 +70,8 @@ async function proxyRequest(request: NextRequest, path: string[]) {
     method: request.method,
     headers,
     body,
+    // @ts-ignore - duplex is required for streaming bodies in Node environments but not yet in TS types
+    duplex: 'half', 
   })
 
 
