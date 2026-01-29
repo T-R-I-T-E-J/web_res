@@ -63,12 +63,25 @@ export default function CategoriesPage() {
         method: 'DELETE',
         credentials: 'include'
       })
+      
       if (res.ok) {
         setCategories(prev => prev.filter(c => c.id !== id))
+        alert('Category deleted successfully')
       } else {
-        alert('Failed to delete')
+        // Try to get the error message from the response
+        let errorMessage = 'Failed to delete'
+        try {
+          const errorData = await res.json()
+          errorMessage = errorData.message || errorMessage
+        } catch {
+          // If parsing fails, use default message
+        }
+        alert(errorMessage)
       }
-    } catch (e) { console.error(e) }
+    } catch (e) { 
+      console.error(e)
+      alert('An error occurred while deleting the category')
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

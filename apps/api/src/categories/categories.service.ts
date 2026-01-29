@@ -35,7 +35,24 @@ export class CategoriesService {
     return this.categoryRepository.update(id, updateCategoryDto);
   }
 
-  remove(id: string) {
-    return this.categoryRepository.delete(id);
+  async remove(id: string) {
+    try {
+      const result = await this.categoryRepository.delete(id);
+
+      if (result.affected === 0) {
+        throw new Error('Category not found');
+      }
+
+      return { success: true, message: 'Category deleted successfully' };
+    } catch (error) {
+      // Handle foreign key constraint violation
+      const dbError = error as { code?: string };
+      if (dbError.code === '23503') {
+        throw new Error(
+          'Cannot delete category because it is being used by one or more downloads. Please reassign or delete those downloads first.',
+        );
+      }
+      throw error;
+    }
   }
 }
