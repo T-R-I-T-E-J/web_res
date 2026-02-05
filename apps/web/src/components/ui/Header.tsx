@@ -31,6 +31,7 @@ const navItems: NavItem[] = [
       { label: 'Upcoming Events', href: '/events' },
     ],
   },
+  { label: 'Awards', href: '/awards' },
   { label: 'Results', href: '/results' },
   { label: 'Media', href: '/media' },
   { label: 'Policies', href: '/policies' },

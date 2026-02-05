@@ -261,6 +261,66 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* Awards Section Preview */}
+      <section className="section bg-white pb-2 md:pb-4 border-t border-neutral-100">
+        <div className="container-main">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+            <h2 className="section-title">Awards & Recognition</h2>
+            <Link
+              href="/awards"
+              className="group inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+            >
+              View All Awards
+              <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+             {/* Shooter of the Year */}
+             <div className="p-6 rounded-2xl bg-gradient-to-br from-amber-50 to-white border border-amber-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                   <svg className="w-24 h-24 text-amber-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> 
+                </div>
+                <h3 className="text-amber-600 font-bold uppercase tracking-wider text-sm mb-2">Shooter of the Year</h3>
+                <p className="font-heading text-2xl font-bold text-neutral-800 mb-1">Avani Lekhara</p>
+                <p className="text-neutral-500 text-sm mb-4">Rifle (SH1)</p>
+                <div className="flex items-center gap-2 text-sm text-neutral-600">
+                   <span className="w-2 h-2 rounded-full bg-success"></span>
+                   Outstanding Performance
+                </div>
+             </div>
+
+             {/* Rising Star */}
+             <div className="p-6 rounded-2xl bg-gradient-to-br from-blue-50 to-white border border-blue-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                   <svg className="w-24 h-24 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                </div>
+                <h3 className="text-blue-600 font-bold uppercase tracking-wider text-sm mb-2">Rising Star</h3>
+                <p className="font-heading text-2xl font-bold text-neutral-800 mb-1">Rudransh Khandelwal</p>
+                <p className="text-neutral-500 text-sm mb-4">Pistol (SH1)</p>
+                 <div className="flex items-center gap-2 text-sm text-neutral-600">
+                   <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                   Top Junior Performer
+                </div>
+             </div>
+
+             {/* Coach of the Year */}
+             <div className="p-6 rounded-2xl bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                   <svg className="w-24 h-24 text-emerald-500" fill="currentColor" viewBox="0 0 24 24"><path d="M9 11.75c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zm6 0c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-.29.02-.58.05-.86 2.36-1.05 4.23-2.98 5.21-5.37C11.07 8.33 14.05 10 17.42 10c.78 0 1.53-.09 2.25-.26.21 1.01.33 2.05.33 3.12 0 4.41-3.59 8-8 8z"/></svg>
+                </div>
+                <h3 className="text-emerald-600 font-bold uppercase tracking-wider text-sm mb-2">Coach of the Year</h3>
+                <p className="font-heading text-2xl font-bold text-neutral-800 mb-1">Chandra Shekhar</p>
+                <p className="text-neutral-500 text-sm mb-4">National Team</p>
+                 <div className="flex items-center gap-2 text-sm text-neutral-600">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                   Mentorship Excellence
+                </div>
+             </div>
+          </div>
+        </div>
+      </section>
+
       {/* Highlights & Achievements Gallery */}
        <section className="section bg-white pb-2 md:pb-4">
         <div className="container-main">
