@@ -15,6 +15,7 @@ import {
   CreateCategoryDto,
   UpdateCategoryDto,
 } from './dto/create-category.dto';
+import { GetCategoriesDto } from './dto/get-categories.dto';
 import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('categories')
@@ -28,8 +29,8 @@ export class CategoriesController {
 
   @Public()
   @Get()
-  findAll(@Query('page') page?: string) {
-    return this.categoriesService.findAll(page);
+  findAll(@Query() query: GetCategoriesDto) {
+    return this.categoriesService.findAll(query.page);
   }
 
   @Public()
