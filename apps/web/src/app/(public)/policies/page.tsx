@@ -33,7 +33,10 @@ export default function PoliciesPage() {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
         
         // 1. Fetch Categories
-        const catRes = await fetch(`${apiUrl}/categories?page=policies`, { credentials: 'include' })
+        const catRes = await fetch(`${apiUrl}/categories?page=policies`, { 
+          credentials: 'include',
+          cache: 'no-store'
+        })
         const catsData = await catRes.json()
         // Handle both wrapped ({data: []}) and unwrapped ([]) responses
         const categoriesArray = Array.isArray(catsData) ? catsData : (catsData.data || [])

@@ -32,7 +32,10 @@ export default function ClassificationPage() {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
         
         // 1. Fetch Categories for classification page
-        const catRes = await fetch(`${apiUrl}/categories?page=classification`, { credentials: 'include' })
+        const catRes = await fetch(`${apiUrl}/categories?page=classification`, { 
+          credentials: 'include',
+          cache: 'no-store'
+        })
         const catsData = await catRes.json()
         const categoriesArray = Array.isArray(catsData) ? catsData : (catsData.data || [])
         
