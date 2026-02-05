@@ -32,23 +32,24 @@ export default function PoliciesPage() {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
         
-        // 1. Fetch Categories
+        // 1. Fetch Categories for policies page
         const catRes = await fetch(`${apiUrl}/categories?page=policies`, { 
           credentials: 'include',
           cache: 'no-store'
         })
         const catsData = await catRes.json()
-        // Handle both wrapped ({data: []}) and unwrapped ([]) responses
         const categoriesArray = Array.isArray(catsData) ? catsData : (catsData.data || [])
         
-        // 2. Fetch All Downloads
-        const docRes = await fetch(`${apiUrl}/downloads`, { credentials: 'include' })
+        // 2. Fetch Policies Downloads only (not all downloads)
+        const docRes = await fetch(`${apiUrl}/downloads?page=policies`, { 
+          credentials: 'include',
+          cache: 'no-store'
+        })
         const docsData = await docRes.json()
-        // Handle both wrapped ({data: []}) and unwrapped ([]) responses
         const documentsArray = Array.isArray(docsData) ? docsData : (docsData.data || [])
 
-        console.log('Categories fetched:', categoriesArray)
-        console.log('Documents fetched:', documentsArray)
+        console.log('Policies Categories fetched:', categoriesArray)
+        console.log('Policies Documents fetched:', documentsArray)
 
         setCategories(categoriesArray)
         setDocuments(documentsArray)

@@ -31,17 +31,15 @@ const AdminPoliciesPage = () => {
   const fetchPolicies = async () => {
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
-      const res = await fetch(`${API_URL}/downloads`, {
-        credentials: 'include', // Send cookies with request
+      // ✅ Use page filter to fetch only policies documents
+      const res = await fetch(`${API_URL}/downloads?page=policies`, {
+        credentials: 'include',
       })
       if (res.ok) {
         const json = await res.json()
         const data = Array.isArray(json) ? json : (json.data || [])
-        // Filter OUT any classification related category
-        const policies = data.filter((item: PolicyItem) => 
-          !['classification', 'medical_classification', 'ipc_license', 'national_classification'].includes(item.category)
-        )
-        setItems(policies)
+        // No client-side filtering needed - backend filters by page
+        setItems(data)
       }
     } catch (error) {
       console.error('Failed to fetch policies:', error)

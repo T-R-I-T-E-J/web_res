@@ -39,8 +39,11 @@ export default function ClassificationPage() {
         const catsData = await catRes.json()
         const categoriesArray = Array.isArray(catsData) ? catsData : (catsData.data || [])
         
-        // 2. Fetch All Downloads
-        const docRes = await fetch(`${apiUrl}/downloads`, { credentials: 'include' })
+        // 2. Fetch Classification Downloads only (not all downloads)
+        const docRes = await fetch(`${apiUrl}/downloads?page=classification`, { 
+          credentials: 'include',
+          cache: 'no-store'
+        })
         const docsData = await docRes.json()
         const documentsArray = Array.isArray(docsData) ? docsData : (docsData.data || [])
 

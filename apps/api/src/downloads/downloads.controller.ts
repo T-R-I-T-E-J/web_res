@@ -32,7 +32,15 @@ export class DownloadsController {
 
   @Public()
   @Get()
-  findAll(@Query('category') category?: string) {
+  findAll(
+    @Query('category') category?: string,
+    @Query('page') page?: 'policies' | 'classification',
+  ) {
+    // If page filter is provided, use it (takes precedence)
+    if (page) {
+      return this.downloadsService.findByPage(page);
+    }
+    // Otherwise use legacy category filter
     return this.downloadsService.findAll(category);
   }
 

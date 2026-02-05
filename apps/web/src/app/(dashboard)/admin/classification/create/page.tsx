@@ -57,14 +57,27 @@ export default function CreateClassificationPage() {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0]
 
-      // Client-side size validation (10MB)
-      const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+      // ✅ Validate file type (only PDF, DOC, DOCX for classification)
+      const allowedTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ]
+      if (!allowedTypes.includes(selectedFile.type)) {
+        alert('Only PDF and DOC/DOCX files are allowed for classification documents')
+        e.target.value = ''
+        setFile(null)
+        return
+      }
+
+      // ✅ Client-side size validation (10MB)
+      const MAX_SIZE_BYTES = 10 * 1024 * 1024
       if (selectedFile.size > MAX_SIZE_BYTES) {
-        alert('File size exceeds 10MB limit. Please choose a smaller file.');
-        e.target.value = ''; // Clear input
-        setFile(null);
-        setFormData(prev => ({ ...prev, size: '', fileType: '' }));
-        return;
+        alert('File size exceeds 10MB limit. Please choose a smaller file.')
+        e.target.value = ''
+        setFile(null)
+        setFormData(prev => ({ ...prev, size: '', fileType: '' }))
+        return
       }
 
       setFile(selectedFile)

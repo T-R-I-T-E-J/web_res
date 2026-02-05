@@ -30,17 +30,15 @@ const AdminClassificationPage = () => {
   const fetchClassification = async () => {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'
-      const res = await fetch(`${baseUrl}/downloads`, {
-        credentials: 'include', // Use HttpOnly cookie
+      // ✅ Use page filter to fetch only classification documents
+      const res = await fetch(`${baseUrl}/downloads?page=classification`, {
+        credentials: 'include',
       })
       if (res.ok) {
         const json = await res.json()
         const data = Array.isArray(json) ? json : (json.data || [])
-        // Filter for any classification related category
-        const classItems = data.filter((item: ClassificationItem) => 
-          ['classification', 'medical_classification', 'ipc_license', 'national_classification'].includes(item.category)
-        )
-        setItems(classItems)
+        // No client-side filtering needed - backend filters by page
+        setItems(data)
       }
     } catch (error) {
       console.error('Failed to fetch classification:', error)

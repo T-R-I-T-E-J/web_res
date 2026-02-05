@@ -70,6 +70,28 @@ export class DownloadsService implements OnModuleInit {
     });
   }
 
+  async findByPage(page: 'policies' | 'classification'): Promise<Download[]> {
+    // Get categories for this page
+    const categories = await this.categoriesService.findAll(page);
+    const categoryIds = categories.map((c) => c.id);
+
+    if (categoryIds.length === 0) {
+      return [];
+    }
+
+    // Import In operator from typeorm
+    const { In } = await import('typeorm');
+
+    return this.downloadRepository.find({
+      where: {
+        categoryId: In(categoryIds),
+        isActive: true,
+      },
+      relations: ['categoryRel'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
   async findOne(id: string): Promise<Download> {
     const download = await this.downloadRepository.findOneBy({
       id,
