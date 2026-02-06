@@ -17,12 +17,26 @@ interface Result {
   fileSize: number
   uploadedAt: string
   url: string
+  categoryId?: string
+  category?: {
+    id: string
+    name: string
+    slug: string
+  }
+}
+
+interface Category {
+  id: string
+  name: string
+  slug: string
+  page: string
 }
 
 const AdminScoresPage = () => {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [results, setResults] = useState<Result[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
@@ -31,6 +45,7 @@ const AdminScoresPage = () => {
   const [title, setTitle] = useState('')
   const [year, setYear] = useState(new Date().getFullYear().toString())
   const [description, setDescription] = useState('')
+  const [categoryId, setCategoryId] = useState('')
   const [file, setFile] = useState<File | null>(null)
 
   // Fetch Results
@@ -49,8 +64,21 @@ const AdminScoresPage = () => {
     }
   }
 
+  // Fetch Categories
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'}/results/categories`)
+      if (!response.ok) throw new Error('Failed to fetch categories')
+      const data = await response.json()
+      setCategories(data || [])
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+    }
+  }
+
   useEffect(() => {
     fetchResults()
+    fetchCategories()
   }, [])
 
   // Handle Upload
@@ -75,6 +103,7 @@ const AdminScoresPage = () => {
       formData.append('title', title)
       formData.append('date', year)
       if (description) formData.append('description', description)
+      if (categoryId) formData.append('categoryId', categoryId)
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'}/results/upload`, {
         method: 'POST',
@@ -97,6 +126,7 @@ const AdminScoresPage = () => {
       setTitle('')
       setYear(new Date().getFullYear().toString())
       setDescription('')
+      setCategoryId('')
       setFile(null)
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
@@ -185,17 +215,36 @@ const AdminScoresPage = () => {
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-1">
-                Description (Optional)
-              </label>
-              <input
-                type="text"
-                value={description}
-                onChange={e => setDescription(e.target.value)}
-                className="input w-full"
-                placeholder="Brief description or category"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  Description (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={description}
+                  onChange={e => setDescription(e.target.value)}
+                  className="input w-full"
+                  placeholder="Brief description or category"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  Category (Optional)
+                </label>
+                <select
+                  value={categoryId}
+                  onChange={e => setCategoryId(e.target.value)}
+                  className="input w-full"
+                >
+                  <option value="">Select a category</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <div>

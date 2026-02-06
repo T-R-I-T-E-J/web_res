@@ -7,6 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Result } from '../entities/result.entity';
+import { Category } from '../../categories/entities/category.entity';
 import { StorageService } from './storage.service';
 import { UploadResultDto } from '../dto/upload-result.dto';
 import { ResultResponseDto } from '../dto/result-response.dto';
@@ -18,6 +19,8 @@ export class ResultsService {
   constructor(
     @InjectRepository(Result)
     private readonly resultRepository: Repository<Result>,
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Category>,
     private readonly storageService: StorageService,
   ) {}
 
@@ -39,6 +42,11 @@ export class ResultsService {
     // Validate file
     this.validateFile(file);
 
+    // [NEW] Validate category if provided
+    if (uploadDto.categoryId) {
+      await this.validateCategory(uploadDto.categoryId);
+    }
+
     try {
       // Upload file to storage
       const storageResult = await this.storageService.uploadFile(file);
@@ -54,6 +62,7 @@ export class ResultsService {
         mime_type: file.mimetype,
         url: storageResult.url,
         uploaded_by: userId,
+        categoryId: uploadDto.categoryId, // [NEW] Add category
         is_published: true,
       });
 
@@ -80,6 +89,7 @@ export class ResultsService {
     const results = await this.resultRepository.find({
       where: { is_published: true, is_deleted: false },
       order: { created_at: 'DESC' },
+      relations: ['category'], // [NEW] Include category relation
     });
 
     return results.map((result) => this.mapToResponseDto(result));
@@ -187,6 +197,30 @@ export class ResultsService {
    * @param result - Result entity
    * @returns Response DTO
    */
+  /**
+   * [NEW] Validate category exists and is for Results page
+   *
+   * @param categoryId - Category ID to validate
+   */
+  private async validateCategory(categoryId: string): Promise<void> {
+    const category = await this.categoryRepository.findOne({
+      where: { id: categoryId },
+    });
+
+    if (!category) {
+      throw new BadRequestException('Invalid category ID');
+    }
+
+    // [CRITICAL] Ensure category is for Results page only
+    if (category.page !== 'results') {
+      throw new BadRequestException(
+        `Selected category is not valid for Results. Category page type: ${category.page}`,
+      );
+    }
+
+    this.logger.log(`Category validation passed: ${category.name} (${categoryId})`);
+  }
+
   private mapToResponseDto(result: Result): ResultResponseDto {
     return {
       id: result.id,
@@ -197,6 +231,12 @@ export class ResultsService {
       storedFileName: result.stored_file_name,
       fileSize: Number(result.file_size),
       mimeType: result.mime_type,
+      categoryId: result.categoryId, // [NEW] Include category ID
+      category: result.category ? { // [NEW] Include category details
+        id: result.category.id,
+        name: result.category.name,
+        slug: result.category.slug,
+      } : undefined,
       url: result.url,
       uploadedAt: result.created_at,
       uploadedBy: result.uploaded_by.toString(),

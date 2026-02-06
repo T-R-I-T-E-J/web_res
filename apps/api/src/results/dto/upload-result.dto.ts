@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, MaxLength, IsUUID } from 'class-validator';
 
 /**
  * DTO for uploading a result PDF
@@ -31,4 +31,12 @@ export class UploadResultDto {
   @IsOptional()
   @MaxLength(500)
   description?: string;
+
+  /**
+   * [NEW] Optional category ID (e.g., National, International)
+   * Must be a category with page='results'
+   */
+  @IsUUID()
+  @IsOptional()
+  categoryId?: string;
 }

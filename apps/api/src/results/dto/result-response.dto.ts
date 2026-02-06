@@ -57,4 +57,18 @@ export class ResultResponseDto {
    * User who uploaded (admin)
    */
   uploadedBy: string;
+
+  /**
+   * [NEW] Category ID (if assigned)
+   */
+  categoryId?: string;
+
+  /**
+   * [NEW] Category details (if assigned)
+   */
+  category?: {
+    id: string;
+    name: string;
+    slug: string;
+  };
 }

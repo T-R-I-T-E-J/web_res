@@ -12,9 +12,12 @@ import {
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { ResultsService } from './services/results.service';
 import { UploadResultDto } from './dto/upload-result.dto';
 import { ResultResponseDto } from './dto/result-response.dto';
+import { Category } from '../categories/entities/category.entity';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Public } from '../auth/decorators/public.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -36,7 +39,11 @@ interface AuthenticatedUser {
  */
 @Controller('results')
 export class ResultsController {
-  constructor(private readonly resultsService: ResultsService) {}
+  constructor(
+    private readonly resultsService: ResultsService,
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Category>,
+  ) {}
 
   /**
    * Upload a new result PDF
@@ -104,6 +111,24 @@ export class ResultsController {
    * curl http://localhost:8080/api/v1/results
    * ```
    */
+  /**
+   * [NEW] Get categories for Results page
+   *
+   * GET /api/v1/results/categories
+   *
+   * Security: Public
+   *
+   * Returns categories where page='results'
+   */
+  @Get('categories')
+  @Public()
+  async getResultsCategories(): Promise<Category[]> {
+    return this.categoryRepository.find({
+      where: { page: 'results', isActive: true },
+      order: { order: 'ASC' },
+    });
+  }
+
   @Get()
   @Public() // Public access
   async findAll(): Promise<ResultResponseDto[]> {

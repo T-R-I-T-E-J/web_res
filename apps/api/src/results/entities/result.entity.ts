@@ -8,6 +8,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
+import { Category } from '../../categories/entities/category.entity';
 
 /**
  * Result Entity
@@ -82,6 +83,19 @@ export class Result {
   @ManyToOne(() => User, { eager: false })
   @JoinColumn({ name: 'uploaded_by' })
   uploader: User;
+
+  /**
+   * Category ID for result classification (e.g., National, International)
+   */
+  @Column({ name: 'category_id', type: 'uuid', nullable: true })
+  categoryId: string;
+
+  /**
+   * Relation to category
+   */
+  @ManyToOne(() => Category, { nullable: true })
+  @JoinColumn({ name: 'category_id' })
+  category: Category;
 
   /**
    * Whether this result is published (visible to public)
